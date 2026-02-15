@@ -61,6 +61,7 @@ export function useVoiceControl({ onCommand, onAIFallback, enabled = true }: Use
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const restartTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isProcessingRef = useRef(false);
+  const isStartingRef = useRef(false);
 
   // Minimal fallback commands that work without AI (emergencies only)
   const parseEmergencyCommand = useCallback((raw: string): VoiceCommand | null => {
@@ -154,6 +155,7 @@ export function useVoiceControl({ onCommand, onAIFallback, enabled = true }: Use
 
         recognition.onstart = () => {
           console.log('🎤 Speech recognition started - SPEAK NOW!');
+          isStartingRef.current = false; // Successfully started
           setFullTranscript('👂 Listening... say something!');
         };
 
@@ -204,34 +206,48 @@ export function useVoiceControl({ onCommand, onAIFallback, enabled = true }: Use
           console.error('❌ Speech recognition error:', e.error);
           if (e.error === 'not-allowed') {
             setFullTranscript('❌ MICROPHONE PERMISSION DENIED - Allow mic in browser settings!');
+            isStartingRef.current = false;
           } else if (e.error === 'no-speech') {
-            console.log('⚠️ No speech detected - keep talking');
-          } else if (e.error !== 'aborted') {
+            console.log('⚠️ No speech detected - continuing...');
+            // Don't reset isStartingRef - it's still running
+          } else if (e.error === 'aborted') {
+            console.log('⚠️ Recognition aborted - will restart if needed');
+            isStartingRef.current = false;
+          } else {
             console.warn('Speech recognition error:', e.error);
+            isStartingRef.current = false;
           }
         };
 
         recognition.onend = () => {
           console.log('🔄 Speech recognition ended');
-          // Restart after a short delay if still enabled
-          if (enabled && !isProcessingRef.current) {
+          isStartingRef.current = false;
+
+          // Restart after a short delay if still enabled and not already restarting
+          if (enabled && !isProcessingRef.current && !isStartingRef.current) {
             restartTimeoutRef.current = setTimeout(() => {
-              try {
-                recognitionRef.current?.start();
-                console.log('♻️ Restarted speech recognition');
-              } catch (err) {
-                console.error('Failed to restart:', err);
+              if (!isStartingRef.current && enabled) {
+                try {
+                  isStartingRef.current = true;
+                  recognitionRef.current?.start();
+                  console.log('♻️ Restarted speech recognition');
+                } catch (err) {
+                  console.error('Failed to restart:', err);
+                  isStartingRef.current = false;
+                }
               }
             }, 500); // Wait 500ms before restarting
           }
         };
 
         try {
+          isStartingRef.current = true;
           recognition.start();
           console.log('🚀 Starting speech recognition...');
         } catch (err) {
           console.error('❌ Failed to start speech recognition:', err);
           setSupported(false);
+          isStartingRef.current = false;
         }
       })
       .catch(err => {
@@ -246,6 +262,7 @@ export function useVoiceControl({ onCommand, onAIFallback, enabled = true }: Use
       recognitionRef.current?.abort();
       recognitionRef.current = null;
       isProcessingRef.current = false;
+      isStartingRef.current = false;
     };
   }, [enabled, processCommand]);
 
