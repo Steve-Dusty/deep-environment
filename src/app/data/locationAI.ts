@@ -72,6 +72,28 @@ ${linkList.join('\n')}`;
 export interface LocationQueryResult {
   problemId: string | null;
   answer: string;
+  generatePDF?: {
+    type: 'location-report' | 'knowledge-graph';
+  };
+}
+
+// Check if query is requesting PDF generation
+function isPDFRequest(query: string): { isPDF: boolean; type?: 'location-report' | 'knowledge-graph' } {
+  const lowerQuery = query.toLowerCase();
+  const pdfKeywords = ['generate pdf', 'create pdf', 'export pdf', 'download pdf', 'pdf report', 'pdf document'];
+  const isPDF = pdfKeywords.some(keyword => lowerQuery.includes(keyword));
+  
+  if (!isPDF) {
+    return { isPDF: false };
+  }
+
+  // Determine PDF type
+  if (lowerQuery.includes('knowledge graph') || lowerQuery.includes('graph pdf')) {
+    return { isPDF: true, type: 'knowledge-graph' };
+  }
+  
+  // Default to location report
+  return { isPDF: true, type: 'location-report' };
 }
 
 export async function queryLocationGraph(
@@ -79,6 +101,18 @@ export async function queryLocationGraph(
   locationId: string,
   graphData: LocationGraph,
 ): Promise<LocationQueryResult> {
+  // Check if this is a PDF generation request
+  const pdfCheck = isPDFRequest(query);
+  if (pdfCheck.isPDF) {
+    return {
+      problemId: null,
+      answer: `I'll generate a ${pdfCheck.type === 'knowledge-graph' ? 'knowledge graph' : 'location report'} PDF for you. Generating now...`,
+      generatePDF: {
+        type: pdfCheck.type || 'location-report',
+      },
+    };
+  }
+
   const graphContext = serializeLocationGraph(locationId, graphData);
   const location = locationSummaries.find((l) => l.id === locationId);
 
@@ -91,8 +125,12 @@ When the user asks a question:
 1. Identify the most relevant problem ID to navigate to (if any).
 2. Give a concise answer (2-3 sentences max) that is context-aware of the location.
 
+SPECIAL CAPABILITIES:
+- If the user requests a PDF (e.g., "generate pdf", "create pdf report", "export pdf"), you should respond with a JSON that includes "generatePDF": {"type": "location-report"} or "generatePDF": {"type": "knowledge-graph"}
+- Otherwise, respond normally
+
 IMPORTANT: Respond in this exact JSON format, nothing else:
-{"problemId": "the-problem-id-or-null", "answer": "Your brief answer here"}
+{"problemId": "the-problem-id-or-null", "answer": "Your brief answer here", "generatePDF": {"type": "location-report"} (only if PDF requested)}
 
 If no specific problem is relevant, set problemId to null.`;
 
@@ -100,6 +138,16 @@ If no specific problem is relevant, set problemId to null.`;
     const raw = await chatCompletion(systemPrompt, query, 300);
     const jsonStr = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     const parsed = JSON.parse(jsonStr);
+    
+    // Check if AI detected PDF request
+    if (parsed.generatePDF) {
+      return {
+        problemId: parsed.problemId || null,
+        answer: parsed.answer || 'Generating PDF...',
+        generatePDF: parsed.generatePDF,
+      };
+    }
+
     return {
       problemId: parsed.problemId || null,
       answer: parsed.answer || 'No answer generated.',

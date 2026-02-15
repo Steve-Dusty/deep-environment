@@ -69,6 +69,44 @@ export default function LocationDetailView({ locationId, onClose }: LocationDeta
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);
 
+  // ── Generate PDF handler ────────────────────────────────────────────────
+
+  const handleGeneratePDF = useCallback(async (type: 'location-report' | 'knowledge-graph') => {
+    try {
+      const response = await fetch('/api/generate-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type,
+          locationId,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to generate PDF');
+      }
+
+      // Get PDF blob and trigger download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${type}-${locationId}-${Date.now()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      return true;
+    } catch (error) {
+      console.error('PDF generation failed:', error);
+      throw error;
+    }
+  }, [locationId]);
+
   // ── AI query handler ─────────────────────────────────────────────────
 
   const handleChatSubmit = useCallback(async () => {
@@ -82,6 +120,22 @@ export default function LocationDetailView({ locationId, onClose }: LocationDeta
     try {
       const result = await queryLocationGraph(q, locationId, graphData);
       setChatMessages((prev) => [...prev, { role: 'ai', text: result.answer }]);
+
+      // Check if PDF generation was requested
+      if (result.generatePDF) {
+        try {
+          await handleGeneratePDF(result.generatePDF.type);
+          setChatMessages((prev) => [
+            ...prev,
+            { role: 'ai', text: 'PDF generated successfully! Your download should start shortly.' },
+          ]);
+        } catch (pdfError) {
+          setChatMessages((prev) => [
+            ...prev,
+            { role: 'ai', text: `PDF generation failed: ${pdfError instanceof Error ? pdfError.message : 'Unknown error'}` },
+          ]);
+        }
+      }
 
       // Navigate to the problem if AI found one
       if (result.problemId) {
@@ -99,7 +153,7 @@ export default function LocationDetailView({ locationId, onClose }: LocationDeta
     } finally {
       setChatLoading(false);
     }
-  }, [chatInput, chatLoading, locationId, graphData]);
+  }, [chatInput, chatLoading, locationId, graphData, handleGeneratePDF]);
 
   // ── Problem select → trigger AI analysis ────────────────────────────────
 

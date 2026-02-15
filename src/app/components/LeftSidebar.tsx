@@ -25,6 +25,7 @@ import {
   RefreshCw,
   ExternalLink,
 } from 'lucide-react';
+import GlobalChatbot from './GlobalChatbot';
 import {
   type PinReport,
   type ThreatLevel,
@@ -33,7 +34,7 @@ import {
   CATEGORY_COLORS,
 } from '../data/locations';
 
-export type NavView = 'feed' | 'odyssey' | 'slack' | null;
+export type NavView = 'feed' | 'odyssey' | 'slack' | 'chatbot' | null;
 
 interface SlackUpload {
   filename: string;
@@ -167,12 +168,20 @@ export default function LeftSidebar({
 
           <div className="w-6 h-px bg-[var(--color-border-subtle)] my-2" />
 
-          {/* placeholder nav */}
+          {/* AI Chatbot */}
           <button
-            className="w-9 h-9 rounded flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.03)]"
-            title="Agents"
+            onClick={() => onViewChange(activeView === 'chatbot' ? null : 'chatbot')}
+            className={`relative w-9 h-9 rounded flex items-center justify-center cursor-pointer transition-all duration-200 ${
+              activeView === 'chatbot'
+                ? 'bg-[rgba(15,245,196,0.1)] text-[var(--color-signal-teal)]'
+                : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[rgba(255,255,255,0.03)]'
+            }`}
+            title="AI Assistant"
           >
             <Bot size={18} />
+            {activeView === 'chatbot' && (
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-px w-[3px] h-4 rounded-r bg-[var(--color-signal-teal)]" />
+            )}
           </button>
           <button
             className="w-9 h-9 rounded flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.03)]"
@@ -540,6 +549,13 @@ export default function LeftSidebar({
                   </div>
                 </div>
               </>
+            )}
+
+            {/* ══════════ AI CHATBOT ══════════ */}
+            {activeView === 'chatbot' && (
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <GlobalChatbot onClose={() => onViewChange(null)} />
+              </div>
             )}
 
             {/* ══════════ ODYSSEY ══════════ */}
