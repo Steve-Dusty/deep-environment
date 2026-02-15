@@ -12,7 +12,8 @@ import { pinReports as staticPinReports, type PinReport, type ThreatLevel, CATEG
 import type { PDFViewData } from './components/ChatView';
 import { useVoiceControl, type VoiceCommand } from './voice/useVoiceControl';
 import { useTTS } from './voice/useTTS';
-import VoiceIndicator from './voice/VoiceIndicator';
+import VoiceControlPanel from './components/VoiceControlPanel';
+import VoiceTestInstructions from './components/VoiceTestInstructions';
 import ChatBox from './components/ChatBox';
 import { interpretVoiceCommand } from './data/ai';
 
@@ -203,6 +204,10 @@ export default function DashboardPage() {
   const [pdfViewData, setPdfViewData] = useState<PDFViewData | null>(null);
   const [slackPins, setSlackPins] = useState<PinReport[]>([]);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [lastCommand, setLastCommand] = useState<string>('');
+  const [lastAction, setLastAction] = useState<string>('');
+  const [lastResponse, setLastResponse] = useState<string>('');
+  const [isTestMode, setIsTestMode] = useState(true); // Enable test mode by default
 
   // Poll Slack uploads and convert to PinReports
   useEffect(() => {
@@ -233,7 +238,9 @@ export default function DashboardPage() {
 
   const handleVoiceCommand = useCallback((cmd: VoiceCommand) => {
     console.log('🎯 Processing command:', cmd);
+    setLastCommand(cmd.raw); // Track the command
     let response = '';
+    let actionTaken = '';
 
     // Add AI interpretation acknowledgment
     if (cmd.fromAI) {
@@ -242,11 +249,13 @@ export default function DashboardPage() {
 
     switch (cmd.action) {
       case 'error': {
+        actionTaken = 'Error handling';
         response = `Sorry, ${cmd.target || 'something went wrong'}. Please try again.`;
         break;
       }
 
       case 'stop': {
+        actionTaken = 'Voice control paused';
         response = 'Voice commands stopped. Say "Hey Deep" to resume.';
         break;
       }
@@ -264,8 +273,10 @@ export default function DashboardPage() {
             heatmap: 'threat overlay',
             weather: 'precipitation data',
           };
+          actionTaken = `${cmd.action === 'enable' ? 'Enabled' : 'Disabled'} ${friendlyNames[key] || key}`;
           response = `${cmd.action === 'enable' ? 'Enabling' : 'Disabling'} ${friendlyNames[key] || key}.`;
         } else {
+          actionTaken = 'Invalid overlay';
           response = `Unknown overlay: ${key}.`;
         }
         break;
@@ -273,17 +284,20 @@ export default function DashboardPage() {
 
       case 'enable-all':
         setToggles({ globe: true, terrain: true, satellite: true, heatmap: true, weather: true });
+        actionTaken = 'Enabled all overlays';
         response = 'Enabling all overlays. Globe, terrain, satellite, threat overlay, and precipitation.';
         break;
 
       case 'disable-all':
         setToggles({ globe: false, terrain: false, satellite: false, heatmap: false, weather: false });
+        actionTaken = 'Disabled all overlays';
         response = 'Disabling all overlays.';
         break;
 
       case 'view-graph':
       case 'show-graph':
         setShowGraph(true);
+        actionTaken = 'Switched to knowledge graph';
         response = 'Opening knowledge graph.';
         break;
 
@@ -292,6 +306,7 @@ export default function DashboardPage() {
         setShowGraph(false);
         setOdysseyPin(null);
         setSelectedPinId(null);
+        actionTaken = 'Switched to map view';
         response = 'Returning to map view.';
         break;
 
@@ -301,11 +316,14 @@ export default function DashboardPage() {
           const pin = allPins.find(p => p.id === selectedPinId);
           if (pin) {
             setOdysseyPin(pin);
+            actionTaken = `Entered Odyssey for ${pin.city}`;
             response = `Entering Odyssey world model for ${pin.city}.`;
           } else {
+            actionTaken = 'Location not found';
             response = 'Please select a location first.';
           }
         } else {
+          actionTaken = 'No location selected';
           response = 'Please select a location first to view in Odyssey.';
         }
         break;
@@ -328,8 +346,10 @@ export default function DashboardPage() {
           setSelectedPinId(match.id);
           setShowGraph(false);
           setOdysseyPin(null);
+          actionTaken = `Navigated to ${match.neighborhood}`;
           response = `Navigating to ${match.neighborhood}. ${match.title}.`;
         } else {
+          actionTaken = 'Location not found';
           response = `Location ${cmd.target} not found.`;
         }
         break;
@@ -348,8 +368,10 @@ export default function DashboardPage() {
         if (match) {
           setSelectedPinId(match.id);
           setOdysseyPin(match);
+          actionTaken = `Odyssey: ${match.city}`;
           response = `Entering Odyssey world model for ${match.city}. ${match.title}.`;
         } else {
+          actionTaken = 'Location not found';
           response = `Location ${cmd.target} not found.`;
         }
         break;
@@ -358,26 +380,31 @@ export default function DashboardPage() {
       case 'view-feed':
       case 'show-feed':
         setActiveView('feed');
+        actionTaken = 'Opened location feed';
         response = 'Opening location feed.';
         break;
 
       case 'show-slack':
         setActiveView('slack');
+        actionTaken = 'Opened Slack uploads';
         response = 'Opening Slack uploads.';
         break;
 
       case 'close-sidebar':
         setActiveView(null);
+        actionTaken = 'Closed sidebar';
         response = 'Closing sidebar.';
         break;
 
       case 'zoom-in':
         setZoom(prev => Math.min(prev + 1, 20));
+        actionTaken = 'Zoomed in';
         response = 'Zooming in.';
         break;
 
       case 'zoom-out':
         setZoom(prev => Math.max(prev - 1, 1));
+        actionTaken = 'Zoomed out';
         response = 'Zooming out.';
         break;
 
@@ -385,8 +412,10 @@ export default function DashboardPage() {
         const level = parseInt(cmd.target || '5', 10);
         if (level >= 1 && level <= 20) {
           setZoom(level);
+          actionTaken = `Set zoom to ${level}`;
           response = `Zoom set to level ${level}.`;
         } else {
+          actionTaken = 'Invalid zoom level';
           response = 'Zoom level must be between 1 and 20.';
         }
         break;
@@ -394,6 +423,7 @@ export default function DashboardPage() {
 
       case 'clear-selection':
         setSelectedPinId(null);
+        actionTaken = 'Cleared selection';
         response = 'Clearing selection.';
         break;
 
@@ -401,12 +431,14 @@ export default function DashboardPage() {
         const critical = allPins.filter(p => p.severity === 'critical').length;
         const high = allPins.filter(p => p.severity === 'high').length;
         const elevated = allPins.filter(p => p.severity === 'elevated').length;
+        actionTaken = 'Generated status report';
         response = `${allPins.length} active locations. ${critical} critical, ${high} high, ${elevated} elevated severity. ${totalAgents} agents online. System nominal.`;
         break;
       }
 
       case 'list-critical': {
         const critical = allPins.filter(p => p.severity === 'critical');
+        actionTaken = `Listed ${critical.length} critical threats`;
         if (critical.length === 0) {
           response = 'No critical threats detected.';
         } else {
@@ -418,6 +450,7 @@ export default function DashboardPage() {
 
       case 'list-high': {
         const high = allPins.filter(p => p.severity === 'high');
+        actionTaken = `Listed ${high.length} high severity threats`;
         if (high.length === 0) {
           response = 'No high severity threats detected.';
         } else {
@@ -430,6 +463,7 @@ export default function DashboardPage() {
       case 'list-category': {
         const cat = cmd.target || '';
         const matches = allPins.filter(p => p.category === cat);
+        actionTaken = `Filtered by ${cat} category`;
         if (matches.length === 0) {
           response = `No ${cat} threats detected.`;
         } else {
@@ -440,12 +474,14 @@ export default function DashboardPage() {
       }
 
       case 'list-agents': {
+        actionTaken = 'Listed active agents';
         response = `${totalAgents} agents active across ${allPins.length} locations. Average ${(totalAgents / allPins.length).toFixed(1)} agents per location.`;
         break;
       }
 
       case 'list-locations': {
         const cities = allPins.map(p => p.city).slice(0, 5).join(', ');
+        actionTaken = 'Listed locations';
         response = `${allPins.length} locations monitored. Including ${cities}, and more.`;
         break;
       }
@@ -453,24 +489,31 @@ export default function DashboardPage() {
       case 'list-all': {
         const states = new Set(allPins.map(p => p.state)).size;
         const categories = new Set(allPins.map(p => p.category)).size;
+        actionTaken = 'Listed all locations';
         response = `Monitoring ${allPins.length} locations across ${states} states. ${categories} threat categories active.`;
         break;
       }
 
       case 'help':
+        actionTaken = 'Showing help';
         response = 'Voice commands available. Map controls: enable satellite, enable terrain, enable precipitation, show threat overlay, globe view, zoom in, zoom out, reset view. Navigation: go to Miami, next location, previous location, select Houston. Views: show knowledge graph, show map, enter odyssey. Filters: show water threats, filter by critical, show all categories. Info: status report, list critical threats, describe Miami, list all agents. Sidebar: open feed, open slack, close sidebar.';
         break;
 
       default:
+        actionTaken = 'Unknown command';
         response = 'Command not recognized. Say help for a list of available commands.';
     }
+
+    // Update tracking states
+    if (actionTaken) setLastAction(actionTaken);
+    if (response) setLastResponse(response);
 
     console.log('🔊 Speaking response:', response);
     if (response) {
       voiceState.setState('speaking');
       speak(response).then(() => voiceState.setState('idle'));
     }
-  }, [speak, totalAgents, selectedPinId, allPins, setToggles, setShowGraph, setOdysseyPin, setSelectedPinId, setActiveView, setZoom]);
+  }, [speak, totalAgents, selectedPinId, allPins, setToggles, setShowGraph, setOdysseyPin, setSelectedPinId, setActiveView, setZoom, setLastAction, setLastResponse]);
 
   const handleAIFallback = useCallback(async (speech: string): Promise<VoiceCommand> => {
     console.log('🤖 AI fallback triggered for command:', speech);
@@ -625,15 +668,22 @@ export default function DashboardPage() {
               />
             </div>
             
+            {/* Voice Test Instructions */}
+            {isTestMode && <VoiceTestInstructions />}
+
             {/* Voice Control UI */}
             <div className="pointer-events-auto fixed bottom-12 right-4 z-50 flex flex-col items-end gap-3">
               <ChatBox onCommand={handleTextCommand} />
-              <VoiceIndicator
+              <VoiceControlPanel
                 state={voiceState.state}
                 enabled={voiceEnabled}
                 onToggle={() => setVoiceEnabled(v => !v)}
                 transcript={voiceState.transcript}
                 fullTranscript={voiceState.fullTranscript}
+                lastCommand={lastCommand}
+                lastAction={lastAction}
+                lastResponse={lastResponse}
+                isTestMode={isTestMode}
               />
             </div>
           </div>
