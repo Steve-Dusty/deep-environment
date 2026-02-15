@@ -3,6 +3,40 @@ import { locationSummaries, buildLocationGraph, PROBLEM_CATEGORY_LABELS } from '
 const OPENAI_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY as string;
 const API_URL = 'https://api.openai.com/v1/chat/completions';
 
+// ── Fetch live Slack upload data ────────────────────────────────────────────
+
+async function fetchSlackUploadsContext(): Promise<string> {
+  try {
+    const res = await fetch('/api/slack-uploads');
+    if (!res.ok) return '';
+    const uploads = await res.json();
+    if (!uploads || uploads.length === 0) return '';
+
+    const lines = ['LIVE FIELD REPORTS (uploaded via Slack):'];
+    for (const u of uploads) {
+      const dt = new Date(u.timestamp * 1000).toLocaleString();
+      const c = u.classification;
+      if (c) {
+        lines.push(
+          `- [${dt}] ${c.problem_name} at ${c.resolved_location || u.user_city || 'Unknown'} ` +
+          `(${c.latitude}, ${c.longitude}) | ${c.category} | severity: ${c.severity} | trend: ${c.trend} | ` +
+          `${c.problem_description} | indicators: ${(c.indicators || []).join(', ')} | ` +
+          `reported by: ${u.user} | location_id: ${c.location_id}`
+        );
+      } else {
+        lines.push(
+          `- [${dt}] ${u.original_name} uploaded by ${u.user}` +
+          (u.user_city ? ` from ${u.user_city}` : '') +
+          (u.ai_description ? ` — ${u.ai_description.slice(0, 200)}` : ' (pending classification)')
+        );
+      }
+    }
+    return '\n' + lines.join('\n');
+  } catch {
+    return '';
+  }
+}
+
 function serializeAllLocationGraphs(): string {
   const summaries = locationSummaries.map((loc) => {
     const graph = buildLocationGraph(loc.id);
@@ -67,18 +101,23 @@ export async function queryGlobalKnowledgeGraph(
   }
 
   const allGraphsContext = serializeAllLocationGraphs();
+  const slackContext = await fetchSlackUploadsContext();
 
   const systemPrompt = `You are an advanced environmental monitoring AI assistant for the Deep Environment system.
-You have access to ALL knowledge graphs across ALL locations in the system.
+You have access to ALL knowledge graphs across ALL locations in the system, plus live field reports uploaded via Slack.
 
 ${allGraphsContext}
+${slackContext}
 
 You can:
 - Answer questions about any location, problem, or relationship
+- Reference live field reports uploaded by users (including specific places like universities, parks, neighborhoods)
 - Compare problems across different locations
 - Identify patterns and correlations
 - Generate insights about environmental issues
 - Generate PDF reports for locations when the user asks for one
+
+When a user asks about a specific place (e.g. "SFSU", "Golden Gate Park"), check the live field reports first — they contain real data from that exact location.
 
 You have a tool called generate_pdf_report. Use it whenever the user wants a report, PDF, document, export, or anything they'd want to download/save. Decide the best matching location based on context.
 
@@ -146,6 +185,41 @@ Be helpful, concise, and technical. Use location names and problem IDs when rele
       answer: `Error querying AI: ${e instanceof Error ? e.message : 'Unknown error'}`,
     };
   }
+}
+
+// ── Poster Generation (Nano Banana Pro) ────────────────────────────────────
+
+export interface PosterCard {
+  id: string;
+  imageDataUrl: string;
+  text: string;
+  accentColor: string;
+}
+
+const POSTER_ACCENTS = ['#06b6d4', '#22c55e', '#a78bfa', '#f59e0b', '#3b82f6'];
+
+export async function generatePosterContent(topic: string): Promise<PosterCard[]> {
+  const res = await fetch('/api/generate-posters', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ topic }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+    throw new Error(err.error || `API error: ${res.status}`);
+  }
+
+  const data = await res.json();
+
+  return (data.posters || []).map(
+    (p: { imageData: string; mimeType: string; text: string; index: number }) => ({
+      id: `poster-${Date.now()}-${p.index}`,
+      imageDataUrl: `data:${p.mimeType};base64,${p.imageData}`,
+      text: p.text || '',
+      accentColor: POSTER_ACCENTS[p.index % POSTER_ACCENTS.length],
+    }),
+  );
 }
 
 export async function generateGlobalPDF(

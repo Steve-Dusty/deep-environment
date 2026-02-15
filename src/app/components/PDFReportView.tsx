@@ -238,7 +238,7 @@ export default function PDFReportView({
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span>PDFKit · OpenAI · GPT-4o-mini</span>
+          <span>PDFKit · Gemini · Gemini-2.0-flash</span>
           <span style={{ color: '#252838' }}>|</span>
           <span style={{ color: '#0ff5c4' }}>COMPLETE</span>
         </div>

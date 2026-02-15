@@ -27,7 +27,22 @@ export interface PinReport {
   impactStatement: string;
   agentsActive: number;
   correlatedWith: string[];
+  source?: 'static' | 'slack';
+  imageUrl?: string;
 }
+
+export const LOCATION_COORDS: Record<string, [number, number]> = {
+  'loc-sf':   [-122.3912, 37.7955],
+  'loc-la':   [-118.2850, 34.0901],
+  'loc-gulf': [-95.3562, 29.7580],
+  'loc-ever': [-80.8320, 25.8500],
+  'loc-pnw':  [-122.3380, 47.6130],
+  'loc-ny':   [-74.0060, 40.7128],
+  'loc-chi':  [-87.6298, 41.8781],
+  'loc-den':  [-104.9903, 39.7392],
+  'loc-phx':  [-112.0740, 33.4484],
+  'loc-atl':  [-84.3880, 33.7490],
+};
 
 export const THREAT_COLORS: Record<ThreatLevel, string> = {
   low: '#0ff5c4',
@@ -580,10 +595,11 @@ export const pinReports: PinReport[] = [
 
 // ===== GeoJSON helpers =====
 
-export function getPinReportsGeoJSON() {
+export function getPinReportsGeoJSON(pins?: PinReport[]) {
+  const data = pins ?? pinReports;
   return {
     type: 'FeatureCollection' as const,
-    features: pinReports.map((pin) => ({
+    features: data.map((pin) => ({
       type: 'Feature' as const,
       properties: {
         id: pin.id,
@@ -595,17 +611,24 @@ export function getPinReportsGeoJSON() {
         title: pin.title,
         user: pin.user,
         timestamp: pin.timestamp,
+        source: pin.source || 'static',
       },
       geometry: { type: 'Point' as const, coordinates: pin.coordinates },
     })),
   };
 }
 
-export function getHeatmapGeoJSON() {
+export function getHeatmapGeoJSON(pins?: PinReport[]) {
+  const data = pins ?? pinReports;
   const features: any[] = [];
   const sevWeight: Record<ThreatLevel, number> = { low: 0.2, moderate: 0.4, elevated: 0.6, high: 0.8, critical: 1.0 };
 
-  pinReports.forEach((pin) => {
+  function seededRandom(seed: number) {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  }
+
+  data.forEach((pin, pinIdx) => {
     const intensity = sevWeight[pin.severity];
     features.push({
       type: 'Feature',
@@ -613,11 +636,12 @@ export function getHeatmapGeoJSON() {
       geometry: { type: 'Point', coordinates: pin.coordinates },
     });
     for (let i = 0; i < 12; i++) {
-      const angle = (i / 12) * Math.PI * 2 + Math.random() * 0.3;
-      const dist = (0.3 + Math.random() * 1.2) * intensity;
+      const seed = pinIdx * 100 + i;
+      const angle = (i / 12) * Math.PI * 2 + seededRandom(seed) * 0.3;
+      const dist = (0.3 + seededRandom(seed + 1) * 1.2) * intensity;
       features.push({
         type: 'Feature',
-        properties: { intensity: intensity * (0.3 + Math.random() * 0.5) },
+        properties: { intensity: intensity * (0.3 + seededRandom(seed + 2) * 0.5) },
         geometry: {
           type: 'Point',
           coordinates: [
@@ -632,15 +656,16 @@ export function getHeatmapGeoJSON() {
   return { type: 'FeatureCollection' as const, features };
 }
 
-export function getConnectionLines() {
+export function getConnectionLines(pins?: PinReport[]) {
+  const data = pins ?? pinReports;
   const seen = new Set<string>();
-  const features = pinReports.flatMap((pin) =>
+  const features = data.flatMap((pin) =>
     pin.correlatedWith
       .map((targetId) => {
         const key = [pin.id, targetId].sort().join('-');
         if (seen.has(key)) return null;
         seen.add(key);
-        const target = pinReports.find((p) => p.id === targetId);
+        const target = data.find((p) => p.id === targetId);
         if (!target) return null;
         return {
           type: 'Feature' as const,

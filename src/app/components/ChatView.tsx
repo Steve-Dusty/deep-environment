@@ -177,7 +177,7 @@ export default function ChatView({ onClose, onOpenPDFView }: ChatViewProps) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={S.sub}>
-            MODEL <span style={{ color: '#0ff5c4' }}>GPT-4o-mini</span>
+            MODEL <span style={{ color: '#0ff5c4' }}>Gemini-2.0-flash</span>
           </span>
           <span style={S.sub}>
             MESSAGES <span style={{ color: '#8b8fa4' }}>{messages.length}</span>
@@ -380,7 +380,7 @@ export default function ChatView({ onClose, onOpenPDFView }: ChatViewProps) {
           <span>SESSION <span style={{ color: '#8b8fa4' }}>{fmt(elapsed)}</span></span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span>GPT-4o-mini · function calling · PDFKit</span>
+          <span>Gemini-2.0-flash · function calling · PDFKit</span>
           <span style={{ color: '#252838' }}>|</span>
           <span style={{ color: '#0ff5c4' }}>CONNECTED</span>
         </div>

@@ -24,6 +24,8 @@ import {
   ImageIcon,
   RefreshCw,
   ExternalLink,
+  Palette,
+  Loader2,
 } from 'lucide-react';
 import {
   type PinReport,
@@ -31,11 +33,26 @@ import {
   THREAT_COLORS,
   THREAT_LABELS,
   CATEGORY_COLORS,
+  LOCATION_COORDS,
 } from '../data/locations';
 import { getPinImage } from '../data/images';
+import { generatePosterContent, type PosterCard } from '../data/globalAI';
 // GlobalChatbot moved to full-page ChatView
 
-export type NavView = 'feed' | 'odyssey' | 'slack' | 'chat' | null;
+export type NavView = 'feed' | 'odyssey' | 'slack' | 'chat' | 'posters' | null;
+
+interface SlackClassification {
+  location_id: string;
+  latitude?: number;
+  longitude?: number;
+  resolved_location?: string;
+  category: string;
+  severity: string;
+  problem_name: string;
+  problem_description: string;
+  indicators: string[];
+  trend: string;
+}
 
 interface SlackUpload {
   filename: string;
@@ -44,6 +61,56 @@ interface SlackUpload {
   channel: string;
   timestamp: number;
   mimetype: string;
+  user_city?: string;
+  classification?: SlackClassification;
+}
+
+/** Build a PinReport from a Slack upload's classification data so Odyssey uses the real info. */
+function pinFromUpload(upload: SlackUpload): PinReport | null {
+  const c = upload.classification;
+  if (!c) return null;
+
+  // Resolve coordinates: use classification's lat/lon, fall back to LOCATION_COORDS
+  let lng = c.longitude;
+  let lat = c.latitude;
+  if (!lat || !lng) {
+    const fallback = LOCATION_COORDS[c.location_id];
+    if (!fallback) return null;
+    lng = fallback[0];
+    lat = fallback[1];
+  }
+  // Always add seeded jitter so Slack pins never overlap static pins or each other
+  // ±0.008 degrees ≈ ±0.9km — enough to visually separate without misplacing
+  const seed = upload.timestamp || 0;
+  lng += Math.sin(seed) * 0.008;
+  lat += Math.cos(seed) * 0.008;
+
+  const severityMap: Record<string, ThreatLevel> = { low: 'low', moderate: 'moderate', elevated: 'elevated', high: 'high', critical: 'critical' };
+  const categoryMap: Record<string, string> = {
+    pollution: 'Water', deforestation: 'Bio', runoff: 'Water', wildfire: 'Air',
+    litter: 'Soil', erosion: 'Soil', invasive: 'Bio', drought: 'Climate',
+    contamination: 'Water', other: 'Climate',
+  };
+  return {
+    id: `upload-${upload.timestamp}`,
+    coordinates: [lng, lat],
+    city: upload.user_city || c.resolved_location || 'Unknown',
+    neighborhood: c.resolved_location || upload.user_city || 'Field Report',
+    state: '',
+    user: upload.user,
+    timestamp: new Date(upload.timestamp * 1000).toISOString(),
+    title: c.problem_name,
+    summary: c.problem_description,
+    analysisDetails: c.indicators,
+    category: categoryMap[c.category] || 'Climate',
+    severity: severityMap[c.severity] || 'moderate',
+    confidence: 85,
+    metrics: [],
+    impactStatement: c.problem_description,
+    agentsActive: 3,
+    correlatedWith: [],
+    source: 'slack',
+  };
 }
 
 /* ── unique gradient "photo" per pin based on category + id hash ── */
@@ -110,6 +177,39 @@ export default function LeftSidebar({
   const categories = ['All', 'Water', 'Air', 'Soil', 'Bio', 'Climate'];
 
   // ── Slack uploads polling ──
+  // ── Poster state ──
+  const [posterTopic, setPosterTopic] = useState('');
+  const [posterLoading, setPosterLoading] = useState(false);
+  const [posterProgress, setPosterProgress] = useState(0);
+  const [posters, setPosters] = useState<PosterCard[]>([]);
+
+  const generatePosters = useCallback(async () => {
+    if (!posterTopic.trim() || posterLoading) return;
+    setPosterLoading(true);
+    setPosterProgress(0);
+    setPosters([]);
+
+    // Optimistic progress animation
+    const interval = setInterval(() => {
+      setPosterProgress((prev) => (prev >= 90 ? 90 : prev + Math.random() * 15));
+    }, 300);
+
+    try {
+      const results = await generatePosterContent(posterTopic.trim());
+      setPosterProgress(100);
+      setTimeout(() => setPosters(results), 200);
+    } catch (err) {
+      console.error('Poster generation failed:', err);
+    } finally {
+      clearInterval(interval);
+      setTimeout(() => {
+        setPosterLoading(false);
+        setPosterProgress(0);
+      }, 400);
+    }
+  }, [posterTopic, posterLoading]);
+
+  // ── Slack uploads polling ──
   const [slackUploads, setSlackUploads] = useState<SlackUpload[]>([]);
   const [slackLoading, setSlackLoading] = useState(false);
 
@@ -136,6 +236,7 @@ export default function LeftSidebar({
     { id: 'feed', icon: <Camera size={18} />, label: 'Feed', badge: pins.length },
     { id: 'slack', icon: <MessageSquare size={18} />, label: 'Slack', badge: slackUploads.length || undefined },
     { id: 'odyssey', icon: <Compass size={18} />, label: 'Odyssey' },
+    { id: 'posters', icon: <Palette size={18} />, label: 'Posters' },
   ];
 
   return (
@@ -259,10 +360,10 @@ export default function LeftSidebar({
                           className="relative w-full h-28 rounded overflow-hidden mb-2 bg-[var(--color-abyss)]"
                         >
                           {/* real image */}
-                          {getPinImage(pin.id) ? (
+                          {(pin.imageUrl || getPinImage(pin.id)) ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
-                              src={getPinImage(pin.id)!}
+                              src={pin.imageUrl || getPinImage(pin.id)!}
                               alt={pin.title}
                               className="absolute inset-0 w-full h-full object-cover"
                               loading="lazy"
@@ -499,7 +600,8 @@ export default function LeftSidebar({
                             {/* Enter Odyssey with this photo */}
                             <button
                               onClick={() => {
-                                const target = pins.find((p) => p.severity === 'critical') || pins[0];
+                                const uploadPin = pinFromUpload(upload);
+                                const target = uploadPin || pins.find((p) => p.severity === 'critical') || pins[0];
                                 if (target) {
                                   onEnterOdyssey?.(target, `/api/slack-uploads/image?f=${encodeURIComponent(upload.filename)}`);
                                 }
@@ -536,6 +638,135 @@ export default function LeftSidebar({
                     </div>
                     <span className="text-[8px] text-[var(--color-text-muted)]">
                       BOT ONLINE
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* ══════════ POSTERS ══════════ */}
+            {activeView === 'posters' && (
+              <>
+                {/* header */}
+                <div className="px-3 py-2.5 border-b border-[var(--color-border-subtle)]">
+                  <div className="flex items-center gap-1.5">
+                    <Palette size={10} className="text-[var(--color-signal-teal)]" />
+                    <span
+                      className="text-[10px] tracking-[0.15em] font-semibold"
+                      style={{ fontFamily: 'var(--font-sans)' }}
+                    >
+                      NANO BANANA PRO
+                    </span>
+                  </div>
+                  <span className="text-[8px] text-[var(--color-text-muted)] tracking-wider mt-0.5 block">
+                    EDUCATIONAL POSTER ENGINE
+                  </span>
+                </div>
+
+                {/* input area */}
+                <div className="px-3 py-2.5 border-b border-[var(--color-border-subtle)]">
+                  <div className="flex gap-1.5">
+                    <input
+                      type="text"
+                      value={posterTopic}
+                      onChange={(e) => setPosterTopic(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') generatePosters(); }}
+                      placeholder="Enter environmental topic..."
+                      className="flex-1 text-[9px] px-2 py-1.5 rounded bg-[var(--color-abyss)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] outline-none focus:border-[var(--color-signal-teal)] transition-colors"
+                    />
+                    <button
+                      onClick={generatePosters}
+                      disabled={posterLoading || !posterTopic.trim()}
+                      className="px-2.5 py-1.5 rounded text-[8px] tracking-wider font-semibold cursor-pointer transition-all hover:brightness-110 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(15,245,196,0.2), rgba(15,245,196,0.08))',
+                        border: '1px solid rgba(15,245,196,0.3)',
+                        color: 'var(--color-signal-teal)',
+                      }}
+                    >
+                      {posterLoading ? <Loader2 size={10} className="animate-spin" /> : 'GENERATE'}
+                    </button>
+                  </div>
+                  {posterLoading && (
+                    <div className="mt-2 h-1 rounded-full bg-[var(--color-abyss)] overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-300"
+                        style={{
+                          width: `${posterProgress}%`,
+                          background: 'linear-gradient(90deg, var(--color-signal-teal), #3b82f6)',
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* content */}
+                <div className="flex-1 overflow-y-auto">
+                  {posters.length === 0 && !posterLoading ? (
+                    <div className="px-3 py-8 text-center">
+                      <Palette size={24} className="text-[var(--color-text-muted)] mx-auto mb-2 opacity-40" />
+                      <p className="text-[9px] text-[var(--color-text-muted)] leading-relaxed">
+                        Enter an environmental topic to generate<br />
+                        educational poster cards.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="p-2.5 space-y-2.5">
+                      {posters.map((poster) => (
+                        <div
+                          key={poster.id}
+                          className="rounded overflow-hidden border border-[var(--color-border-subtle)] group"
+                        >
+                          {/* generated poster image */}
+                          <div className="relative w-full bg-[var(--color-abyss)]">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={poster.imageDataUrl}
+                              alt="Generated poster"
+                              className="w-full h-auto block"
+                              loading="lazy"
+                            />
+                            {/* scan sweep on hover */}
+                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 scan-sweep-bg" />
+                            {/* corners */}
+                            {[
+                              'top-1.5 left-1.5 border-t border-l',
+                              'top-1.5 right-1.5 border-t border-r',
+                              'bottom-1.5 left-1.5 border-b border-l',
+                              'bottom-1.5 right-1.5 border-b border-r',
+                            ].map((cls) => (
+                              <div
+                                key={cls}
+                                className={`absolute w-2.5 h-2.5 ${cls}`}
+                                style={{ borderColor: `${poster.accentColor}50` }}
+                              />
+                            ))}
+                          </div>
+                          {/* caption */}
+                          {poster.text && (
+                            <div className="px-3 py-2 bg-[var(--color-abyss)] border-t border-[var(--color-border-subtle)]">
+                              <p className="text-[8px] text-[var(--color-text-muted)] leading-relaxed line-clamp-2">
+                                {poster.text}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* footer */}
+                <div className="p-3 border-t border-[var(--color-border-subtle)]">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-signal-teal)] data-live" />
+                      <span className="text-[8px] text-[var(--color-text-muted)] tracking-wider">
+                        NANO BANANA PRO
+                      </span>
+                    </div>
+                    <span className="text-[8px] text-[var(--color-text-muted)]">
+                      Gemini 3 Pro Image
                     </span>
                   </div>
                 </div>
@@ -621,7 +852,7 @@ export default function LeftSidebar({
                 {/* description */}
                 <div className="px-3 py-3">
                   <p className="text-[9px] text-[var(--color-text-secondary)] leading-relaxed">
-                    Step into AI-predicted environmental futures. Odyssey uses multi-agent
+                    Step into AI-predicted environmental futures. Odyssey uses Gemini-powered multi-agent
                     world models to simulate and visualize change trajectories across
                     monitored locations.
                   </p>
