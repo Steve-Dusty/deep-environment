@@ -329,6 +329,25 @@ html, body {
   overflow: hidden;
 }
 
+/* Pin image popup */
+.pin-popup .mapboxgl-popup-content {
+  background: #0a0e14 !important;
+  padding: 0 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+  border-radius: 6px !important;
+  border: none !important;
+  overflow: hidden;
+}
+
+.pin-popup .mapboxgl-popup-tip {
+  border-top-color: #0a0e14 !important;
+  border-bottom-color: #0a0e14 !important;
+}
+
+.pin-popup .mapboxgl-popup-close-button {
+  display: none !important;
+}
+
 /* Upload pin popup */
 .upload-popup .mapboxgl-popup-content {
   background: transparent !important;

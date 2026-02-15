@@ -1,0 +1,551 @@
+{
+  "locations": [
+    {
+      "id": "pin-1",
+      "city": "San Francisco",
+      "neighborhood": "Mission Creek",
+      "state": "CA",
+      "coordinates": [-122.3912, 37.7955],
+      "title": "Algal Bloom in Harbor Zone",
+      "category": "Water",
+      "severity": "elevated",
+      "confidence": 87,
+      "summary": "Dense algal bloom detected spanning approximately 200m of Mission Creek canal. Water discoloration consistent with harmful cyanobacteria.",
+      "analysis": [
+        "Chlorophyll-a concentration estimated at 45 µg/L (threshold: 10 µg/L)",
+        "Water surface temperature anomaly of +3.2°C above seasonal baseline",
+        "Dissolved oxygen likely depressed in bloom zone",
+        "Potential microcystin toxin risk for local wildlife"
+      ],
+      "metrics": {
+        "Chlorophyll-a": "45 µg/L (elevated) — Bloom indicator 4.5x safe threshold",
+        "Water Temp": "68°F (moderate) — +3.2°F above 30-day average",
+        "Dissolved O₂": "3.2 mg/L (high) — Below minimum for aquatic life",
+        "Turbidity": "42 NTU (elevated) — Reduced visibility from bloom density"
+      },
+      "impact": "Bloom correlates with 48-hour warming trend and upstream nutrient loading from recent storm runoff. Similar blooms at 3 other Bay Area sites this week.",
+      "agents_active": 4,
+      "correlated_with": ["pin-2", "pin-14"],
+      "reporter": "sarah.chen",
+      "time": "2m ago"
+    },
+    {
+      "id": "pin-2",
+      "city": "San Francisco",
+      "neighborhood": "Ocean Beach",
+      "state": "CA",
+      "coordinates": [-122.4786, 37.7582],
+      "title": "Storm Drain Contamination",
+      "category": "Water",
+      "severity": "high",
+      "confidence": 92,
+      "summary": "Orange-brown discharge from storm drain outfall at south end of Ocean Beach. Industrial runoff characteristics with visible foam formation.",
+      "analysis": [
+        "Visible iron oxide coloration indicating metal-laden discharge",
+        "Foam formation suggests surfactant contamination",
+        "Discharge plume extending ~50m into surf zone",
+        "No posted advisory at beach access points"
+      ],
+      "metrics": {
+        "Heavy Metals": "78 idx (high) — Iron and copper above EPA recreation limits",
+        "pH Level": "5.2 (elevated) — Acidic runoff, normal ocean is 8.1",
+        "Surfactants": "0.8 mg/L (high) — Detergent-class compounds detected",
+        "E. coli": "640 MPN (elevated) — Above 320 MPN swim advisory threshold"
+      },
+      "impact": "Source traced to construction site 0.4mi upstream. Similar events increasing 23% year-over-year at Bay Area outfalls.",
+      "agents_active": 3,
+      "correlated_with": ["pin-1", "pin-4"],
+      "reporter": "mike.torres",
+      "time": "8m ago"
+    },
+    {
+      "id": "pin-3",
+      "city": "Los Angeles",
+      "neighborhood": "Griffith Park",
+      "state": "CA",
+      "coordinates": [-118.285, 34.0901],
+      "title": "Wildfire Smoke Plume",
+      "category": "Air",
+      "severity": "critical",
+      "confidence": 95,
+      "summary": "Heavy smoke plume from foothill region reducing visibility to 0.8 miles. AQI readings in hazardous range across Griffith Park area.",
+      "analysis": [
+        "PM2.5 at 285 µg/m³ (hazardous threshold: 250)",
+        "Visibility reduced to approximately 0.8 miles",
+        "Smoke composition consistent with chaparral combustion",
+        "Wind direction suggests plume will affect downtown by 6PM"
+      ],
+      "metrics": {
+        "PM2.5": "285 µg/m³ (critical) — Hazardous: 11x WHO daily limit",
+        "AQI": "342 (critical) — Emergency conditions, stay indoors",
+        "Visibility": "0.8 mi (critical) — Near-zero in smoke zone",
+        "CO": "12 ppm (elevated) — Carbon monoxide from incomplete combustion"
+      },
+      "impact": "Wildfire started 6 hours ago in Angeles National Forest. 200+ acres burned. Smoke advisory for 2.3M residents in LA basin.",
+      "agents_active": 6,
+      "correlated_with": ["pin-4", "pin-16"],
+      "reporter": "jenna.wu",
+      "time": "4m ago"
+    },
+    {
+      "id": "pin-4",
+      "city": "Long Beach",
+      "neighborhood": "Port of Long Beach",
+      "state": "CA",
+      "coordinates": [-118.192, 33.755],
+      "title": "Oil Sheen on Harbor Water",
+      "category": "Water",
+      "severity": "high",
+      "confidence": 89,
+      "summary": "Iridescent oil film covering ~400m² of harbor surface near container terminal. Hydrocarbon rainbow patterns clearly visible in photo.",
+      "analysis": [
+        "Oil film thickness estimated 1-5 µm based on color patterns",
+        "Rainbow sheen indicates petroleum-based hydrocarbon",
+        "Source appears to be bilge discharge or fuel transfer spill",
+        "No containment boom deployed at time of photo"
+      ],
+      "metrics": {
+        "Oil Coverage": "400 m² (high) — Growing from initial 50m² over 2 hours",
+        "Film Thickness": "3 µm (elevated) — Visible rainbow = petroleum source",
+        "Wind Speed": "4 mph (low) — Low wind causing sheen to concentrate",
+        "Dissolved HC": "15 mg/L (high) — Hydrocarbons above ambient levels"
+      },
+      "impact": "Third oil sheen at this terminal in 60 days. Coast Guard investigation pending. Migratory bird habitat 0.5mi south.",
+      "agents_active": 5,
+      "correlated_with": ["pin-2", "pin-3"],
+      "reporter": "omar.hassan",
+      "time": "11m ago"
+    },
+    {
+      "id": "pin-5",
+      "city": "Houston",
+      "neighborhood": "Texas City",
+      "state": "TX",
+      "coordinates": [-95.3562, 29.758],
+      "title": "Refinery Flare Event",
+      "category": "Air",
+      "severity": "critical",
+      "confidence": 94,
+      "summary": "Abnormally large flare at Texas City refinery complex. Black smoke indicates incomplete combustion. SO₂ odor detectable at 2-mile radius.",
+      "analysis": [
+        "Flare height estimated 40m, 3x normal operation",
+        "Black smoke particulates suggest equipment malfunction",
+        "SO₂ at fence line likely exceeding 75 ppb NAAQS",
+        "Flare event duration: 45+ minutes and ongoing"
+      ],
+      "metrics": {
+        "SO₂": "142 ppb (critical) — Nearly 2x EPA 1-hour standard",
+        "PM10": "195 µg/m³ (high) — Black particulate from incomplete burn",
+        "VOCs": "88 ppb (high) — Benzene and toluene detectable downwind",
+        "H₂S": "35 ppb (elevated) — Rotten egg odor at 2mi radius"
+      },
+      "impact": "3 schools within 5-mile downwind zone. 7th reportable flare event at this facility this year. Community health alert issued.",
+      "agents_active": 7,
+      "correlated_with": ["pin-6", "pin-15"],
+      "reporter": "tyler.james",
+      "time": "1m ago"
+    },
+    {
+      "id": "pin-6",
+      "city": "Galveston",
+      "neighborhood": "Galveston Bay",
+      "state": "TX",
+      "coordinates": [-94.8035, 29.3105],
+      "title": "Mass Fish Kill Event",
+      "category": "Water",
+      "severity": "critical",
+      "confidence": 91,
+      "summary": "~5,000 dead fish along 0.5-mile stretch of Galveston Bay. Multiple species affected. Dissolved oxygen at lethal levels.",
+      "analysis": [
+        "Dissolved oxygen at 1.2 mg/L (lethal below 2.0)",
+        "Water temperature 34°C, well above seasonal norm",
+        "No visible algal bloom — hypoxia from nutrient loading",
+        "Fish showing no external lesions, consistent with suffocation"
+      ],
+      "metrics": {
+        "Dissolved O₂": "1.2 mg/L (critical) — Fatal: below 2.0 minimum for fish",
+        "Water Temp": "93°F (critical) — +8°F above 10-year average",
+        "Nitrogen": "4.8 mg/L (high) — Eutrophic from upstream runoff",
+        "Species Affected": "5 (critical) — Multi-species die-off = systemic"
+      },
+      "impact": "Dead zone expanding. NOAA vessel dispatched. Coincides with record Gulf surface temps and spring fertilizer runoff.",
+      "agents_active": 5,
+      "correlated_with": ["pin-5", "pin-7"],
+      "reporter": "chris.doe",
+      "time": "14m ago"
+    },
+    {
+      "id": "pin-7",
+      "city": "Miami",
+      "neighborhood": "Everglades Entrance",
+      "state": "FL",
+      "coordinates": [-80.832, 25.85],
+      "title": "Invasive Python Nest",
+      "category": "Bio",
+      "severity": "critical",
+      "confidence": 98,
+      "summary": "Burmese python nest with 47 eggs in critical wading bird nesting area. Adult female (16ft) captured. Within core wood stork breeding habitat.",
+      "analysis": [
+        "Nest 200m from active wood stork colony",
+        "Egg count (47) indicates peak reproductive fitness",
+        "GPS data shows individual traveled 12mi in 30 days",
+        "Recent mammal predation evidence (raccoon remains) nearby"
+      ],
+      "metrics": {
+        "Nest Size": "47 eggs (critical) — Above-average = thriving population",
+        "Proximity": "200 m (critical) — Within endangered bird buffer zone",
+        "Pop. Density": "85/mi² (critical) — 4x management target",
+        "Native Mammal": "12% left (critical) — 88% decline since 2003"
+      },
+      "impact": "Python population estimated at 100K+. Native mammals declined 90%+ in invaded areas. This nest threatens last wood stork breeding colony in South FL.",
+      "agents_active": 6,
+      "correlated_with": ["pin-8", "pin-6"],
+      "reporter": "ana.rivera",
+      "time": "3m ago"
+    },
+    {
+      "id": "pin-8",
+      "city": "Miami",
+      "neighborhood": "Biscayne Bay",
+      "state": "FL",
+      "coordinates": [-80.134, 25.749],
+      "title": "Coral Bleaching Event",
+      "category": "Bio",
+      "severity": "critical",
+      "confidence": 96,
+      "summary": "Widespread coral bleaching across 2-acre patch reef at 15ft depth. 80% of staghorn and elkhorn coral showing white skeletal exposure.",
+      "analysis": [
+        "Reef temp: 31.8°C (bleaching threshold: 29.5°C)",
+        "Bleaching severity: 80% of colonies affected",
+        "Staghorn coral — federally threatened species",
+        "No disease signs; purely thermal stress bleaching"
+      ],
+      "metrics": {
+        "Sea Temp": "89°F (critical) — 4.1°F above bleaching threshold",
+        "Bleach Cover": "80% (critical) — 4 of 5 colonies fully bleached",
+        "Recovery": "22% (critical) — Low if temps stay elevated >2wk",
+        "ESA Species": "3 at risk (critical) — Staghorn, elkhorn, pillar coral"
+      },
+      "impact": "3rd consecutive year of bleaching at this reef. NOAA Alert Level 2 for all South Florida. Recovery unlikely without cooling in 14 days.",
+      "agents_active": 4,
+      "correlated_with": ["pin-7"],
+      "reporter": "james.wright",
+      "time": "9m ago"
+    },
+    {
+      "id": "pin-9",
+      "city": "Annapolis",
+      "neighborhood": "Kent Island",
+      "state": "MD",
+      "coordinates": [-76.089, 38.935],
+      "title": "Agricultural Nutrient Runoff",
+      "category": "Water",
+      "severity": "high",
+      "confidence": 88,
+      "summary": "Green-brown nutrient plume extending 1.2 miles from Eastern Shore agricultural drainage into Chesapeake Bay. Phosphate 4x baseline.",
+      "analysis": [
+        "Plume visible in satellite imagery spanning 1.2mi",
+        "Source: poultry farm drainage after 2-inch rainfall",
+        "Phosphate at 0.8 mg/L, 4x bay ambient",
+        "Nitrogen loading at 45 kg/day at this outfall"
+      ],
+      "metrics": {
+        "Phosphate": "0.8 mg/L (high) — 40x ambient — eutrophication driver",
+        "Nitrogen": "8.5 mg/L (high) — Agricultural fertilizer confirmed",
+        "Plume Size": "1.2 mi (elevated) — Expanding with outgoing tide",
+        "Sediment": "180 mg/L (elevated) — Topsoil erosion from unprotected fields"
+      },
+      "impact": "Chesapeake Bay receives 300M lbs of nitrogen annually. This drainage serves 12 poultry operations. Dead zone expanded 15% this summer.",
+      "agents_active": 3,
+      "correlated_with": ["pin-10", "pin-13"],
+      "reporter": "maria.santos",
+      "time": "5m ago"
+    },
+    {
+      "id": "pin-10",
+      "city": "Detroit",
+      "neighborhood": "Belle Isle",
+      "state": "MI",
+      "coordinates": [-83.65, 42.342],
+      "title": "Microplastic Contamination",
+      "category": "Water",
+      "severity": "elevated",
+      "confidence": 83,
+      "summary": "Water samples from Detroit River near Belle Isle show microplastic at 12,400 particles/m³ — 6x the Great Lakes average.",
+      "analysis": [
+        "Dominant types: polyethylene (45%), polypropylene (32%)",
+        "Size range: 100µm-2mm (microplastic classification)",
+        "Sources: tire wear, textile fibers, packaging",
+        "Biofilm on particles = potential pathogen vector"
+      ],
+      "metrics": {
+        "Microplastic": "12,400/m³ (elevated) — 6x Great Lakes regional average",
+        "Particle Size": "350 µm (moderate) — Ingestible by filter feeders",
+        "Biofilm": "68% (elevated) — Bacteria colonizing 68% of particles",
+        "Flow Rate": "188,000 cfs (low) — Normal flow dispersing contaminants"
+      },
+      "impact": "Great Lakes hold 22M tons of plastic. Detroit River is a major transport corridor to Lake Erie. Microplastics found in 83% of regional tap water.",
+      "agents_active": 3,
+      "correlated_with": ["pin-9", "pin-14"],
+      "reporter": "emma.clark",
+      "time": "16m ago"
+    },
+    {
+      "id": "pin-11",
+      "city": "Seattle",
+      "neighborhood": "Puget Sound",
+      "state": "WA",
+      "coordinates": [-122.338, 47.613],
+      "title": "Old-Growth Logging Encroachment",
+      "category": "Bio",
+      "severity": "moderate",
+      "confidence": 90,
+      "summary": "Fresh clear-cut 150m from designated old-growth preserve. ~8 acres of 150-300yr Douglas fir removed in violation of buffer zone.",
+      "analysis": [
+        "Cut boundary violates 500m buffer zone requirement",
+        "Trees estimated 150-300 years old from stump rings",
+        "Northern spotted owl habitat in adjacent preserve",
+        "Heavy equipment soil disturbance visible"
+      ],
+      "metrics": {
+        "Buffer Violation": "350 m (moderate) — 350m inside required buffer zone",
+        "Area Cleared": "8 acres (moderate) — ~200 mature trees removed",
+        "Tree Age": "225 years (elevated) — Irreplaceable old-growth",
+        "ESA Species": "3 at risk (moderate) — Spotted owl, murrelet, salmon"
+      },
+      "impact": "Less than 10% of original PNW old-growth remains. This cut disrupts a wildlife corridor connecting two protected areas.",
+      "agents_active": 2,
+      "correlated_with": ["pin-16"],
+      "reporter": "noah.park",
+      "time": "31m ago"
+    },
+    {
+      "id": "pin-12",
+      "city": "Estes Park",
+      "neighborhood": "Rocky Mountain NP",
+      "state": "CO",
+      "coordinates": [-105.78, 40.377],
+      "title": "Below-Average Snowpack",
+      "category": "Climate",
+      "severity": "moderate",
+      "confidence": 86,
+      "summary": "Snowpack at 11,500ft measuring 62% of 30-year median. Early melt exposing alpine meadow at unprecedented rates for February.",
+      "analysis": [
+        "Snow depth: 38\" vs. 61\" median (62%)",
+        "Snow water equivalent: 14.2\" vs. 22.8\" median",
+        "Melt rate 3x faster than historical average",
+        "Downstream reservoirs already 8% below target"
+      ],
+      "metrics": {
+        "Snowpack": "62% median (moderate) — 38% below normal for this date",
+        "SWE": "14.2 in (moderate) — Snow water equiv drives spring runoff",
+        "Melt Rate": "3x norm (elevated) — Above-average temps accelerating melt",
+        "Reservoir": "72% (moderate) — Below target for irrigation season"
+      },
+      "impact": "Colorado River serves 40M people. Low snowpack correlates with 60% increased summer wildfire risk. Water curtailment likely.",
+      "agents_active": 2,
+      "correlated_with": ["pin-16"],
+      "reporter": "zoe.miller",
+      "time": "45m ago"
+    },
+    {
+      "id": "pin-13",
+      "city": "New York City",
+      "neighborhood": "Gowanus Canal",
+      "state": "NY",
+      "coordinates": [-73.9857, 40.6782],
+      "title": "Combined Sewer Overflow",
+      "category": "Water",
+      "severity": "high",
+      "confidence": 93,
+      "summary": "Raw sewage overflow at Gowanus Canal outfall after 1.5-inch rain event. Brown turbid water with visible debris and sewage odor.",
+      "analysis": [
+        "CSO discharge duration: 4+ hours after rain stopped",
+        "Estimated 30M gallons untreated sewage + stormwater",
+        "E. coli: >24,000 MPN/100mL (beach standard: 235)",
+        "Gowanus is an active Superfund site"
+      ],
+      "metrics": {
+        "E. coli": "24,000 MPN (critical) — 102x safe swimming standard",
+        "CSO Volume": "30M gal (high) — Raw sewage + stormwater mix",
+        "Duration": "4 hours (elevated) — Continues after rain stops",
+        "DO": "2.1 mg/L (high) — Anoxic from organic loading"
+      },
+      "impact": "NYC has 460 CSO outfalls. Gowanus is an EPA Superfund site. CSO events negate $1.5B ongoing remediation.",
+      "agents_active": 4,
+      "correlated_with": ["pin-10", "pin-9"],
+      "reporter": "dev.patel",
+      "time": "15m ago"
+    },
+    {
+      "id": "pin-14",
+      "city": "Chicago",
+      "neighborhood": "Montrose Beach",
+      "state": "IL",
+      "coordinates": [-87.6298, 41.896],
+      "title": "Lake Michigan Algae Bloom",
+      "category": "Water",
+      "severity": "elevated",
+      "confidence": 81,
+      "summary": "Green algae mat along 0.3-mile stretch of Montrose Beach shoreline. Distinct musty odor. No advisory posted.",
+      "analysis": [
+        "Cladophora algae 2-6 inches thick accumulation",
+        "Decomposing algae creating hydrogen sulfide odor",
+        "No confirmed blue-green cyanobacteria yet",
+        "Growth linked to quagga mussel water clarity changes"
+      ],
+      "metrics": {
+        "Coverage": "0.3 mi (elevated) — Growing daily with onshore winds",
+        "Algae Depth": "4 in (moderate) — Accumulating faster than decomposing",
+        "H₂S": "22 ppb (moderate) — Odor from decomposition",
+        "Beach Score": "35 idx (elevated) — Below advisory threshold"
+      },
+      "impact": "Lake Michigan Cladophora up 5x since quagga mussel invasion. Mussels filter water, increase light, fuel algae — an invasive species cascade.",
+      "agents_active": 3,
+      "correlated_with": ["pin-10", "pin-1"],
+      "reporter": "alex.kim",
+      "time": "23m ago"
+    },
+    {
+      "id": "pin-15",
+      "city": "New Orleans",
+      "neighborhood": "Plaquemines Parish",
+      "state": "LA",
+      "coordinates": [-89.934, 29.9465],
+      "title": "Accelerating Coastal Erosion",
+      "category": "Soil",
+      "severity": "critical",
+      "confidence": 92,
+      "summary": "Comparison photos show 18m of shoreline retreat in 6 months. Infrastructure now at water edge. Barrier island near breakthrough.",
+      "analysis": [
+        "Land loss rate: 3m/month, 2x historical average",
+        "Barrier island width reduced to <100m at narrowest",
+        "Saltwater intrusion advancing into freshwater marsh",
+        "Hurricane season vulnerability significantly increased"
+      ],
+      "metrics": {
+        "Land Loss": "18 m/6mo (critical) — 2x historical erosion rate",
+        "Island Width": "95 m (critical) — Near breakthrough to open water",
+        "Saltwater Intrusion": "3.2 mi (high) — Killing freshwater marsh",
+        "Elevation": "1.2 ft ASL (critical) — Below storm surge threshold"
+      },
+      "impact": "Louisiana loses a football field of land every 100 minutes. This island protects $2.8B infrastructure and 12K residents. Breakthrough expected in 18 months.",
+      "agents_active": 5,
+      "correlated_with": ["pin-5", "pin-6"],
+      "reporter": "lisa.tran",
+      "time": "7m ago"
+    },
+    {
+      "id": "pin-16",
+      "city": "Portland",
+      "neighborhood": "Downtown",
+      "state": "OR",
+      "coordinates": [-122.675, 45.5152],
+      "title": "Transboundary Smoke Drift",
+      "category": "Air",
+      "severity": "elevated",
+      "confidence": 87,
+      "summary": "BC wildfire smoke creating persistent haze over Portland metro. AQI fluctuating Unhealthy to Very Unhealthy for 36 hours.",
+      "analysis": [
+        "Source: 3 large fires in BC, ~600 miles north",
+        "Temperature inversion trapping smoke at surface",
+        "PM2.5 oscillating 85-165 µg/m³ over 24 hours",
+        "Entirely transboundary — no local fire source"
+      ],
+      "metrics": {
+        "PM2.5": "124 µg/m³ (high) — Very Unhealthy for all groups",
+        "AQI": "186 (high) — Outdoor activity discouraged",
+        "Visibility": "2.5 mi (elevated) — Haze layer 0-3000ft altitude",
+        "Duration": "36 hrs (elevated) — Inversion preventing clearing"
+      },
+      "impact": "PNW smoke seasons have doubled since 2000. Transboundary smoke affects 4.2M people with no fire management options.",
+      "agents_active": 3,
+      "correlated_with": ["pin-3", "pin-11", "pin-12"],
+      "reporter": "rachel.ng",
+      "time": "19m ago"
+    },
+    {
+      "id": "pin-17",
+      "city": "Atlanta",
+      "neighborhood": "Midtown",
+      "state": "GA",
+      "coordinates": [-84.388, 33.767],
+      "title": "Urban Heat Island Extreme",
+      "category": "Climate",
+      "severity": "high",
+      "confidence": 85,
+      "summary": "Surface temp mapping shows Midtown pavement at 147°F — 23°F above tree-canopy neighborhoods 2 miles away. Heat index 118°F.",
+      "analysis": [
+        "Asphalt surface: 147°F vs. 124°F in canopy areas",
+        "Ambient air: 104°F (heat index 118°F)",
+        "Zero shade on 6-block commercial corridor",
+        "HVAC exhaust adding to urban heat canyon effect"
+      ],
+      "metrics": {
+        "Surface Temp": "147°F (critical) — Burns in <1 sec contact",
+        "Heat Index": "118°F (critical) — Extreme danger for outdoor workers",
+        "UHI Delta": "23°F (high) — Urban vs. suburban temp gap",
+        "Tree Canopy": "8% (critical) — vs. 45% metro Atlanta average"
+      },
+      "impact": "Urban heat islands cause 1,300+ excess US deaths annually. Atlanta lost 15% tree canopy since 2008. Low-income areas 5-8°F hotter.",
+      "agents_active": 3,
+      "correlated_with": ["pin-5"],
+      "reporter": "carlos.silva",
+      "time": "28m ago"
+    },
+    {
+      "id": "pin-18",
+      "city": "Washington DC",
+      "neighborhood": "Georgetown",
+      "state": "DC",
+      "coordinates": [-77.0369, 38.8977],
+      "title": "Potomac Sediment Plume",
+      "category": "Water",
+      "severity": "elevated",
+      "confidence": 84,
+      "summary": "Heavy sediment discharge into Potomac visible from Key Bridge. Brown turbidity plume 0.5mi downstream from Rock Creek outfall.",
+      "analysis": [
+        "Secchi disk visibility: 8\" (normal: 36\")",
+        "Sediment load at 450 mg/L (4.5x ambient)",
+        "Stormwater carrying oils, road salt, litter",
+        "Plume reaching DC drinking water intake"
+      ],
+      "metrics": {
+        "Turbidity": "85 NTU (high) — Near-opaque, 10x normal",
+        "Sediment": "450 mg/L (elevated) — Heavy upstream soil erosion",
+        "Flow Rate": "28,000 cfs (elevated) — 3x baseflow from storm",
+        "Pollutants": "12 types (elevated) — PAHs, metals, bacteria found"
+      },
+      "impact": "Rock Creek watershed is 75% impervious surface. Every 1-inch rain triggers CSO and sediment discharge. Green infrastructure 60% behind plan.",
+      "agents_active": 3,
+      "correlated_with": ["pin-9", "pin-13"],
+      "reporter": "david.lee",
+      "time": "22m ago"
+    }
+  ],
+  "knowledge_graph": {
+    "regions": [
+      {"name": "SF Bay", "threat_level": "moderate", "health_score": 72, "key_metric": "Water Purity: 81/100"},
+      {"name": "LA Basin", "threat_level": "elevated", "health_score": 48, "key_metric": "Air Quality: 38/100"},
+      {"name": "Gulf Coast", "threat_level": "high", "health_score": 35, "key_metric": "Water Purity: 29/100, Air Quality: 32/100"},
+      {"name": "Everglades", "threat_level": "critical", "health_score": 24, "key_metric": "Biodiversity: 21/100, Water Purity: 18/100"},
+      {"name": "Pacific NW", "threat_level": "low", "health_score": 84, "key_metric": "Air Quality: 86/100"}
+    ],
+    "active_threats": [
+      {"name": "Algal Bloom", "region": "SF Bay", "severity": "elevated"},
+      {"name": "Wildfire Smoke", "region": "LA Basin", "severity": "critical"},
+      {"name": "SO2 Spike", "region": "Gulf Coast", "severity": "critical"},
+      {"name": "Fish Kill", "region": "Gulf Coast", "severity": "high"},
+      {"name": "Invasive Species", "region": "Everglades", "severity": "critical"},
+      {"name": "Drought Stress", "region": "Everglades", "severity": "high"}
+    ],
+    "correlations": [
+      "SF Bay <-> LA Basin (California corridor)",
+      "LA Basin <-> Gulf Coast (Southern US)",
+      "Gulf Coast <-> Everglades (Gulf to Florida)",
+      "SF Bay <-> Pacific NW (West coast)",
+      "Refinery SO2 -> Fish Kill (causal)",
+      "Drought -> Invasive Species (amplifies)"
+    ]
+  }
+}
