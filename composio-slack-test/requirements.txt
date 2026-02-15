@@ -1,0 +1,7 @@
+composio
+composio-openai
+openai
+python-dotenv
+flask
+requests
+pillow

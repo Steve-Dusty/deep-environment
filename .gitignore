@@ -1,0 +1,55 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# build output
+.next/
+out/
+dist/
+build/
+
+# env files (secrets)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+composio-slack-test/.env
+
+# uploaded images (user data)
+composio-slack-test/uploads/*.png
+composio-slack-test/uploads/*.jpg
+composio-slack-test/uploads/*.jpeg
+composio-slack-test/uploads/*.gif
+composio-slack-test/uploads/*.webp
+composio-slack-test/uploads/metadata.json
+
+# python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# misc
+.vercel
+*.local
