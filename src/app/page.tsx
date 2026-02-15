@@ -202,6 +202,7 @@ export default function DashboardPage() {
   const [showChat, setShowChat] = useState(false);
   const [pdfViewData, setPdfViewData] = useState<PDFViewData | null>(null);
   const [slackPins, setSlackPins] = useState<PinReport[]>([]);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
 
   // Poll Slack uploads and convert to PinReports
   useEffect(() => {
@@ -227,15 +228,295 @@ export default function DashboardPage() {
 
   // Voice control hooks
   const { speak } = useTTS();
-  const [voiceFeedback, setVoiceFeedback] = useState('');
-  
-  const handleVoiceCommand = useCallback(async (cmd: VoiceCommand) => {
-    const response = await interpretVoiceCommand(cmd.transcript, allPins);
-    setVoiceFeedback(response);
-    speak(response);
-  }, [allPins, speak]);
 
-  const { isListening, transcript } = useVoiceControl({ onCommand: handleVoiceCommand });
+  const totalAgents = allPins.reduce((sum, p) => sum + p.agentsActive, 0);
+
+  const handleVoiceCommand = useCallback((cmd: VoiceCommand) => {
+    console.log('🎯 Processing command:', cmd);
+    let response = '';
+
+    // Add AI interpretation acknowledgment
+    if (cmd.fromAI) {
+      console.log('✨ Command interpreted by AI');
+    }
+
+    switch (cmd.action) {
+      case 'error': {
+        response = `Sorry, ${cmd.target || 'something went wrong'}. Please try again.`;
+        break;
+      }
+
+      case 'stop': {
+        response = 'Voice commands stopped. Say "Hey Deep" to resume.';
+        break;
+      }
+
+      case 'enable':
+      case 'disable': {
+        const key = cmd.target || '';
+        const validKeys = ['globe', 'terrain', 'satellite', 'heatmap', 'weather'];
+        if (validKeys.includes(key)) {
+          setToggles(prev => ({ ...prev, [key]: cmd.action === 'enable' }));
+          const friendlyNames: Record<string, string> = {
+            globe: 'globe view',
+            terrain: '3D terrain',
+            satellite: 'satellite imagery',
+            heatmap: 'threat overlay',
+            weather: 'precipitation data',
+          };
+          response = `${cmd.action === 'enable' ? 'Enabling' : 'Disabling'} ${friendlyNames[key] || key}.`;
+        } else {
+          response = `Unknown overlay: ${key}.`;
+        }
+        break;
+      }
+
+      case 'enable-all':
+        setToggles({ globe: true, terrain: true, satellite: true, heatmap: true, weather: true });
+        response = 'Enabling all overlays. Globe, terrain, satellite, threat overlay, and precipitation.';
+        break;
+
+      case 'disable-all':
+        setToggles({ globe: false, terrain: false, satellite: false, heatmap: false, weather: false });
+        response = 'Disabling all overlays.';
+        break;
+
+      case 'view-graph':
+      case 'show-graph':
+        setShowGraph(true);
+        response = 'Opening knowledge graph.';
+        break;
+
+      case 'view-map':
+      case 'show-map':
+        setShowGraph(false);
+        setOdysseyPin(null);
+        setSelectedPinId(null);
+        response = 'Returning to map view.';
+        break;
+
+      case 'view-odyssey':
+      case 'show-odyssey':
+        if (selectedPinId) {
+          const pin = allPins.find(p => p.id === selectedPinId);
+          if (pin) {
+            setOdysseyPin(pin);
+            response = `Entering Odyssey world model for ${pin.city}.`;
+          } else {
+            response = 'Please select a location first.';
+          }
+        } else {
+          response = 'Please select a location first to view in Odyssey.';
+        }
+        break;
+
+      case 'navigate':
+      case 'select-location': {
+        const target = cmd.target?.toLowerCase() || '';
+        // Try to match by ID first (from AI), then by name
+        let match = allPins.find(p => p.id === cmd.target);
+        if (!match) {
+          match = allPins.find(p =>
+            p.city.toLowerCase().includes(target) ||
+            p.neighborhood.toLowerCase().includes(target) ||
+            p.title.toLowerCase().includes(target) ||
+            p.state.toLowerCase().includes(target) ||
+            p.id.toLowerCase().includes(target)
+          );
+        }
+        if (match) {
+          setSelectedPinId(match.id);
+          setShowGraph(false);
+          setOdysseyPin(null);
+          response = `Navigating to ${match.neighborhood}. ${match.title}.`;
+        } else {
+          response = `Location ${cmd.target} not found.`;
+        }
+        break;
+      }
+
+      case 'odyssey-location': {
+        const target = cmd.target?.toLowerCase() || '';
+        let match = allPins.find(p => p.id === cmd.target);
+        if (!match) {
+          match = allPins.find(p =>
+            p.city.toLowerCase().includes(target) ||
+            p.neighborhood.toLowerCase().includes(target) ||
+            p.title.toLowerCase().includes(target)
+          );
+        }
+        if (match) {
+          setSelectedPinId(match.id);
+          setOdysseyPin(match);
+          response = `Entering Odyssey world model for ${match.city}. ${match.title}.`;
+        } else {
+          response = `Location ${cmd.target} not found.`;
+        }
+        break;
+      }
+
+      case 'view-feed':
+      case 'show-feed':
+        setActiveView('feed');
+        response = 'Opening location feed.';
+        break;
+
+      case 'show-slack':
+        setActiveView('slack');
+        response = 'Opening Slack uploads.';
+        break;
+
+      case 'close-sidebar':
+        setActiveView(null);
+        response = 'Closing sidebar.';
+        break;
+
+      case 'zoom-in':
+        setZoom(prev => Math.min(prev + 1, 20));
+        response = 'Zooming in.';
+        break;
+
+      case 'zoom-out':
+        setZoom(prev => Math.max(prev - 1, 1));
+        response = 'Zooming out.';
+        break;
+
+      case 'zoom-level': {
+        const level = parseInt(cmd.target || '5', 10);
+        if (level >= 1 && level <= 20) {
+          setZoom(level);
+          response = `Zoom set to level ${level}.`;
+        } else {
+          response = 'Zoom level must be between 1 and 20.';
+        }
+        break;
+      }
+
+      case 'clear-selection':
+        setSelectedPinId(null);
+        response = 'Clearing selection.';
+        break;
+
+      case 'status': {
+        const critical = allPins.filter(p => p.severity === 'critical').length;
+        const high = allPins.filter(p => p.severity === 'high').length;
+        const elevated = allPins.filter(p => p.severity === 'elevated').length;
+        response = `${allPins.length} active locations. ${critical} critical, ${high} high, ${elevated} elevated severity. ${totalAgents} agents online. System nominal.`;
+        break;
+      }
+
+      case 'list-critical': {
+        const critical = allPins.filter(p => p.severity === 'critical');
+        if (critical.length === 0) {
+          response = 'No critical threats detected.';
+        } else {
+          const details = critical.slice(0, 4).map(p => `${p.city}: ${p.title}`).join('. ');
+          response = `${critical.length} critical threats. ${details}.`;
+        }
+        break;
+      }
+
+      case 'list-high': {
+        const high = allPins.filter(p => p.severity === 'high');
+        if (high.length === 0) {
+          response = 'No high severity threats detected.';
+        } else {
+          const details = high.slice(0, 4).map(p => `${p.city}: ${p.title}`).join('. ');
+          response = `${high.length} high severity threats. ${details}.`;
+        }
+        break;
+      }
+
+      case 'list-category': {
+        const cat = cmd.target || '';
+        const matches = allPins.filter(p => p.category === cat);
+        if (matches.length === 0) {
+          response = `No ${cat} threats detected.`;
+        } else {
+          const details = matches.slice(0, 4).map(p => `${p.city}: ${p.title}`).join('. ');
+          response = `${matches.length} ${cat} threats. ${details}.`;
+        }
+        break;
+      }
+
+      case 'list-agents': {
+        response = `${totalAgents} agents active across ${allPins.length} locations. Average ${(totalAgents / allPins.length).toFixed(1)} agents per location.`;
+        break;
+      }
+
+      case 'list-locations': {
+        const cities = allPins.map(p => p.city).slice(0, 5).join(', ');
+        response = `${allPins.length} locations monitored. Including ${cities}, and more.`;
+        break;
+      }
+
+      case 'list-all': {
+        const states = new Set(allPins.map(p => p.state)).size;
+        const categories = new Set(allPins.map(p => p.category)).size;
+        response = `Monitoring ${allPins.length} locations across ${states} states. ${categories} threat categories active.`;
+        break;
+      }
+
+      case 'help':
+        response = 'Voice commands available. Map controls: enable satellite, enable terrain, enable precipitation, show threat overlay, globe view, zoom in, zoom out, reset view. Navigation: go to Miami, next location, previous location, select Houston. Views: show knowledge graph, show map, enter odyssey. Filters: show water threats, filter by critical, show all categories. Info: status report, list critical threats, describe Miami, list all agents. Sidebar: open feed, open slack, close sidebar.';
+        break;
+
+      default:
+        response = 'Command not recognized. Say help for a list of available commands.';
+    }
+
+    console.log('🔊 Speaking response:', response);
+    if (response) {
+      voiceState.setState('speaking');
+      speak(response).then(() => voiceState.setState('idle'));
+    }
+  }, [speak, totalAgents, selectedPinId, allPins, setToggles, setShowGraph, setOdysseyPin, setSelectedPinId, setActiveView, setZoom]);
+
+  const handleAIFallback = useCallback(async (speech: string): Promise<VoiceCommand> => {
+    console.log('🤖 AI fallback triggered for command:', speech);
+
+    try {
+      const aiResult = await interpretVoiceCommand(speech);
+      console.log('✨ AI result:', aiResult);
+      return {
+        raw: speech,
+        action: aiResult.action,
+        target: aiResult.target,
+        fromAI: true,
+      };
+    } catch (error) {
+      console.error('❌ AI fallback error:', error);
+      throw error;
+    }
+  }, []);
+
+  const handleTextCommand = useCallback(async (text: string) => {
+    console.log('💬 Text command:', text);
+    try {
+      const aiResult = await interpretVoiceCommand(text);
+      console.log('✨ AI interpreted text:', aiResult);
+      const cmd: VoiceCommand = {
+        raw: text,
+        action: aiResult.action,
+        target: aiResult.target,
+        fromAI: true,
+      };
+      handleVoiceCommand(cmd);
+    } catch (error) {
+      console.error('❌ Text command error:', error);
+      handleVoiceCommand({
+        raw: text,
+        action: 'error',
+        target: 'AI unavailable',
+      });
+    }
+  }, [handleVoiceCommand]);
+
+  const voiceState = useVoiceControl({
+    onCommand: handleVoiceCommand,
+    onAIFallback: handleAIFallback,
+    enabled: voiceEnabled,
+  });
 
   const handleToggle = useCallback((key: string) => {
     setToggles((prev) => ({ ...prev, [key]: !prev[key as keyof typeof prev] }));
@@ -263,8 +544,6 @@ export default function DashboardPage() {
   const handleClosePDFView = useCallback(() => {
     setPdfViewData(null);
   }, []);
-
-  const totalAgents = allPins.reduce((sum, p) => sum + p.agentsActive, 0);
 
   // Odyssey fullscreen takes priority
   if (odysseyPin) {
@@ -347,8 +626,16 @@ export default function DashboardPage() {
             </div>
             
             {/* Voice Control UI */}
-            <VoiceIndicator isListening={isListening} transcript={transcript} />
-            <ChatBox message={voiceFeedback} onClear={() => setVoiceFeedback('')} />
+            <div className="pointer-events-auto fixed bottom-12 right-4 z-50 flex flex-col items-end gap-3">
+              <ChatBox onCommand={handleTextCommand} />
+              <VoiceIndicator
+                state={voiceState.state}
+                enabled={voiceEnabled}
+                onToggle={() => setVoiceEnabled(v => !v)}
+                transcript={voiceState.transcript}
+                fullTranscript={voiceState.fullTranscript}
+              />
+            </div>
           </div>
         </>
       )}
