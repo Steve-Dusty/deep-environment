@@ -8,8 +8,10 @@ import {
   getConnectionLines,
   getPinReportsGeoJSON,
   THREAT_COLORS,
+  THREAT_LABELS,
   CATEGORY_COLORS,
 } from '../data/locations';
+import { getPinImage } from '../data/images';
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY || '';
 
@@ -33,6 +35,7 @@ export default function MapView({
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const popupRef = useRef<mapboxgl.Popup | null>(null);
   const animFrameRef = useRef<number>(0);
   const userInteractedRef = useRef(false);
   const [mapReady, setMapReady] = useState(false);
@@ -92,6 +95,47 @@ export default function MapView({
       container.addEventListener('click', (e) => {
         e.stopPropagation();
         onSelectPin(pin.id);
+
+        // Show image popup
+        const map = mapRef.current;
+        if (map) {
+          // Close any existing popup
+          if (popupRef.current) popupRef.current.remove();
+
+          const img = getPinImage(pin.id);
+          const threatColor = THREAT_COLORS[pin.severity];
+          const threatLabel = THREAT_LABELS[pin.severity];
+
+          const html = `
+            <div style="font-family:'JetBrains Mono','SF Mono',monospace;background:#0a0e14;border:1px solid ${threatColor}30;border-radius:6px;overflow:hidden;width:240px;">
+              ${img ? `<div style="position:relative;width:100%;height:140px;overflow:hidden;">
+                <img src="${img}" alt="${pin.title}" style="width:100%;height:100%;object-fit:cover;" />
+                <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(10,14,20,0.7),transparent 60%);"></div>
+                <div style="position:absolute;top:6px;right:6px;font-size:7px;letter-spacing:1.5px;padding:2px 6px;border-radius:3px;color:${threatColor};background:rgba(0,0,0,0.7);border:1px solid ${threatColor}40;font-weight:600;">${threatLabel}</div>
+              </div>` : ''}
+              <div style="padding:8px 10px;">
+                <div style="font-size:10px;font-weight:600;color:#e4e6ef;margin-bottom:3px;line-height:1.3;">${pin.title}</div>
+                <div style="font-size:8px;color:#8b8fa4;margin-bottom:4px;">${pin.neighborhood}, ${pin.city}</div>
+                <div style="font-size:7px;color:#555870;display:flex;align-items:center;gap:6px;">
+                  <span>@${pin.user}</span>
+                  <span>${pin.timestamp}</span>
+                  <span style="margin-left:auto;color:${CATEGORY_COLORS[pin.category] || '#8b8fa4'}">${pin.category.toUpperCase()}</span>
+                </div>
+              </div>
+            </div>
+          `;
+
+          popupRef.current = new mapboxgl.Popup({
+            closeButton: false,
+            closeOnClick: true,
+            maxWidth: 'none',
+            offset: [0, -20],
+            className: 'pin-popup',
+          })
+            .setLngLat(pin.coordinates)
+            .setHTML(html)
+            .addTo(map);
+        }
       });
 
       return container;
@@ -289,6 +333,7 @@ export default function MapView({
 
     return () => {
       cancelAnimationFrame(animFrameRef.current);
+      if (popupRef.current) popupRef.current.remove();
       markersRef.current.forEach((m) => m.remove());
       markersRef.current = [];
       map.remove();

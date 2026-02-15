@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ChevronRight,
   ChevronLeft,
@@ -27,6 +27,7 @@ import {
   CATEGORY_COLORS,
   pinReports,
 } from '../data/locations';
+import { getPinImages } from '../data/images';
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   Water: <Droplets size={14} />,
@@ -79,7 +80,13 @@ interface SidePanelProps {
 
 export default function SidePanel({ pins, selectedId, onSelect }: SidePanelProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const [activeImageIdx, setActiveImageIdx] = useState(0);
   const selected = pins.find((p) => p.id === selectedId);
+  const images = selected ? getPinImages(selected.id) : [];
+
+  // Reset image index when switching pins
+  useEffect(() => { setActiveImageIdx(0); }, [selectedId]);
+
   const correlatedPins = selected
     ? selected.correlatedWith.map((id) => pinReports.find((p) => p.id === id)).filter(Boolean) as PinReport[]
     : [];
@@ -123,35 +130,75 @@ export default function SidePanel({ pins, selectedId, onSelect }: SidePanelProps
                 <span className="text-[8px] tracking-wider">ALL LOCATIONS</span>
               </button>
 
-              {/* Image / capture placeholder */}
-              <div
-                className="relative mx-3 mt-3 h-32 rounded overflow-hidden"
-                style={{
-                  background: `linear-gradient(135deg, ${CATEGORY_COLORS[selected.category] || '#8b8fa4'}18, ${CATEGORY_COLORS[selected.category] || '#8b8fa4'}06)`,
-                  border: `1px solid ${CATEGORY_COLORS[selected.category] || '#8b8fa4'}25`,
-                }}
-              >
-                {/* Grid overlay for "analyzed" look */}
-                <div className="absolute inset-0" style={{
-                  backgroundImage: `linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)`,
-                  backgroundSize: '20px 20px',
-                }} />
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
-                  <div style={{ color: CATEGORY_COLORS[selected.category] || '#8b8fa4' }}>
-                    {CATEGORY_ICONS[selected.category] || <Camera size={14} />}
+              {/* Field capture image */}
+              <div className="mx-3 mt-3">
+                <div
+                  className="relative w-full h-40 rounded overflow-hidden bg-[var(--color-abyss)]"
+                  style={{ border: `1px solid ${CATEGORY_COLORS[selected.category] || '#8b8fa4'}25` }}
+                >
+                  {images.length > 0 ? (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={images[activeImageIdx] || images[0]}
+                        alt={selected.title}
+                        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
+                    </>
+                  ) : (
+                    <>
+                      <div className="absolute inset-0" style={{
+                        background: `linear-gradient(135deg, ${CATEGORY_COLORS[selected.category] || '#8b8fa4'}18, ${CATEGORY_COLORS[selected.category] || '#8b8fa4'}06)`,
+                      }} />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
+                        <div style={{ color: CATEGORY_COLORS[selected.category] || '#8b8fa4' }}>
+                          {CATEGORY_ICONS[selected.category] || <Camera size={14} />}
+                        </div>
+                        <span className="text-[9px] tracking-[0.15em] font-semibold" style={{ color: CATEGORY_COLORS[selected.category] || '#8b8fa4' }}>
+                          FIELD CAPTURE
+                        </span>
+                      </div>
+                    </>
+                  )}
+                  {/* Image counter */}
+                  {images.length > 1 && (
+                    <div className="absolute top-2 right-2 text-[7px] tracking-wider px-1.5 py-0.5 rounded"
+                      style={{ background: 'rgba(0,0,0,0.6)', color: 'rgba(255,255,255,0.7)' }}>
+                      {activeImageIdx + 1}/{images.length}
+                    </div>
+                  )}
+                  {/* User + time overlay */}
+                  <div className="absolute bottom-2 left-2 flex items-center gap-2">
+                    <span className="text-[7px] text-[rgba(255,255,255,0.7)]">@{selected.user}</span>
+                    <span className="text-[7px] text-[rgba(255,255,255,0.5)]">{selected.timestamp}</span>
                   </div>
-                  <span className="text-[9px] tracking-[0.15em] font-semibold" style={{ color: CATEGORY_COLORS[selected.category] || '#8b8fa4' }}>
-                    FIELD CAPTURE
-                  </span>
-                  <span className="text-[7px] text-[var(--color-text-muted)]">
-                    @{selected.user} &middot; {selected.timestamp}
-                  </span>
+                  {/* Corner brackets */}
+                  {['top-2 left-2 border-t border-l', 'top-2 right-2 border-t border-r', 'bottom-2 left-2 border-b border-l', 'bottom-2 right-2 border-b border-r'].map((cls) => (
+                    <div key={cls} className={`absolute w-3 h-3 ${cls}`} style={{ borderColor: `${CATEGORY_COLORS[selected.category] || '#8b8fa4'}40` }} />
+                  ))}
                 </div>
-                {/* Corner brackets */}
-                <div className="absolute top-2 left-2 w-3 h-3 border-t border-l" style={{ borderColor: `${CATEGORY_COLORS[selected.category] || '#8b8fa4'}40` }} />
-                <div className="absolute top-2 right-2 w-3 h-3 border-t border-r" style={{ borderColor: `${CATEGORY_COLORS[selected.category] || '#8b8fa4'}40` }} />
-                <div className="absolute bottom-2 left-2 w-3 h-3 border-b border-l" style={{ borderColor: `${CATEGORY_COLORS[selected.category] || '#8b8fa4'}40` }} />
-                <div className="absolute bottom-2 right-2 w-3 h-3 border-b border-r" style={{ borderColor: `${CATEGORY_COLORS[selected.category] || '#8b8fa4'}40` }} />
+
+                {/* Thumbnail strip */}
+                {images.length > 1 && (
+                  <div className="flex gap-1 mt-1.5 overflow-x-auto scrollbar-hide">
+                    {images.map((img, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setActiveImageIdx(i)}
+                        className={`shrink-0 w-12 h-8 rounded overflow-hidden cursor-pointer transition-all ${
+                          i === activeImageIdx
+                            ? 'ring-1 ring-[var(--color-signal-teal)] opacity-100'
+                            : 'opacity-50 hover:opacity-80'
+                        }`}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={img} alt={`${selected.title} ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Title + location */}

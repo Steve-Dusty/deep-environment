@@ -32,6 +32,7 @@ import {
   THREAT_LABELS,
   CATEGORY_COLORS,
 } from '../data/locations';
+import { getPinImage } from '../data/images';
 
 export type NavView = 'feed' | 'odyssey' | 'slack' | null;
 
@@ -251,27 +252,22 @@ export default function LeftSidebar({
                       >
                         {/* photo area */}
                         <div
-                          className="relative w-full h-28 rounded overflow-hidden mb-2"
-                          style={getPhotoStyle(pin)}
+                          className="relative w-full h-28 rounded overflow-hidden mb-2 bg-[var(--color-abyss)]"
                         >
-                          {/* grid */}
-                          <div
-                            className="absolute inset-0"
-                            style={{
-                              backgroundImage: `linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-                                                linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)`,
-                              backgroundSize: '16px 16px',
-                            }}
-                          />
-                          {/* noise dither */}
-                          <div
-                            className="absolute inset-0 opacity-40"
-                            style={{
-                              backgroundImage:
-                                'repeating-conic-gradient(rgba(255,255,255,0.03) 0% 25%, transparent 25% 50%)',
-                              backgroundSize: '2px 2px',
-                            }}
-                          />
+                          {/* real image */}
+                          {getPinImage(pin.id) ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={getPinImage(pin.id)!}
+                              alt={pin.title}
+                              className="absolute inset-0 w-full h-full object-cover"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="absolute inset-0" style={getPhotoStyle(pin)} />
+                          )}
+                          {/* subtle dark overlay for readability */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
                           {/* scan sweep on hover */}
                           <div
                             className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 scan-sweep-bg"

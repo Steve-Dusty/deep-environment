@@ -234,6 +234,13 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
   const [timerPct, setTimerPct] = useState(100);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Custom prompt input
+  const [promptInput, setPromptInput] = useState('');
+  const [promptOpen, setPromptOpen] = useState(false);
+  const [promptSending, setPromptSending] = useState(false);
+  const [promptHistory, setPromptHistory] = useState<string[]>([]);
+  const promptInputRef = useRef<HTMLInputElement>(null);
+
   const bootLines = getBootLines(pin, !!imageUrl);
   const decisions = generateDecisions(pin);
   const threatColor = THREAT_COLORS[pin.severity];
@@ -427,6 +434,40 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
     },
     [decisionIndex, decisions.length],
   );
+
+  // ── Custom prompt ──────────────────────────────────────────────────
+
+  const sendCustomPrompt = useCallback(() => {
+    const text = promptInput.trim();
+    if (!text || !clientRef.current) return;
+    setPromptSending(true);
+    try {
+      clientRef.current.interact({ prompt: text });
+      setPromptHistory((prev) => [text, ...prev].slice(0, 20));
+      setPromptInput('');
+    } catch (err) {
+      console.error('Interact failed:', err);
+    }
+    setTimeout(() => setPromptSending(false), 1500);
+  }, [promptInput]);
+
+  // Toggle prompt bar with T key
+  useEffect(() => {
+    if (phase !== 'streaming') return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 't' || e.key === 'T') {
+        // Don't trigger if already typing in input
+        if (document.activeElement?.tagName === 'INPUT') return;
+        setPromptOpen((prev) => {
+          if (!prev) setTimeout(() => promptInputRef.current?.focus(), 50);
+          return !prev;
+        });
+      }
+      if (e.key === 'Escape') setPromptOpen(false);
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [phase]);
 
   // ── Cleanup ──────────────────────────────────────────────────────────
 
@@ -653,6 +694,71 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
             </div>
           )}
 
+          {/* ── CUSTOM PROMPT BAR ── */}
+          {hudVisible && (
+            <>
+              {/* Toggle button */}
+              {!promptOpen && (
+                <button
+                  onClick={() => { setPromptOpen(true); setTimeout(() => promptInputRef.current?.focus(), 50); }}
+                  style={S.promptToggle}
+                  title="Transform (T)"
+                >
+                  <span style={{ fontSize: 12 }}>⌘</span>
+                  <span style={{ fontSize: 8, letterSpacing: 1.5 }}>TRANSFORM</span>
+                </button>
+              )}
+
+              {/* Prompt input panel */}
+              {promptOpen && (
+                <div style={S.promptBar}>
+                  <div style={S.promptHeader}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#0ff5c4', boxShadow: '0 0 6px #0ff5c4' }} />
+                      <span style={{ fontSize: 8, letterSpacing: 2, color: '#0ff5c4', fontWeight: 600 }}>TRANSFORM PROMPT</span>
+                    </div>
+                    <button onClick={() => setPromptOpen(false)} style={S.promptClose}>ESC</button>
+                  </div>
+                  <div style={S.promptInputRow}>
+                    <input
+                      ref={promptInputRef}
+                      type="text"
+                      value={promptInput}
+                      onChange={(e) => setPromptInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') sendCustomPrompt(); }}
+                      placeholder="Describe how to transform the scene..."
+                      style={S.promptInputField}
+                    />
+                    <button
+                      onClick={sendCustomPrompt}
+                      disabled={!promptInput.trim() || promptSending}
+                      style={{
+                        ...S.promptSendBtn,
+                        opacity: promptInput.trim() && !promptSending ? 1 : 0.3,
+                      }}
+                    >
+                      {promptSending ? '●' : '→'}
+                    </button>
+                  </div>
+                  {promptHistory.length > 0 && (
+                    <div style={S.promptHistoryContainer}>
+                      {promptHistory.slice(0, 3).map((h, i) => (
+                        <button
+                          key={i}
+                          onClick={() => { setPromptInput(h); promptInputRef.current?.focus(); }}
+                          style={S.promptHistoryItem}
+                        >
+                          <span style={{ fontSize: 7, color: '#555870', marginRight: 4 }}>↩</span>
+                          <span style={{ fontSize: 8, color: '#8b8fa4', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+
           {/* Corner brackets */}
           <div style={{ ...S.corner, top: 12, left: 12, borderTop: `2px solid ${threatColor}40`, borderLeft: `2px solid ${threatColor}40` }} />
           <div style={{ ...S.corner, top: 12, right: 12, borderTop: `2px solid ${threatColor}40`, borderRight: `2px solid ${threatColor}40` }} />
@@ -813,6 +919,68 @@ const S: Record<string, React.CSSProperties> = {
   corner: {
     position: 'fixed', width: 36, height: 36, zIndex: 200, pointerEvents: 'none',
   },
+
+  // Custom prompt
+  promptToggle: {
+    position: 'fixed', bottom: 16, right: 16, zIndex: 200,
+    display: 'flex', alignItems: 'center', gap: 6,
+    padding: '8px 14px', borderRadius: 6,
+    background: 'rgba(8,9,12,0.7)', backdropFilter: 'blur(20px)',
+    border: '1px solid rgba(15,245,196,0.25)',
+    color: '#0ff5c4', cursor: 'pointer',
+    fontFamily: "'JetBrains Mono', monospace",
+    transition: 'all 0.2s ease',
+  } as React.CSSProperties,
+  promptBar: {
+    position: 'fixed', bottom: 16, right: 16, zIndex: 200,
+    width: 420, borderRadius: 8,
+    background: 'rgba(8,9,12,0.85)', backdropFilter: 'blur(24px)',
+    border: '1px solid rgba(15,245,196,0.2)',
+    overflow: 'hidden',
+    animation: 'ody-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) both',
+  } as React.CSSProperties,
+  promptHeader: {
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    padding: '8px 12px',
+    borderBottom: '1px solid rgba(255,255,255,0.06)',
+  } as React.CSSProperties,
+  promptClose: {
+    fontSize: 7, letterSpacing: 1.5, padding: '3px 8px', borderRadius: 3,
+    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+    color: '#8b8fa4', cursor: 'pointer',
+    fontFamily: "'JetBrains Mono', monospace",
+  } as React.CSSProperties,
+  promptInputRow: {
+    display: 'flex', alignItems: 'center', gap: 8,
+    padding: '10px 12px',
+  } as React.CSSProperties,
+  promptInputField: {
+    flex: 1, padding: '8px 12px', borderRadius: 4,
+    background: 'rgba(255,255,255,0.04)',
+    border: '1px solid rgba(255,255,255,0.08)',
+    color: '#e4e6ef', fontSize: 11, outline: 'none',
+    fontFamily: "'JetBrains Mono', monospace",
+  } as React.CSSProperties,
+  promptSendBtn: {
+    width: 32, height: 32, borderRadius: 4, flexShrink: 0,
+    background: 'rgba(15,245,196,0.12)', border: '1px solid rgba(15,245,196,0.3)',
+    color: '#0ff5c4', fontSize: 14, cursor: 'pointer',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontFamily: "'JetBrains Mono', monospace",
+    transition: 'all 0.15s ease',
+  } as React.CSSProperties,
+  promptHistoryContainer: {
+    padding: '0 12px 10px',
+    display: 'flex', flexDirection: 'column', gap: 2,
+  } as React.CSSProperties,
+  promptHistoryItem: {
+    display: 'flex', alignItems: 'center', padding: '4px 8px',
+    borderRadius: 3, background: 'transparent',
+    border: 'none', cursor: 'pointer', textAlign: 'left',
+    fontFamily: "'JetBrains Mono', monospace",
+    maxWidth: '100%', overflow: 'hidden',
+    transition: 'background 0.15s ease',
+  } as React.CSSProperties,
 
   // Scanline
   scanline: {
