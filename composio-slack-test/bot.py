@@ -106,6 +106,84 @@ def convert_image_to_png(img_bytes):
 conversations = {}
 
 
+LOCATION_SUMMARIES_PROMPT = """Available monitoring locations (use these exact IDs):
+- loc-sf: SF Bay, San Francisco, CA (37.7955, -122.3912)
+- loc-la: LA Basin, Los Angeles, CA (34.0901, -118.2850)
+- loc-gulf: Gulf Coast, Houston, TX (29.7580, -95.3562)
+- loc-ever: Everglades, Miami, FL (25.8500, -80.8320)
+- loc-pnw: Pacific NW, Seattle, WA (47.6130, -122.3380)
+- loc-ny: NY Harbor, New York, NY (40.7128, -74.0060)
+- loc-chi: Chicago River, Chicago, IL (41.8781, -87.6298)
+- loc-den: Denver Metro, Denver, CO (39.7392, -104.9903)
+- loc-phx: Phoenix Valley, Phoenix, AZ (33.4484, -112.0740)
+- loc-atl: Atlanta Metro, Atlanta, GA (33.7490, -84.3880)
+"""
+
+
+def classify_image(image_bytes, ai_description):
+    """Classify an uploaded image for the dashboard knowledge graph.
+    Returns a dict with location_id, category, severity, etc., or None on failure."""
+    try:
+        b64 = base64.b64encode(image_bytes).decode("utf-8")
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            response_format={"type": "json_object"},
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are an environmental monitoring classifier. Given an image and its AI description, "
+                        "classify it for our environmental dashboard.\n\n"
+                        + LOCATION_SUMMARIES_PROMPT + "\n"
+                        "Respond with a JSON object containing:\n"
+                        '- "location_id": one of the location IDs above (pick the best match based on image content, '
+                        "description, or default to loc-sf if unclear)\n"
+                        '- "category": one of: pollution, deforestation, runoff, wildfire, litter, erosion, invasive, drought, contamination, other\n'
+                        '- "severity": one of: low, moderate, elevated, high, critical\n'
+                        '- "problem_name": short name for the environmental problem (2-5 words)\n'
+                        '- "problem_description": one sentence describing the environmental issue shown\n'
+                        '- "indicators": array of 2-4 specific observable indicators from the image\n'
+                        '- "trend": one of: improving, stable, worsening\n'
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": f"Classify this environmental image. Previous AI analysis: {ai_description}",
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:image/png;base64,{b64}"},
+                        },
+                    ],
+                },
+            ],
+        )
+        result = json.loads(response.choices[0].message.content)
+        # Validate required fields
+        required = ["location_id", "category", "severity", "problem_name", "problem_description", "indicators", "trend"]
+        for key in required:
+            if key not in result:
+                print(f"Classification missing field: {key}")
+                return None
+        return result
+    except Exception as e:
+        print(f"Classification failed: {e}")
+        return None
+
+
+def save_classification(timestamp, classification):
+    """Save the classification result back into the upload metadata."""
+    metadata = load_metadata()
+    for entry in metadata:
+        if entry.get("timestamp") == timestamp:
+            entry["classification"] = classification
+            break
+    save_metadata(metadata)
+
+
 def build_upload_context():
     """Build a context string from recent image uploads with their AI descriptions."""
     metadata = load_metadata()
@@ -365,6 +443,14 @@ def main():
 
         # Send reply
         send_slack_reply(channel, ai_response)
+
+        # Classify images for dashboard knowledge graph (runs after reply is sent)
+        if image_data and image_timestamps:
+            for png_bytes, ts in zip(image_data, image_timestamps):
+                classification = classify_image(png_bytes, ai_response)
+                if classification:
+                    save_classification(ts, classification)
+                    print(f"  Classified → {classification['location_id']} / {classification['category']} / {classification['severity']}")
 
     subscription.wait_forever()
 

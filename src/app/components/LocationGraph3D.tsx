@@ -17,26 +17,26 @@ import {
   PROBLEM_CATEGORY_COLORS,
   PROBLEM_CATEGORY_LABELS,
 } from '../data/locationGraphs';
-import { THREAT_COLORS } from '../data/locations';
+
 
 // ── Sprite text label ──────────────────────────────────────────────────────
 
 function createTextSprite(text: string, color: string, size = 3): THREE.Sprite {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d')!;
-  canvas.width = 512;
-  canvas.height = 64;
-  ctx.font = `600 ${Math.round(size * 8)}px 'JetBrains Mono', monospace`;
+  canvas.width = 1024;
+  canvas.height = 128;
+  ctx.font = `700 ${Math.round(size * 16)}px 'JetBrains Mono', monospace`;
   ctx.fillStyle = color;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(text.substring(0, 22), canvas.width / 2, canvas.height / 2);
+  ctx.fillText(text.substring(0, 26), canvas.width / 2, canvas.height / 2);
   const texture = new THREE.CanvasTexture(canvas);
   texture.minFilter = THREE.LinearFilter;
   const sprite = new THREE.Sprite(
-    new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false, opacity: 0.9 }),
+    new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false, opacity: 1.0 }),
   );
-  sprite.scale.set(size * 6, size * 0.75, 1);
+  sprite.scale.set(size * 12, size * 1.5, 1);
   return sprite;
 }
 
@@ -103,10 +103,11 @@ interface Props {
   onProblemSelect?: (problem: ProblemNode | null) => void;
   onGraphUpdate?: (data: { nodes: number; links: number }) => void;
   autoUpdate?: boolean;
+  transparentBg?: boolean;
 }
 
 const LocationGraph3D = forwardRef<LocationGraphHandle, Props>(
-  ({ graphData, onProblemSelect, onGraphUpdate, autoUpdate = true }, ref) => {
+  ({ graphData, onProblemSelect, onGraphUpdate, autoUpdate = true, transparentBg = false }, ref) => {
     const fgRef = useRef<any>(undefined);
     const converted = useMemo(() => convertToGraphData(graphData), [graphData]);
     const [highlightNodes, setHighlightNodes] = useState<Set<string>>(new Set());
@@ -186,7 +187,7 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, Props>(
       resetView() {
         const fg = fgRef.current;
         if (!fg) return;
-        fg.cameraPosition({ x: 0, y: 0, z: 300 }, { x: 0, y: 0, z: 0 }, 600);
+        fg.cameraPosition({ x: 0, y: 0, z: 350 }, { x: 0, y: 0, z: 0 }, 600);
         setTimeout(() => {
           const controls = fg.controls();
           if (controls) {
@@ -217,7 +218,7 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, Props>(
       const fg = fgRef.current;
       if (!fg) return;
 
-      fg.cameraPosition({ x: 0, y: 0, z: 300 });
+      fg.cameraPosition({ x: 0, y: 0, z: 350 });
 
       const controls = fg.controls();
       if (controls) {
@@ -229,21 +230,30 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, Props>(
       }
 
       const scene = fg.scene();
-      scene.fog = new THREE.FogExp2(0x08090c, 0.0008);
-      scene.background = new THREE.Color(0x08090c);
-      scene.add(new THREE.AmbientLight(0x444466, 1.0));
+      scene.fog = new THREE.FogExp2(0x06070a, 0.0004);
+      scene.background = new THREE.Color(0x06070a);
+      scene.add(new THREE.AmbientLight(0x334455, 0.4));
 
-      const teal = new THREE.PointLight(0x0ff5c4, 1.2, 600);
-      teal.position.set(80, 80, 200);
-      scene.add(teal);
-      const red = new THREE.PointLight(0xff3b4f, 0.6, 400);
-      red.position.set(-100, -60, 150);
-      scene.add(red);
-
-      fg.d3Force('charge').strength(-80).distanceMax(250);
-      fg.d3Force('link').distance(40).strength(0.2);
+      fg.d3Force('charge').strength(-120).distanceMax(350);
+      fg.d3Force('link').distance(60).strength(0.15);
       fg.d3Force('center').strength(0.04);
     }, []);
+
+    // ── Toggle transparent background ─────────────────────────────────
+
+    useEffect(() => {
+      const fg = fgRef.current;
+      if (!fg) return;
+      const scene = fg.scene();
+      const renderer = fg.renderer();
+      if (transparentBg) {
+        scene.background = null;
+        renderer.setClearColor(0x000000, 0);
+      } else {
+        scene.background = new THREE.Color(0x06070a);
+        renderer.setClearColor(0x06070a, 1);
+      }
+    }, [transparentBg]);
 
     // ── Hover ──────────────────────────────────────────────────────────
 
@@ -280,54 +290,56 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, Props>(
       const isHl = highlightNodes.has(node.id);
       const isHover = hoverNode?.id === node.id;
       const color = node.color;
-      const base = Math.cbrt(node.val) * 1.5;
-      const r = isHover ? base * 1.25 : base;
+      const base = Math.cbrt(node.val) * 2.2;
+      const r = isHover ? base * 1.3 : base;
 
-      // Core sphere
+      // Core star
       group.add(new THREE.Mesh(
         new THREE.SphereGeometry(r, 20, 20),
-        new THREE.MeshPhongMaterial({
+        new THREE.MeshBasicMaterial({
           color: new THREE.Color(color),
-          emissive: new THREE.Color(color),
-          emissiveIntensity: isHl ? 0.5 : 0.25,
           transparent: true,
-          opacity: isHl ? 0.95 : 0.8,
-          shininess: 40,
+          opacity: isHl ? 1.0 : 0.9,
         }),
       ));
 
-      // Glow shell
+      // Soft glow shell
       group.add(new THREE.Mesh(
-        new THREE.SphereGeometry(r * 1.7, 14, 14),
-        new THREE.MeshBasicMaterial({ color: new THREE.Color(color), transparent: true, opacity: isHl ? 0.15 : 0.06, side: THREE.BackSide }),
+        new THREE.SphereGeometry(r * 2.2, 14, 14),
+        new THREE.MeshBasicMaterial({ color: new THREE.Color(color), transparent: true, opacity: isHl ? 0.22 : 0.1, side: THREE.BackSide }),
       ));
 
-      // Threat wireframe for critical/high
-      if (node.severity === 'critical' || node.severity === 'high') {
-        group.add(new THREE.LineSegments(
-          new THREE.EdgesGeometry(new THREE.OctahedronGeometry(r * 1.5)),
-          new THREE.LineBasicMaterial({ color: new THREE.Color(THREAT_COLORS[node.severity as keyof typeof THREAT_COLORS]), transparent: true, opacity: 0.4 }),
-        ));
-      }
+      // Star-point cross (constellation sparkle)
+      const armLen = r * 2.8;
+      const armGeo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(-armLen, 0, 0), new THREE.Vector3(armLen, 0, 0),
+        new THREE.Vector3(0, -armLen, 0), new THREE.Vector3(0, armLen, 0),
+      ]);
+      armGeo.setIndex([0, 1, 2, 3]);
+      group.add(new THREE.LineSegments(
+        armGeo,
+        new THREE.LineBasicMaterial({ color: new THREE.Color(color), transparent: true, opacity: isHl ? 0.5 : 0.25 }),
+      ));
 
-      // Labels on highlight
-      if (isHl) {
-        const label = createTextSprite(node.name, isHover ? '#fff' : color, 2.4);
-        label.position.set(0, r + 5, 0);
-        group.add(label);
-        const tag = createTextSprite(PROBLEM_CATEGORY_LABELS[node.category], color, 1.6);
-        tag.position.set(0, r + 8, 0);
-        group.add(tag);
-      }
+      // Always show label — name (large and readable)
+      const label = createTextSprite(node.name, isHover ? '#ffffff' : color, isHl ? 4.5 : 3.5);
+      label.position.set(0, r + 8, 0);
+      group.add(label);
+
+      // Category tag (always visible)
+      const tag = createTextSprite(PROBLEM_CATEGORY_LABELS[node.category], color, isHl ? 3.0 : 2.2);
+      tag.position.set(0, r + 14, 0);
+      tag.material.opacity = isHl ? 0.9 : 0.55;
+      group.add(tag);
 
       return group;
     }, [highlightNodes, hoverNode]);
 
     // ── Link accessors ─────────────────────────────────────────────────
 
-    const linkColor = useCallback((link: GLink) => highlightLinks.has(link) ? '#0ff5c4' : link.color || '#1a1d2a', [highlightLinks]);
-    const linkWidth = useCallback((link: GLink) => highlightLinks.has(link) ? 2 : 0.4, [highlightLinks]);
-    const linkParticles = useCallback((link: GLink) => highlightLinks.has(link) ? 5 : (link.particles || 0), [highlightLinks]);
+    const linkColor = useCallback((link: GLink) => highlightLinks.has(link) ? '#0ff5c4' : 'rgba(255,255,255,0.15)', [highlightLinks]);
+    const linkWidth = useCallback((link: GLink) => highlightLinks.has(link) ? 0.8 : 0.15, [highlightLinks]);
+    const linkParticles = useCallback((link: GLink) => highlightLinks.has(link) ? 3 : (link.particles || 0), [highlightLinks]);
 
     return (
       <ForceGraph3D
@@ -340,11 +352,11 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, Props>(
         nodeResolution={20}
         linkColor={linkColor}
         linkWidth={linkWidth}
-        linkOpacity={0.5}
-        linkCurvature={0.12}
+        linkOpacity={0.25}
+        linkCurvature={0.08}
         linkDirectionalParticles={linkParticles}
-        linkDirectionalParticleWidth={1.5}
-        linkDirectionalParticleSpeed={0.005}
+        linkDirectionalParticleWidth={0.8}
+        linkDirectionalParticleSpeed={0.004}
         linkDirectionalParticleColor={() => '#0ff5c4'}
         d3AlphaDecay={0.025}
         d3VelocityDecay={0.35}
@@ -356,7 +368,7 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, Props>(
         enableNodeDrag={false}
         enableNavigationControls={true}
         controlType="trackball"
-        backgroundColor="#08090c"
+        backgroundColor="#06070a"
       />
     );
   },

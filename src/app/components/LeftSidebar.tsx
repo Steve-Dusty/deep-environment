@@ -33,8 +33,9 @@ import {
   CATEGORY_COLORS,
 } from '../data/locations';
 import { getPinImage } from '../data/images';
+// GlobalChatbot moved to full-page ChatView
 
-export type NavView = 'feed' | 'odyssey' | 'slack' | null;
+export type NavView = 'feed' | 'odyssey' | 'slack' | 'chat' | null;
 
 interface SlackUpload {
   filename: string;
@@ -86,6 +87,7 @@ interface LeftSidebarProps {
   onViewChange: (v: NavView) => void;
   onShowGraph?: () => void;
   onEnterOdyssey?: (pin: PinReport, imageUrl?: string) => void;
+  onShowChat?: () => void;
 }
 
 export default function LeftSidebar({
@@ -96,6 +98,7 @@ export default function LeftSidebar({
   onViewChange,
   onShowGraph,
   onEnterOdyssey,
+  onShowChat,
 }: LeftSidebarProps) {
   const [categoryFilter, setCategoryFilter] = useState('All');
 
@@ -168,10 +171,11 @@ export default function LeftSidebar({
 
           <div className="w-6 h-px bg-[var(--color-border-subtle)] my-2" />
 
-          {/* placeholder nav */}
+          {/* AI Chatbot — opens full page */}
           <button
-            className="w-9 h-9 rounded flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.03)]"
-            title="Agents"
+            onClick={() => onShowChat?.()}
+            className="relative w-9 h-9 rounded flex items-center justify-center cursor-pointer transition-all duration-200 text-[var(--color-text-muted)] hover:text-[var(--color-signal-teal)] hover:bg-[rgba(15,245,196,0.08)]"
+            title="AI Assistant"
           >
             <Bot size={18} />
           </button>
@@ -537,6 +541,8 @@ export default function LeftSidebar({
                 </div>
               </>
             )}
+
+            {/* AI CHAT moved to full-page ChatView */}
 
             {/* ══════════ ODYSSEY ══════════ */}
             {activeView === 'odyssey' && (

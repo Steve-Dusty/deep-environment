@@ -8,6 +8,7 @@ import LeftSidebar from './components/LeftSidebar';
 import type { NavView } from './components/LeftSidebar';
 import StatusBar from './components/StatusBar';
 import { pinReports, type PinReport } from './data/locations';
+import type { PDFViewData } from './components/ChatView';
 
 const MapView = dynamic(() => import('./components/MapView'), {
   ssr: false,
@@ -65,6 +66,34 @@ const LocationDetailView = dynamic(() => import('./components/LocationDetailView
   ),
 });
 
+const ChatView = dynamic(() => import('./components/ChatView'), {
+  ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 flex items-center justify-center bg-[var(--color-void)] z-50">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-3 h-3 rounded-full bg-[var(--color-signal-teal)] data-live" />
+        <span className="text-[10px] tracking-[0.3em] text-[var(--color-text-muted)]">
+          INITIALIZING AI ASSISTANT
+        </span>
+      </div>
+    </div>
+  ),
+});
+
+const PDFReportView = dynamic(() => import('./components/PDFReportView'), {
+  ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 flex items-center justify-center bg-[var(--color-void)] z-50">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-3 h-3 rounded-full bg-[var(--color-signal-teal)] data-live" />
+        <span className="text-[10px] tracking-[0.3em] text-[var(--color-text-muted)]">
+          LOADING PDF VIEWER
+        </span>
+      </div>
+    </div>
+  ),
+});
+
 const OdysseyView = dynamic(() => import('./components/OdysseyView'), {
   ssr: false,
   loading: () => (
@@ -96,6 +125,8 @@ export default function DashboardPage() {
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [odysseyPin, setOdysseyPin] = useState<PinReport | null>(null);
   const [odysseyImageUrl, setOdysseyImageUrl] = useState<string | undefined>(undefined);
+  const [showChat, setShowChat] = useState(false);
+  const [pdfViewData, setPdfViewData] = useState<PDFViewData | null>(null);
 
   const handleToggle = useCallback((key: string) => {
     setToggles((prev) => ({ ...prev, [key]: !prev[key as keyof typeof prev] }));
@@ -106,11 +137,39 @@ export default function DashboardPage() {
     setOdysseyImageUrl(imageUrl);
   }, []);
 
+  const handleOpenPDFView = useCallback((data: PDFViewData) => {
+    setPdfViewData(data);
+  }, []);
+
+  const handleDownloadPDF = useCallback(() => {
+    if (!pdfViewData) return;
+    const a = document.createElement('a');
+    a.href = pdfViewData.url;
+    a.download = pdfViewData.filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }, [pdfViewData]);
+
+  const handleClosePDFView = useCallback(() => {
+    setPdfViewData(null);
+  }, []);
+
   const totalAgents = pinReports.reduce((sum, p) => sum + p.agentsActive, 0);
 
   // Odyssey fullscreen takes priority
   if (odysseyPin) {
     return <OdysseyView pin={odysseyPin} imageUrl={odysseyImageUrl} onClose={() => { setOdysseyPin(null); setOdysseyImageUrl(undefined); }} />;
+  }
+
+  // PDF Report fullscreen view
+  if (pdfViewData) {
+    return <PDFReportView pdfUrl={pdfViewData.url} pdfFilename={pdfViewData.filename} messages={pdfViewData.messages} onClose={handleClosePDFView} onDownload={handleDownloadPDF} />;
+  }
+
+  // Full-page AI chat
+  if (showChat) {
+    return <ChatView onClose={() => setShowChat(false)} onOpenPDFView={handleOpenPDFView} />;
   }
 
   if (showGraph && selectedLocationId) {
@@ -149,6 +208,7 @@ export default function DashboardPage() {
                 onViewChange={setActiveView}
                 onShowGraph={() => setShowGraph(true)}
                 onEnterOdyssey={handleEnterOdyssey}
+                onShowChat={() => setShowChat(true)}
               />
             </div>
             <div className="pointer-events-auto">

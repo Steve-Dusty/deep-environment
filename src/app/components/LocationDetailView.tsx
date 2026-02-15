@@ -2,11 +2,65 @@
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { buildLocationGraph, locationSummaries, PROBLEM_CATEGORY_COLORS, PROBLEM_CATEGORY_LABELS, type ProblemNode } from '../data/locationGraphs';
+import { buildLocationGraph, fetchDynamicNodes, locationSummaries, PROBLEM_CATEGORY_COLORS, PROBLEM_CATEGORY_LABELS, type ProblemNode, type LocationGraph } from '../data/locationGraphs';
 import { THREAT_COLORS } from '../data/locations';
 import { queryLocationGraph, analyzeProblem, generatePlanToFix } from '../data/locationAI';
 import { getPinImage, getPinImages } from '../data/images';
 import { pinReports, type PinReport } from '../data/locations';
+
+// Fallback images per problem category — ensures every node always has a background
+const CATEGORY_FALLBACK_IMAGES: Record<string, string[]> = {
+  pollution: [
+    'https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=1200&h=800&fit=crop',
+    'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=1200&h=800&fit=crop',
+    'https://images.unsplash.com/photo-1516937941344-00b4e0337589?w=1200&h=800&fit=crop',
+  ],
+  wildfire: [
+    'https://images.unsplash.com/photo-1602980085374-7e743fff3cc6?w=1200&h=800&fit=crop',
+    'https://images.unsplash.com/photo-1617917197067-5de504d8518e?w=1200&h=800&fit=crop',
+    'https://images.unsplash.com/photo-1628075266900-37ac61d97322?w=1200&h=800&fit=crop',
+  ],
+  drought: [
+    'https://images.unsplash.com/photo-1504297050568-910d24c426d3?w=1200&h=800&fit=crop',
+    'https://images.unsplash.com/photo-1560156030-ed406fc91812?w=1200&h=800&fit=crop',
+    'https://images.unsplash.com/photo-1496542386008-62c44d5acbaa?w=1200&h=800&fit=crop',
+  ],
+  contamination: [
+    'https://images.unsplash.com/photo-1635351235168-568f7afff426?w=1200&h=800&fit=crop',
+    'https://images.unsplash.com/photo-1632247620837-970aa94d2b99?w=1200&h=800&fit=crop',
+    'https://images.unsplash.com/photo-1638454797905-dfb0f80b6c65?w=1200&h=800&fit=crop',
+  ],
+  deforestation: [
+    'https://images.unsplash.com/photo-1706023341956-13067d50203a?w=1200&h=800&fit=crop',
+    'https://images.unsplash.com/photo-1592930632383-c1a687a41022?w=1200&h=800&fit=crop',
+    'https://images.unsplash.com/photo-1652786982251-ef9c8c350ebc?w=1200&h=800&fit=crop',
+  ],
+  runoff: [
+    'https://images.unsplash.com/photo-1588803103006-2822e4b2619d?w=1200&h=800&fit=crop',
+    'https://images.unsplash.com/photo-1655365035125-e36d1379bf65?w=1200&h=800&fit=crop',
+    'https://images.unsplash.com/photo-1526898943670-92bfa9f94c12?w=1200&h=800&fit=crop',
+  ],
+  erosion: [
+    'https://images.unsplash.com/photo-1735744605821-e241a794f0a3?w=1200&h=800&fit=crop',
+    'https://images.unsplash.com/photo-1762788507640-aa8bec054c25?w=1200&h=800&fit=crop',
+    'https://images.unsplash.com/photo-1764943094440-e6e762489934?w=1200&h=800&fit=crop',
+  ],
+  invasive: [
+    'https://images.pexels.com/photos/3280908/pexels-photo-3280908.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    'https://images.pexels.com/photos/4320463/pexels-photo-4320463.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?w=1200&h=800&fit=crop',
+  ],
+  litter: [
+    'https://images.unsplash.com/photo-1637681316418-dd7a4b6e545e?w=1200&h=800&fit=crop',
+    'https://images.unsplash.com/photo-1603460536405-f4f1a1ce91f0?w=1200&h=800&fit=crop',
+    'https://images.unsplash.com/photo-1604061244498-cc3e269eb336?w=1200&h=800&fit=crop',
+  ],
+  other: [
+    'https://images.unsplash.com/photo-1544548091-47584b1ec10d?w=1200&h=800&fit=crop',
+    'https://images.unsplash.com/photo-1467088210886-cd9759771814?w=1200&h=800&fit=crop',
+    'https://images.unsplash.com/photo-1598985201807-a6a2f61474df?w=1200&h=800&fit=crop',
+  ],
+};
 
 const LocationGraph3D = dynamic(() => import('./LocationGraph3D'), {
   ssr: false,
@@ -33,10 +87,50 @@ export default function LocationDetailView({ locationId, onEnterOdyssey, onClose
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const location = locationSummaries.find((l) => l.id === locationId);
-  const graphData = useMemo(() => {
+
+  // Static graph as baseline
+  const staticGraph = useMemo(() => {
     try { return buildLocationGraph(locationId); }
-    catch { return { locationId, problems: [], links: [] }; }
+    catch { return { locationId, problems: [], links: [] } as LocationGraph; }
   }, [locationId]);
+
+  // Merged graph (static + dynamic Slack nodes)
+  const [graphData, setGraphData] = useState<LocationGraph>(staticGraph);
+  const [slackImageMap, setSlackImageMap] = useState<Record<string, string>>({});
+
+  // Poll for dynamic Slack nodes every 10 seconds
+  useEffect(() => {
+    let cancelled = false;
+
+    const mergeDynamic = async () => {
+      const { problems, links, imageMap } = await fetchDynamicNodes(locationId);
+      if (cancelled) return;
+
+      if (problems.length === 0) {
+        setGraphData(staticGraph);
+        setSlackImageMap({});
+        return;
+      }
+
+      // Merge: static + dynamic, dedup by ID
+      const existingIds = new Set(staticGraph.problems.map((p) => p.id));
+      const newProblems = problems.filter((p) => !existingIds.has(p.id));
+      const newLinks = links.filter(
+        (l) => !existingIds.has(typeof l.source === 'string' ? l.source : ''),
+      );
+
+      setGraphData({
+        locationId,
+        problems: [...staticGraph.problems, ...newProblems],
+        links: [...staticGraph.links, ...newLinks],
+      });
+      setSlackImageMap(imageMap);
+    };
+
+    mergeDynamic();
+    const interval = setInterval(mergeDynamic, 10_000);
+    return () => { cancelled = true; clearInterval(interval); };
+  }, [locationId, staticGraph]);
 
   // Get images from associated pins
   const locationImages = useMemo(() => {
@@ -45,6 +139,7 @@ export default function LocationDetailView({ locationId, onEnterOdyssey, onClose
   }, [location]);
 
   const [selectedProblem, setSelectedProblem] = useState<ProblemNode | null>(null);
+  const [bgImageUrl, setBgImageUrl] = useState<string | null>(null);
   const [graphStats, setGraphStats] = useState({ nodes: graphData.problems.length, links: graphData.links.length });
   const [autoUpdate, setAutoUpdate] = useState(true);
   const [elapsed, setElapsed] = useState(0);
@@ -108,7 +203,24 @@ export default function LocationDetailView({ locationId, onEnterOdyssey, onClose
     setAnalysis(null);
     setPlanToFix(null);
 
-    if (!problem) return;
+    if (!problem) {
+      setBgImageUrl(null);
+      return;
+    }
+
+    // Use Slack uploaded image if this is a dynamic node, otherwise category fallback
+    const isSlackNode = problem.id.startsWith('slack-');
+    if (isSlackNode && slackImageMap[problem.id]) {
+      setBgImageUrl(slackImageMap[problem.id]);
+    } else {
+      const rawIdx = graphData.problems.findIndex((p) => p.id === problem.id);
+      const idx = Math.max(0, rawIdx);
+      const catFallback = CATEGORY_FALLBACK_IMAGES[problem.category] || CATEGORY_FALLBACK_IMAGES.other;
+      const locImg = locationImages.length > 0
+        ? locationImages[idx % locationImages.length]
+        : null;
+      setBgImageUrl(locImg || catFallback[idx % catFallback.length]);
+    }
 
     setAnalysisLoading(true);
     try {
@@ -119,7 +231,7 @@ export default function LocationDetailView({ locationId, onEnterOdyssey, onClose
     } finally {
       setAnalysisLoading(false);
     }
-  }, [locationId, graphData]);
+  }, [locationId, graphData, locationImages, slackImageMap]);
 
   // ── Plan to Fix ─────────────────────────────────────────────────
 
@@ -156,6 +268,21 @@ export default function LocationDetailView({ locationId, onEnterOdyssey, onClose
 
   return (
     <div style={S.container}>
+      {/* Background field capture image */}
+      {bgImageUrl && (
+        <div
+          key={bgImageUrl}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 0,
+            backgroundImage: `url(${bgImageUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'brightness(0.3) saturate(0.6)',
+            animation: 'bgFadeIn 0.8s ease-out both',
+          }}
+        />
+      )}
+
       {/* 3D graph */}
       <LocationGraph3D
         ref={graphRef}
@@ -164,6 +291,7 @@ export default function LocationDetailView({ locationId, onEnterOdyssey, onClose
         onProblemSelect={handleProblemSelect}
         onGraphUpdate={handleGraphUpdate}
         autoUpdate={autoUpdate}
+        transparentBg={!!bgImageUrl}
       />
 
       {/* ── Header ── */}
@@ -189,7 +317,7 @@ export default function LocationDetailView({ locationId, onEnterOdyssey, onClose
             {autoUpdate ? '● LIVE' : '○ PAUSED'}
           </button>
           <button
-            onClick={() => { graphRef.current?.resetView(); setSelectedProblem(null); setAnalysis(null); setPlanToFix(null); }}
+            onClick={() => { graphRef.current?.resetView(); setSelectedProblem(null); setAnalysis(null); setPlanToFix(null); setBgImageUrl(null); }}
             style={S.btn}
           >
             RESET VIEW
@@ -219,16 +347,29 @@ export default function LocationDetailView({ locationId, onEnterOdyssey, onClose
       {selectedProblem && (
         <div key={selectedProblem.id} style={S.leftPanel} className="kg-panel-slide-in">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-            <span style={{
-              fontSize: 8, fontWeight: 600, letterSpacing: 2,
-              color: PROBLEM_CATEGORY_COLORS[selectedProblem.category],
-              background: `${PROBLEM_CATEGORY_COLORS[selectedProblem.category]}18`,
-              padding: '2px 6px', borderRadius: 3,
-              border: `1px solid ${PROBLEM_CATEGORY_COLORS[selectedProblem.category]}33`,
-            }}>
-              {PROBLEM_CATEGORY_LABELS[selectedProblem.category]}
-            </span>
-            <button onClick={() => { setSelectedProblem(null); setAnalysis(null); setPlanToFix(null); }} style={{ ...S.btn, padding: '2px 6px', fontSize: 8 }}>
+            <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+              <span style={{
+                fontSize: 8, fontWeight: 600, letterSpacing: 2,
+                color: PROBLEM_CATEGORY_COLORS[selectedProblem.category],
+                background: `${PROBLEM_CATEGORY_COLORS[selectedProblem.category]}18`,
+                padding: '2px 6px', borderRadius: 3,
+                border: `1px solid ${PROBLEM_CATEGORY_COLORS[selectedProblem.category]}33`,
+              }}>
+                {PROBLEM_CATEGORY_LABELS[selectedProblem.category]}
+              </span>
+              {selectedProblem.id.startsWith('slack-') && (
+                <span style={{
+                  fontSize: 7, fontWeight: 600, letterSpacing: 2,
+                  color: '#f59e0b',
+                  background: 'rgba(245,158,11,0.12)',
+                  padding: '2px 6px', borderRadius: 3,
+                  border: '1px solid rgba(245,158,11,0.3)',
+                }}>
+                  FROM SLACK
+                </span>
+              )}
+            </div>
+            <button onClick={() => { setSelectedProblem(null); setAnalysis(null); setPlanToFix(null); setBgImageUrl(null); }} style={{ ...S.btn, padding: '2px 6px', fontSize: 8 }}>
               CLOSE
             </button>
           </div>
@@ -274,6 +415,21 @@ export default function LocationDetailView({ locationId, onEnterOdyssey, onClose
                 <div key={i} style={{ fontSize: 9, color: '#8b8fa4', marginBottom: 2 }}>{ind}</div>
               ))}
             </div>
+          )}
+
+          {/* Slack uploaded image */}
+          {selectedProblem.id.startsWith('slack-') && slackImageMap[selectedProblem.id] && (
+            <>
+              <div style={S.divider} />
+              <div style={{ fontSize: 8, fontWeight: 600, letterSpacing: 2.5, color: '#f59e0b', marginBottom: 6 }}>SLACK UPLOAD</div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={slackImageMap[selectedProblem.id]}
+                alt="Slack upload"
+                style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 4, border: '1px solid rgba(245,158,11,0.2)', marginBottom: 4 }}
+                loading="lazy"
+              />
+            </>
           )}
 
           {/* Location images */}
@@ -447,6 +603,10 @@ export default function LocationDetailView({ locationId, onEnterOdyssey, onClose
           100% { opacity: 1; transform: translateX(0) scale(1); }
         }
         .kg-panel-slide-in { animation: kgPanelSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        @keyframes bgFadeIn {
+          0% { opacity: 0; }
+          100% { opacity: 1; }
+        }
       `}</style>
     </div>
   );

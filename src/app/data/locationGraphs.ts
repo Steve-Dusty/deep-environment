@@ -451,3 +451,101 @@ export function buildLocationGraph(locationId: string): LocationGraph {
 
   return { locationId, problems, links };
 }
+
+// ── Dynamic nodes from Slack uploads ────────────────────────────────────────
+
+interface SlackClassification {
+  location_id: string;
+  category: ProblemNode['category'];
+  severity: ThreatLevel;
+  problem_name: string;
+  problem_description: string;
+  indicators: string[];
+  trend: 'improving' | 'stable' | 'worsening';
+}
+
+interface SlackUploadEntry {
+  filename: string;
+  original_name: string;
+  user: string;
+  channel: string;
+  timestamp: number;
+  mimetype: string;
+  ai_description?: string;
+  classification?: SlackClassification;
+}
+
+export async function fetchDynamicNodes(locationId: string): Promise<{
+  problems: ProblemNode[];
+  links: ProblemLink[];
+  imageMap: Record<string, string>;
+}> {
+  try {
+    const res = await fetch('/api/slack-uploads');
+    if (!res.ok) return { problems: [], links: [], imageMap: {} };
+    const uploads: SlackUploadEntry[] = await res.json();
+
+    const matched = uploads.filter(
+      (u) => u.classification && u.classification.location_id === locationId,
+    );
+
+    if (matched.length === 0) return { problems: [], links: [], imageMap: {} };
+
+    // Build the static graph to find category-matching nodes for linking
+    const staticGraph = buildLocationGraph(locationId);
+
+    const problems: ProblemNode[] = [];
+    const links: ProblemLink[] = [];
+    const imageMap: Record<string, string> = {};
+
+    for (const upload of matched) {
+      const c = upload.classification!;
+      const nodeId = `slack-${upload.timestamp}`;
+      const ts = new Date(upload.timestamp * 1000);
+      const timeAgo = formatTimeAgo(ts);
+
+      problems.push({
+        id: nodeId,
+        name: c.problem_name,
+        category: c.category,
+        severity: c.severity as ThreatLevel,
+        description: c.problem_description,
+        indicators: c.indicators,
+        trend: c.trend,
+        confidence: 75,
+        lastUpdated: timeAgo,
+      });
+
+      // Store image URL for this node
+      imageMap[nodeId] = `/api/slack-uploads/image?f=${encodeURIComponent(upload.filename)}`;
+
+      // Link to the most relevant static node (same category, or first root)
+      const sameCat = staticGraph.problems.find((p) => p.category === c.category);
+      const target = sameCat || staticGraph.problems[0];
+      if (target) {
+        links.push({
+          source: nodeId,
+          target: target.id,
+          label: 'correlates',
+          type: 'correlates',
+          strength: 0.5,
+        });
+      }
+    }
+
+    return { problems, links, imageMap };
+  } catch (e) {
+    console.error('Failed to fetch dynamic nodes:', e);
+    return { problems: [], links: [], imageMap: {} };
+  }
+}
+
+function formatTimeAgo(date: Date): string {
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
+}
