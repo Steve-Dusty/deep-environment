@@ -31,121 +31,121 @@ function generateDecisions(pin: PinReport): Decision[] {
   const trees: Record<string, Decision[]> = {
     Water: [
       {
-        narrative: `${pin.title} — what would ${pin.neighborhood} look like if the water was cleaned?`,
+        narrative: 'How should we begin restoring this waterway?',
         choices: [
-          { label: 'REMOVE POLLUTANTS', sub: 'Filter contaminants from the water', prompt: `The water in ${loc} is now clear and clean. All pollutants, oil sheens, and chemical runoff have been removed. Sunlight penetrates the surface revealing a sandy bottom. The waterway is pristine and reflective. Photorealistic, same location, clean water transformation.`, consequence: 'Water runs clear again', type: 'positive' },
-          { label: 'RESTORE SHORELINE', sub: 'Rebuild the natural water\'s edge', prompt: `The shoreline of ${loc} has been restored. Trash and debris are gone. Native reeds, grasses, and wetland plants grow thick along the banks. The water meets a living green edge instead of concrete and garbage. Natural, lush, photorealistic.`, consequence: 'Natural shoreline restored', type: 'positive' },
-          { label: 'NO INTERVENTION', sub: 'See how it continues to degrade', prompt: `The water in ${loc} deteriorates further. More pollutants accumulate. The surface becomes opaque, dark, and lifeless. Algae blooms choke the waterway. Dead fish float. The smell is visible as a green haze over the surface. Photorealistic environmental decline.`, consequence: 'Pollution accelerates unchecked', type: 'negative' },
+          { label: 'REMOVE POLLUTANTS', sub: 'Filter contaminants from the water', prompt: `The water in ${loc} is now clear and clean. All pollutants removed. Sunlight penetrates the surface. The waterway is pristine. Photorealistic clean water transformation.`, consequence: 'Water runs clear again', type: 'positive' },
+          { label: 'RESTORE SHORELINE', sub: 'Rebuild the natural water\'s edge', prompt: `The shoreline of ${loc} restored. Native reeds and wetland plants grow thick along the banks. Natural, lush, photorealistic.`, consequence: 'Natural shoreline restored', type: 'positive' },
+          { label: 'NO INTERVENTION', sub: 'See how it degrades further', prompt: `The water in ${loc} deteriorates. More pollutants accumulate. Algae blooms choke the waterway. Photorealistic environmental decline.`, consequence: 'Pollution accelerates unchecked', type: 'negative' },
         ],
       },
       {
-        narrative: 'The water is responding. What happens if we restore the ecosystem around it?',
+        narrative: 'The water is responding. What comes next?',
         choices: [
-          { label: 'BRING BACK WILDLIFE', sub: 'Reintroduce native species', prompt: `${loc} waterway is now teeming with life. Fish swim in clear water. Herons and egrets wade in the shallows. Turtles sun on logs. Dragonflies hover. The entire aquatic ecosystem has been restored. Vibrant, alive, photorealistic nature scene.`, consequence: 'Ecosystem springs back to life', type: 'positive' },
-          { label: 'BUILD WETLANDS', sub: 'Create natural water filtration', prompt: `A new constructed wetland stretches along ${loc}. Pools of filtered water cascade through layers of native marsh plants. The wetland acts as a living filter, cleaning water naturally. Lush green vegetation everywhere. Photorealistic restored wetland.`, consequence: 'Natural filtration system thriving', type: 'positive' },
+          { label: 'BRING BACK WILDLIFE', sub: 'Reintroduce native species', prompt: `${loc} waterway teeming with life. Fish, herons, turtles, dragonflies. The aquatic ecosystem restored. Photorealistic nature scene.`, consequence: 'Ecosystem springs back to life', type: 'positive' },
+          { label: 'BUILD WETLANDS', sub: 'Create natural water filtration', prompt: `Constructed wetland along ${loc}. Pools of filtered water cascade through marsh plants. Living filter. Photorealistic restored wetland.`, consequence: 'Natural filtration system thriving', type: 'positive' },
         ],
       },
       {
-        narrative: 'Full restoration complete. This is what recovery looks like.',
+        narrative: 'Full restoration. See what is possible.',
         choices: [
-          { label: 'VIEW RESTORED SITE', sub: 'See the fully recovered environment', prompt: `${loc} fully restored. Crystal clear water flows through a thriving natural waterway. Dense native vegetation. Birds nesting. Fish jumping. People walking along clean, beautiful paths beside sparkling water. A complete environmental transformation. Golden hour, photorealistic.`, consequence: 'Complete environmental recovery', type: 'positive' },
-          { label: 'COMPARE BEFORE/AFTER', sub: 'See the contrast of change', prompt: `Split view transformation of ${loc}. On one side, the polluted, degraded waterway as it was. On the other, the same location now — clean, green, alive. The dramatic difference between neglect and restoration. Photorealistic comparison.`, consequence: 'The power of restoration revealed', type: 'positive' },
+          { label: 'VIEW RESTORED SITE', sub: 'The fully recovered environment', prompt: `${loc} fully restored. Crystal clear water, dense vegetation, birds nesting, fish jumping. Golden hour, photorealistic.`, consequence: 'Complete environmental recovery', type: 'positive' },
+          { label: 'COMPARE BEFORE/AFTER', sub: 'See the contrast', prompt: `Split view of ${loc}. Polluted waterway vs. clean, green, alive. Photorealistic comparison.`, consequence: 'The power of restoration revealed', type: 'positive' },
         ],
       },
     ],
     Air: [
       {
-        narrative: `${pin.title} — what would ${pin.city} look like with clean air?`,
+        narrative: 'How do we clear these skies?',
         choices: [
-          { label: 'CLEAR THE SKIES', sub: 'Remove the smoke and haze', prompt: `The skies over ${loc} are now completely clear. All smoke, haze, and pollution have dissipated. Deep blue sky stretches overhead. The sun shines clearly. Buildings, trees, and distant mountains are crisp and visible. The same location but with perfectly clean air. Photorealistic clear day.`, consequence: 'Skies are crystal clear', type: 'positive' },
-          { label: 'ADD GREEN CANOPY', sub: 'Plant trees to filter the air', prompt: `${loc} is now lined with mature trees. A thick green canopy shades the streets. The air is filtered naturally by thousands of leaves. Where there was haze, there is now dappled green light. The urban landscape transformed by vegetation. Photorealistic urban forest.`, consequence: 'Urban forest filters the air', type: 'positive' },
-          { label: 'NO INTERVENTION', sub: 'See how the pollution compounds', prompt: `The air quality in ${loc} worsens dramatically. Thick brown-grey smog blankets everything. Visibility drops to a few hundred feet. The sun is a dim orange disk behind toxic haze. Streets are barely visible. A suffocating atmosphere. Photorealistic severe air pollution.`, consequence: 'Air becomes hazardous', type: 'negative' },
+          { label: 'CLEAR THE SKIES', sub: 'Remove the smoke and haze', prompt: `Skies over ${loc} completely clear. Deep blue sky, crisp visibility, mountains visible. Photorealistic clear day.`, consequence: 'Skies are crystal clear', type: 'positive' },
+          { label: 'ADD GREEN CANOPY', sub: 'Plant trees to filter the air', prompt: `${loc} lined with mature trees. Thick green canopy shades streets. Dappled light. Photorealistic urban forest.`, consequence: 'Urban forest filters the air', type: 'positive' },
+          { label: 'NO INTERVENTION', sub: 'See how pollution compounds', prompt: `Air quality in ${loc} worsens. Thick smog blankets everything. Visibility drops. Photorealistic severe air pollution.`, consequence: 'Air becomes hazardous', type: 'negative' },
         ],
       },
       {
-        narrative: 'The air is clearing. What would this neighborhood look like fully transformed?',
+        narrative: 'The air is clearing. How do we make it permanent?',
         choices: [
-          { label: 'SOLAR TRANSITION', sub: 'Replace all fossil fuel sources', prompt: `${loc} transformed with clean energy. Solar panels on every rooftop. No smokestacks, no exhaust. The air is pristine. Electric vehicles move silently through clean streets under blue skies. Renewable energy infrastructure gleaming. Photorealistic clean city.`, consequence: 'Zero emissions achieved', type: 'positive' },
-          { label: 'GREEN INFRASTRUCTURE', sub: 'Living walls and rooftop gardens', prompt: `Every building in ${loc} covered with living green walls and rooftop gardens. Plants growing vertically up facades. Clean air flows between buildings. The neighborhood breathes. A green urban oasis under clear blue sky. Photorealistic sustainable architecture.`, consequence: 'The city itself cleans the air', type: 'positive' },
+          { label: 'SOLAR TRANSITION', sub: 'Replace all fossil fuel sources', prompt: `${loc} with clean energy. Solar panels everywhere. No smokestacks. Pristine air. Photorealistic clean city.`, consequence: 'Zero emissions achieved', type: 'positive' },
+          { label: 'GREEN INFRASTRUCTURE', sub: 'Living walls and rooftop gardens', prompt: `Buildings in ${loc} covered with living green walls and rooftop gardens. Clean air flows between buildings. Photorealistic sustainable architecture.`, consequence: 'The city itself cleans the air', type: 'positive' },
         ],
       },
       {
-        narrative: 'Full recovery. This is the potential of clean air.',
+        narrative: 'Full recovery. The potential of clean air.',
         choices: [
-          { label: 'VIEW CLEAN FUTURE', sub: 'See the pollution-free environment', prompt: `${loc} on a perfectly clear day. Brilliant blue sky. Distant mountains and skyline sharp and crisp on the horizon. Children playing outside. People jogging. The air is so clean you can see for miles. Vibrant colors, sharp shadows, pure atmosphere. Golden hour photorealism.`, consequence: 'A breathable future realized', type: 'positive' },
-          { label: 'COMPARE BEFORE/AFTER', sub: 'Contrast the hazy past with the clear present', prompt: `The same view of ${loc} — before and after. One side choked in grey-brown haze, buildings fading into smog. The other side pristine, sharp, colorful under a vivid blue sky. The same place, utterly transformed by clean air. Photorealistic comparison.`, consequence: 'Clean air changes everything', type: 'positive' },
+          { label: 'VIEW CLEAN FUTURE', sub: 'See the pollution-free city', prompt: `${loc} perfectly clear day. Blue sky, sharp horizon, children playing. Golden hour photorealism.`, consequence: 'A breathable future realized', type: 'positive' },
+          { label: 'COMPARE BEFORE/AFTER', sub: 'Contrast the transformation', prompt: `Same view of ${loc} — haze vs. pristine blue sky. Photorealistic comparison.`, consequence: 'Clean air changes everything', type: 'positive' },
         ],
       },
     ],
     Bio: [
       {
-        narrative: `${pin.title} — what would ${pin.neighborhood} look like with a thriving ecosystem?`,
+        narrative: 'How do we restore the native ecosystem?',
         choices: [
-          { label: 'REMOVE INVASIVE SPECIES', sub: 'Clear out what doesn\'t belong', prompt: `${loc} cleared of all invasive species. The overgrown, choking vegetation is gone. Native plants now have room to grow. The natural landscape emerges — the habitat as it should be. Open, balanced, healthy ground cover. Photorealistic restored habitat.`, consequence: 'Native habitat reclaimed', type: 'positive' },
-          { label: 'RESTORE NATIVE PLANTS', sub: 'Replant the original ecosystem', prompt: `${loc} is now covered in native vegetation. Indigenous wildflowers, grasses, and shrubs grow in natural patterns. The landscape looks like it did before human disruption. Rich biodiversity everywhere. Butterflies, bees, and birds populate the thriving habitat. Photorealistic native ecosystem.`, consequence: 'Original ecosystem returns', type: 'positive' },
-          { label: 'NO INTERVENTION', sub: 'Let the invasives spread', prompt: `${loc} overrun completely by invasive species. A monoculture of aggressive plants chokes out everything. No native birds, no butterflies, no diversity. A biological desert disguised as greenery. The habitat is functionally dead despite looking green. Photorealistic ecological collapse.`, consequence: 'Biodiversity collapses', type: 'negative' },
+          { label: 'REMOVE INVASIVE SPECIES', sub: 'Clear out what doesn\'t belong', prompt: `${loc} cleared of invasive species. Native plants growing. Balanced, healthy ground cover. Photorealistic restored habitat.`, consequence: 'Native habitat reclaimed', type: 'positive' },
+          { label: 'RESTORE NATIVE PLANTS', sub: 'Replant the original ecosystem', prompt: `${loc} covered in native vegetation. Wildflowers, grasses, butterflies, bees. Photorealistic native ecosystem.`, consequence: 'Original ecosystem returns', type: 'positive' },
+          { label: 'NO INTERVENTION', sub: 'Let the invasives spread', prompt: `${loc} overrun by invasive monoculture. No diversity. Functionally dead. Photorealistic ecological collapse.`, consequence: 'Biodiversity collapses', type: 'negative' },
         ],
       },
       {
         narrative: 'The habitat is recovering. What about the wildlife?',
         choices: [
-          { label: 'BRING BACK WILDLIFE', sub: 'Reintroduce native animal species', prompt: `${loc} alive with native wildlife. Birds nesting in restored trees. Foxes, rabbits, and deer visible in the underbrush. Pollinators swarm flowering plants. The food chain is complete and functioning. A living, breathing, balanced ecosystem. Photorealistic wildlife sanctuary.`, consequence: 'The food chain is whole again', type: 'positive' },
-          { label: 'CREATE CORRIDORS', sub: 'Connect isolated habitat patches', prompt: `Green wildlife corridors stretch through ${loc}, connecting parks and natural areas. Bridges over roads for animals. Continuous strips of native vegetation. Wildlife moves freely through the landscape. An interconnected network of living spaces. Photorealistic ecological corridors.`, consequence: 'Habitats reconnected', type: 'positive' },
+          { label: 'BRING BACK WILDLIFE', sub: 'Reintroduce native species', prompt: `${loc} alive with wildlife. Birds nesting, pollinators swarming. Complete food chain. Photorealistic wildlife sanctuary.`, consequence: 'The food chain is whole again', type: 'positive' },
+          { label: 'CREATE CORRIDORS', sub: 'Connect isolated habitat patches', prompt: `Green wildlife corridors through ${loc} connecting parks. Wildlife moves freely. Photorealistic ecological corridors.`, consequence: 'Habitats reconnected', type: 'positive' },
         ],
       },
       {
-        narrative: 'Full ecological restoration. A vision of what\'s possible.',
+        narrative: 'Full ecological restoration.',
         choices: [
-          { label: 'VIEW THRIVING HABITAT', sub: 'See the fully recovered ecosystem', prompt: `${loc} is a thriving nature sanctuary. Dense, diverse native vegetation. Abundant wildlife at every level — insects, birds, mammals. Clean water flowing through. The air smells of wildflowers and earth. A complete, self-sustaining ecosystem in perfect balance. Sunset, photorealistic.`, consequence: 'Biodiversity fully restored', type: 'positive' },
-          { label: 'COMPARE BEFORE/AFTER', sub: 'See degraded vs. restored', prompt: `${loc} before and after restoration. One side shows the degraded, invaded, lifeless habitat. The other shows the same spot thriving — native plants, wildlife, clean streams, rich soil. The dramatic potential of ecological restoration. Photorealistic comparison.`, consequence: 'Nature can recover', type: 'positive' },
+          { label: 'VIEW THRIVING HABITAT', sub: 'The fully recovered ecosystem', prompt: `${loc} thriving nature sanctuary. Dense native vegetation, abundant wildlife, clean water. Sunset, photorealistic.`, consequence: 'Biodiversity fully restored', type: 'positive' },
+          { label: 'COMPARE BEFORE/AFTER', sub: 'See degraded vs. restored', prompt: `${loc} before and after. Degraded habitat vs. thriving native life. Photorealistic comparison.`, consequence: 'Nature can recover', type: 'positive' },
         ],
       },
     ],
     Soil: [
       {
-        narrative: `${pin.title} — what would ${pin.neighborhood} look like with healthy ground?`,
+        narrative: 'How do we heal this ground?',
         choices: [
-          { label: 'REMEDIATE THE SOIL', sub: 'Remove contaminants and toxins', prompt: `The soil in ${loc} is now clean and healthy. All industrial contaminants, heavy metals, and toxic waste have been removed. Rich, dark, fertile earth is visible. New grass and plants sprout from the remediated ground. The land is safe and productive again. Photorealistic soil restoration.`, consequence: 'Clean soil, new growth', type: 'positive' },
-          { label: 'STOP THE EROSION', sub: 'Stabilize and rebuild the terrain', prompt: `The eroding landscape of ${loc} has been stabilized. Retaining walls of natural stone hold the soil. Deep-rooted native plants anchor the ground. Where land was washing away, it is now firm, green, and stable. Terraced vegetation prevents future erosion. Photorealistic erosion control.`, consequence: 'Ground stabilized naturally', type: 'positive' },
-          { label: 'NO INTERVENTION', sub: 'Let degradation continue', prompt: `The soil in ${loc} continues to erode and degrade. Bare, cracked earth expands. Dust blows where plants once grew. The ground becomes barren and lifeless. Gullies deepen. Infrastructure tilts and cracks. Photorealistic land degradation.`, consequence: 'The ground keeps washing away', type: 'negative' },
+          { label: 'REMEDIATE THE SOIL', sub: 'Remove contaminants and toxins', prompt: `Soil in ${loc} now clean and healthy. Rich dark fertile earth. New plants sprouting. Photorealistic soil restoration.`, consequence: 'Clean soil, new growth', type: 'positive' },
+          { label: 'STOP THE EROSION', sub: 'Stabilize the terrain', prompt: `Eroding landscape of ${loc} stabilized. Deep-rooted native plants anchor the ground. Green and stable. Photorealistic erosion control.`, consequence: 'Ground stabilized naturally', type: 'positive' },
+          { label: 'NO INTERVENTION', sub: 'Let degradation continue', prompt: `Soil in ${loc} continues to erode. Bare cracked earth. Dust and barren lifelessness. Photorealistic land degradation.`, consequence: 'The ground keeps washing away', type: 'negative' },
         ],
       },
       {
-        narrative: 'The ground is healing. What grows when the soil is healthy?',
+        narrative: 'The ground is healing. What grows here now?',
         choices: [
-          { label: 'PLANT A FOOD FOREST', sub: 'Grow productive trees and gardens', prompt: `${loc} transformed into a lush food forest. Fruit trees, vegetable gardens, and herb patches cover the once-barren ground. Layers of productive vegetation — tall canopy trees, understory shrubs, ground cover crops. A community growing food on restored land. Photorealistic urban agriculture.`, consequence: 'Productive land from barren ground', type: 'positive' },
-          { label: 'RESTORE NATIVE GROUND COVER', sub: 'Let nature rebuild the soil layer', prompt: `${loc} covered in native ground vegetation. Thick grass, mosses, and low shrubs protect the soil surface. Fallen leaves decompose into rich humus. The soil darkens with organic matter. Earthworms and mycelium networks rebuild the underground ecosystem. Photorealistic natural soil recovery.`, consequence: 'Living soil ecosystem returns', type: 'positive' },
+          { label: 'PLANT A FOOD FOREST', sub: 'Grow productive trees and gardens', prompt: `${loc} transformed into lush food forest. Fruit trees, vegetable gardens. Photorealistic urban agriculture.`, consequence: 'Productive land from barren ground', type: 'positive' },
+          { label: 'RESTORE NATIVE GROUND COVER', sub: 'Let nature rebuild the soil', prompt: `${loc} covered in native ground vegetation. Thick grass, mosses, rich humus. Photorealistic natural soil recovery.`, consequence: 'Living soil ecosystem returns', type: 'positive' },
         ],
       },
       {
-        narrative: 'Complete soil restoration. The foundation of everything else.',
+        narrative: 'Complete soil restoration.',
         choices: [
-          { label: 'VIEW RESTORED LAND', sub: 'See healthy ground supporting life', prompt: `${loc} with fully restored, healthy soil. Rich green vegetation everywhere. Tall trees with deep roots. Wildflowers blooming. The ground is dark, moist, and alive with organisms. A thriving landscape built on healthy soil. Everything grows from the ground up. Golden hour, photorealistic.`, consequence: 'Healthy soil supports all life', type: 'positive' },
-          { label: 'COMPARE BEFORE/AFTER', sub: 'Barren ground vs. living soil', prompt: `${loc} before and after soil restoration. One side shows cracked, eroded, contaminated ground — lifeless and barren. The other shows the same land now — rich dark soil, dense vegetation, productive and alive. The transformation that starts underground. Photorealistic comparison.`, consequence: 'From barren to abundant', type: 'positive' },
+          { label: 'VIEW RESTORED LAND', sub: 'Healthy ground supporting life', prompt: `${loc} fully restored healthy soil. Rich vegetation, tall trees, wildflowers. Golden hour, photorealistic.`, consequence: 'Healthy soil supports all life', type: 'positive' },
+          { label: 'COMPARE BEFORE/AFTER', sub: 'Barren ground vs. living soil', prompt: `${loc} before and after. Cracked contaminated ground vs. rich dark soil with dense vegetation. Photorealistic comparison.`, consequence: 'From barren to abundant', type: 'positive' },
         ],
       },
     ],
     Climate: [
       {
-        narrative: `${pin.title} — what would ${pin.city} look like adapted and resilient?`,
+        narrative: 'How do we make this place resilient?',
         choices: [
-          { label: 'COOL THE CITY', sub: 'Add shade, water features, and green space', prompt: `${loc} dramatically cooled. Mature shade trees line every street. Reflective cool roofs on buildings. Misting fountains in public spaces. Green parks replace concrete lots. The temperature drops visibly — no more heat shimmer on pavement. Cool, shaded, livable streets. Photorealistic urban cooling.`, consequence: 'Temperature drops significantly', type: 'positive' },
-          { label: 'FLOOD-PROOF THE AREA', sub: 'Build for extreme weather resilience', prompt: `${loc} redesigned for resilience. Rain gardens absorb downpours. Permeable surfaces replace concrete. Bioswales channel water safely. Buildings elevated on stilts. Green infrastructure handles extreme rainfall gracefully. No flooding, no damage. The city works with water instead of fighting it. Photorealistic climate adaptation.`, consequence: 'Built to handle extremes', type: 'positive' },
-          { label: 'NO ADAPTATION', sub: 'See what happens without action', prompt: `${loc} battered by worsening extreme weather. Flooded streets. Buckled pavement from heat. Cracked foundations. Overwhelmed storm drains. A city infrastructure failing under climate stress it was never designed for. Brown lawns, dried trees, crumbling roads. Photorealistic climate damage.`, consequence: 'Infrastructure keeps failing', type: 'negative' },
+          { label: 'COOL THE CITY', sub: 'Shade, water features, green space', prompt: `${loc} cooled. Mature shade trees, reflective roofs, green parks. No heat shimmer. Photorealistic urban cooling.`, consequence: 'Temperature drops significantly', type: 'positive' },
+          { label: 'FLOOD-PROOF THE AREA', sub: 'Build for extreme weather', prompt: `${loc} redesigned for resilience. Rain gardens, permeable surfaces, bioswales. No flooding. Photorealistic climate adaptation.`, consequence: 'Built to handle extremes', type: 'positive' },
+          { label: 'NO ADAPTATION', sub: 'See what happens without action', prompt: `${loc} battered by extreme weather. Flooded streets, buckled pavement, dead trees. Photorealistic climate damage.`, consequence: 'Infrastructure keeps failing', type: 'negative' },
         ],
       },
       {
-        narrative: 'The environment is responding. What does a climate-resilient community look like?',
+        narrative: 'How do we future-proof this community?',
         choices: [
-          { label: 'RENEWABLE ENERGY', sub: 'Power everything with clean sources', prompt: `${loc} powered entirely by renewables. Solar panels gleam on every roof. Small wind turbines on buildings. Community battery storage. No power lines sagging in heat. The grid is resilient, clean, and independent. Blue sky, cool air, energy abundance. Photorealistic clean energy city.`, consequence: 'Energy independence achieved', type: 'positive' },
-          { label: 'GREEN CORRIDORS', sub: 'Nature-based climate solutions', prompt: `${loc} interwoven with green corridors. Tree-lined boulevards connect parks. Urban streams flow through neighborhoods. Wetlands buffer against storms. The city is half-nature, half-infrastructure. Temperature regulated naturally. A cooler, greener, more livable place. Photorealistic green urbanism.`, consequence: 'Nature cools and protects the city', type: 'positive' },
+          { label: 'RENEWABLE ENERGY', sub: 'Power everything with clean sources', prompt: `${loc} powered by renewables. Solar panels, battery storage. Clean, resilient grid. Photorealistic clean energy city.`, consequence: 'Energy independence achieved', type: 'positive' },
+          { label: 'GREEN CORRIDORS', sub: 'Nature-based climate solutions', prompt: `${loc} interwoven with green corridors. Tree-lined boulevards, urban streams, wetlands. Photorealistic green urbanism.`, consequence: 'Nature cools and protects the city', type: 'positive' },
         ],
       },
       {
-        narrative: 'Full climate adaptation. A model for the future.',
+        narrative: 'Full climate adaptation.',
         choices: [
-          { label: 'VIEW RESILIENT FUTURE', sub: 'See the climate-adapted city', prompt: `${loc} fully adapted to climate change. Green everywhere. Cool streets under tree canopy. Solar roofs. Rain gardens. Thriving public spaces. People outdoors, comfortable, safe. A city that turned climate crisis into climate opportunity. Beautiful, livable, sustainable. Sunset, photorealistic.`, consequence: 'A city designed for the future', type: 'positive' },
-          { label: 'COMPARE BEFORE/AFTER', sub: 'Climate-stressed vs. climate-adapted', prompt: `${loc} before and after climate adaptation. One side shows heat-stressed, flood-prone, crumbling infrastructure. The other shows the same place green, cool, resilient, thriving. The difference between denial and action. Photorealistic comparison.`, consequence: 'Adaptation transforms everything', type: 'positive' },
+          { label: 'VIEW RESILIENT FUTURE', sub: 'See the climate-adapted city', prompt: `${loc} fully adapted. Green, cool, solar roofs, rain gardens, thriving public spaces. Sunset, photorealistic.`, consequence: 'A city designed for the future', type: 'positive' },
+          { label: 'COMPARE BEFORE/AFTER', sub: 'Climate-stressed vs. adapted', prompt: `${loc} before and after adaptation. Heat-stressed vs. green, cool, resilient. Photorealistic comparison.`, consequence: 'Adaptation transforms everything', type: 'positive' },
         ],
       },
     ],
@@ -232,6 +232,56 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
   const [hudVisible, setHudVisible] = useState(false);
   const [timerPct, setTimerPct] = useState(100);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Voice narration
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  // Speak pre-written text directly via TTS
+  const speak = useCallback(async (text: string) => {
+    if (!voiceEnabled) return;
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+    setIsSpeaking(true);
+    try {
+      const res = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      if (!res.ok) { setIsSpeaking(false); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      audio.onended = () => { setIsSpeaking(false); URL.revokeObjectURL(url); audioRef.current = null; };
+      audio.onerror = () => { setIsSpeaking(false); URL.revokeObjectURL(url); audioRef.current = null; };
+      await audio.play();
+    } catch { setIsSpeaking(false); }
+  }, [voiceEnabled]);
+
+  // Generate AI narration then speak it — adapts to any pin dynamically
+  const narrateAI = useCallback(async (type: 'opening' | 'consequence' | 'finale', extra?: { choiceLabel?: string; choiceType?: string }) => {
+    if (!voiceEnabled) return;
+    try {
+      const res = await fetch('/api/narrate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: { neighborhood: pin.neighborhood, city: pin.city, title: pin.title, category: pin.category, summary: pin.summary }, type, ...extra }),
+      });
+      if (!res.ok) return;
+      const { text } = await res.json();
+      if (text) speak(text);
+    } catch { /* silent fail */ }
+  }, [voiceEnabled, pin, speak]);
+
+  const stopSpeaking = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    setIsSpeaking(false);
+  }, []);
 
   // Custom prompt input
   const [promptInput, setPromptInput] = useState('');
@@ -348,7 +398,7 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
           setStoryPhase('cinematic');
           setStatusText('');
           setTimeout(() => setHudVisible(true), 600);
-          setTimeout(() => setStoryPhase('narrating'), 5000);
+          setTimeout(() => setStoryPhase('narrating'), 8000);
         },
         onInteractAcknowledged: (prompt: string) => {
           console.log('[Odyssey] Interact acknowledged:', prompt.slice(0, 60));
@@ -378,20 +428,30 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
 
   // ── Story transitions ────────────────────────────────────────────────
 
-  // Narrating → Choosing (after text is visible for 2s)
+  // AI-generated opening narration when streaming starts
+  const hasSpokenOpening = useRef(false);
+  useEffect(() => {
+    if (phase === 'streaming' && !hasSpokenOpening.current) {
+      hasSpokenOpening.current = true;
+      narrateAI('opening');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
+
+  // Narrating → Choosing (give time for voice to finish scene narration)
   useEffect(() => {
     if (storyPhase !== 'narrating') return;
     const t = setTimeout(() => {
       setStoryPhase('choosing');
       setTimerPct(100);
-      // Start countdown timer (20 seconds)
+      // Start countdown timer (25 seconds)
       let pct = 100;
       if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = setInterval(() => {
-        pct -= 0.5;
+        pct -= 0.4;
         setTimerPct(Math.max(0, pct));
       }, 100);
-    }, 2200);
+    }, 3000);
     return () => clearTimeout(t);
   }, [storyPhase]);
 
@@ -412,6 +472,9 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
       setConsequenceText(choice.consequence);
       setChoicesMade((prev) => [...prev, { label: choice.label, type: choice.type }]);
 
+      // AI-generated narration for this specific choice
+      narrateAI('consequence', { choiceLabel: choice.label, choiceType: choice.type });
+
       // Send interact prompt to Odyssey
       const client = clientRef.current;
       if (client) {
@@ -426,12 +489,11 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
         } else {
           setDecisionIndex(nextIdx);
           setStoryPhase('cinematic');
-          // Show next decision after 4s of cinematic
-          setTimeout(() => setStoryPhase('narrating'), 4000);
+          setTimeout(() => setStoryPhase('narrating'), 6000);
         }
       }, 6000);
     },
-    [decisionIndex, decisions.length],
+    [decisionIndex, decisions.length, narrateAI],
   );
 
   // ── Custom prompt ──────────────────────────────────────────────────
@@ -488,6 +550,20 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
       : negativeCount > positiveCount
         ? { text: 'DEGRADATION CONTINUES', color: '#ff3b4f', sub: 'Without intervention, the environment keeps declining.' }
         : { text: 'PARTIAL RECOVERY', color: '#f5a623', sub: 'Some improvement, but more action is needed.' };
+
+  // AI-generated finale narration
+  useEffect(() => {
+    if (storyPhase === 'finale') {
+      const overall = positiveCount > negativeCount ? 'positive' : negativeCount > positiveCount ? 'negative' : 'neutral';
+      narrateAI('finale', { choiceType: overall });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storyPhase]);
+
+  // Clean up audio on unmount
+  useEffect(() => {
+    return () => { stopSpeaking(); };
+  }, [stopSpeaking]);
 
   // ═══════════════════════════════════════════════════════════════════════
   // RENDER
@@ -572,6 +648,22 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
               )}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button
+                onClick={() => { setVoiceEnabled((v) => { if (v) stopSpeaking(); return !v; }); }}
+                style={{
+                  ...S.exitBtn,
+                  width: 'auto', padding: '0 8px',
+                  background: voiceEnabled ? 'rgba(15,245,196,0.12)' : 'rgba(255,255,255,0.05)',
+                  borderColor: voiceEnabled ? 'rgba(15,245,196,0.3)' : 'rgba(255,255,255,0.1)',
+                  color: voiceEnabled ? '#0ff5c4' : '#555870',
+                  fontSize: 8, letterSpacing: 1.5, fontWeight: 600,
+                  display: 'flex', alignItems: 'center', gap: 5,
+                }}
+                title={voiceEnabled ? 'Mute narration' : 'Enable narration'}
+              >
+                {voiceEnabled ? (isSpeaking ? '◉' : '♫') : '♫̶'}
+                <span>{voiceEnabled ? 'VOICE ON' : 'VOICE OFF'}</span>
+              </button>
               <span style={{ fontSize: 9, color: '#8b8fa4' }}>{pin.city}</span>
               <span style={{ fontSize: 8, letterSpacing: 1, padding: '2px 6px', borderRadius: 3, color: threatColor, background: `${threatColor}15`, border: `1px solid ${threatColor}30` }}>
                 {pin.severity.toUpperCase()}
