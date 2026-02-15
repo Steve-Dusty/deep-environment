@@ -11,7 +11,10 @@ import {
   CATEGORY_COLORS,
 } from '../data/locations';
 
-mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY || '';
+const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY || '';
+if (mapboxToken) {
+  mapboxgl.accessToken = mapboxToken;
+}
 
 interface MapViewProps {
   toggles: Record<string, boolean>;
@@ -128,6 +131,25 @@ export default function MapView({
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
+
+    // Check if Mapbox token is configured
+    if (!mapboxToken) {
+      console.error('Mapbox API token is missing. Please set NEXT_PUBLIC_MAPBOX_API_KEY in your .env.local file.');
+      if (containerRef.current) {
+        containerRef.current.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: var(--color-void); color: var(--color-text-primary); font-family: var(--font-mono); padding: 2rem; text-align: center;">
+            <div>
+              <div style="font-size: 14px; color: var(--color-signal-red); margin-bottom: 1rem;">⚠️ Mapbox API Token Required</div>
+              <div style="font-size: 12px; color: var(--color-text-secondary); line-height: 1.6;">
+                Please set <code style="background: var(--color-surface); padding: 2px 6px; border-radius: 3px;">NEXT_PUBLIC_MAPBOX_API_KEY</code> in your <code style="background: var(--color-surface); padding: 2px 6px; border-radius: 3px;">.env.local</code> file.<br/>
+                Get your token from <a href="https://account.mapbox.com/access-tokens/" target="_blank" rel="noopener noreferrer" style="color: var(--color-signal-teal); text-decoration: underline;">Mapbox</a>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      return;
+    }
 
     const map = new mapboxgl.Map({
       container: containerRef.current,

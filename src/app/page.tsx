@@ -23,14 +23,28 @@ const MapView = dynamic(() => import('./components/MapView'), {
   ),
 });
 
-const KnowledgeGraphView = dynamic(() => import('./components/KnowledgeGraphView'), {
+const LocationsDashboard = dynamic(() => import('./components/LocationsDashboard'), {
   ssr: false,
   loading: () => (
     <div className="fixed inset-0 flex items-center justify-center bg-[var(--color-void)] z-50">
       <div className="flex flex-col items-center gap-3">
         <div className="w-3 h-3 rounded-full bg-[var(--color-signal-teal)] data-live" />
         <span className="text-[10px] tracking-[0.3em] text-[var(--color-text-muted)]">
-          INITIALIZING KNOWLEDGE GRAPH
+          LOADING LOCATIONS DASHBOARD
+        </span>
+      </div>
+    </div>
+  ),
+});
+
+const LocationDetailView = dynamic(() => import('./components/LocationDetailView'), {
+  ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 flex items-center justify-center bg-[var(--color-void)] z-50">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-3 h-3 rounded-full bg-[var(--color-signal-teal)] data-live" />
+        <span className="text-[10px] tracking-[0.3em] text-[var(--color-text-muted)]">
+          LOADING LOCATION GRAPH
         </span>
       </div>
     </div>
@@ -65,6 +79,7 @@ export default function DashboardPage() {
   const [mapReady, setMapReady] = useState(false);
   const [activeView, setActiveView] = useState<NavView>(null);
   const [showGraph, setShowGraph] = useState(false);
+  const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [odysseyPin, setOdysseyPin] = useState<PinReport | null>(null);
   const [odysseyImageUrl, setOdysseyImageUrl] = useState<string | undefined>(undefined);
 
@@ -84,8 +99,24 @@ export default function DashboardPage() {
     return <OdysseyView pin={odysseyPin} imageUrl={odysseyImageUrl} onClose={() => { setOdysseyPin(null); setOdysseyImageUrl(undefined); }} />;
   }
 
+  // Knowledge Graph section routing
   if (showGraph) {
-    return <KnowledgeGraphView onClose={() => setShowGraph(false)} />;
+    // If a location is selected, show its detail view
+    if (selectedLocationId) {
+      return (
+        <LocationDetailView
+          locationId={selectedLocationId}
+          onClose={() => setSelectedLocationId(null)}
+        />
+      );
+    }
+    // Otherwise show the Locations Dashboard
+    return (
+      <LocationsDashboard
+        onSelectLocation={(locationId) => setSelectedLocationId(locationId)}
+        onClose={() => setShowGraph(false)}
+      />
+    );
   }
 
   return (
