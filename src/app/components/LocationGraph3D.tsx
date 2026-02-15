@@ -106,7 +106,8 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, LocationGraph3DProps>(
   ({ locationId, graphData, onProblemSelect, onGraphUpdate, autoUpdate = true, width, height }, ref) => {
     const fgRef = useRef<any>(undefined);
     const converted = useMemo(() => convertToGraphData(graphData), [graphData]);
-    const [graphNodes, setGraphNodes] = useState<{ nodes: GraphNode[]; links: GraphLink[] }>(converted);
+    const onGraphUpdateRef = useRef(onGraphUpdate);
+    const [graphNodes, setGraphNodes] = useState<{ nodes: GraphNode[]; links: GraphLink[] }>(() => converted);
     const [highlightNodes, setHighlightNodes] = useState<Set<string>>(new Set());
     const [highlightLinks, setHighlightLinks] = useState<Set<GraphLink>>(new Set());
     const [hoverNode, setHoverNode] = useState<GraphNode | null>(null);
@@ -115,12 +116,16 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, LocationGraph3DProps>(
       h: height || (typeof window !== 'undefined' ? window.innerHeight : 800),
     });
 
-    // Update graph when graphData changes
+    // Update ref when callback changes
     useEffect(() => {
-      const converted = convertToGraphData(graphData);
+      onGraphUpdateRef.current = onGraphUpdate;
+    }, [onGraphUpdate]);
+
+    // Update graph when converted data changes
+    useEffect(() => {
       setGraphNodes(converted);
-      onGraphUpdate?.({ nodes: converted.nodes.length, links: converted.links.length });
-    }, [graphData, onGraphUpdate]);
+      onGraphUpdateRef.current?.({ nodes: converted.nodes.length, links: converted.links.length });
+    }, [converted]);
 
     // ── Neighbor map ───────────────────────────────────────────────────
 
@@ -355,6 +360,11 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, LocationGraph3DProps>(
       [highlightLinks],
     );
 
+    const linkParticles = useCallback(
+      (link: GraphLink) => (highlightLinks.has(link) ? 5 : 0),
+      [highlightLinks],
+    );
+
     // ── Render ─────────────────────────────────────────────────────────
 
     return (
@@ -370,6 +380,10 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, LocationGraph3DProps>(
         linkWidth={linkWidth}
         linkOpacity={0.5}
         linkCurvature={0.12}
+        linkDirectionalParticles={linkParticles}
+        linkDirectionalParticleWidth={1.5}
+        linkDirectionalParticleSpeed={0.005}
+        linkDirectionalParticleColor={() => '#0ff5c4'}
         d3AlphaDecay={0.025}
         d3VelocityDecay={0.35}
         warmupTicks={60}

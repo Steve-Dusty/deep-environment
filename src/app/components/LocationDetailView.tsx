@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { buildLocationGraph, locationSummaries, PROBLEM_CATEGORY_COLORS, PROBLEM_CATEGORY_LABELS, type ProblemNode } from '../data/locationGraphs';
 import { THREAT_COLORS } from '../data/locations';
@@ -30,13 +30,14 @@ export default function LocationDetailView({ locationId, onClose }: LocationDeta
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const location = locationSummaries.find((l) => l.id === locationId);
-  let graphData;
-  try {
-    graphData = buildLocationGraph(locationId);
-  } catch (error) {
-    console.error('Error building location graph:', error);
-    graphData = { locationId, problems: [], links: [] };
-  }
+  const graphData = useMemo(() => {
+    try {
+      return buildLocationGraph(locationId);
+    } catch (error) {
+      console.error('Error building location graph:', error);
+      return { locationId, problems: [], links: [] };
+    }
+  }, [locationId]);
 
   const [selectedProblem, setSelectedProblem] = useState<ProblemNode | null>(null);
   const [graphStats, setGraphStats] = useState({ nodes: graphData.problems.length, links: graphData.links.length });
