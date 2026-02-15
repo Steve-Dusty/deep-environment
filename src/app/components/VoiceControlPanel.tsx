@@ -149,9 +149,14 @@ export default function VoiceControlPanel({
                   <StateIcon size={14} style={{ color }} />
                 )}
               </div>
-              <span className="text-[8px] tracking-[0.2em]" style={{ color }}>
-                {label}
-              </span>
+              <div className="flex flex-col">
+                <span className="text-[8px] tracking-[0.2em]" style={{ color }}>
+                  {label}
+                </span>
+                <span className="text-[6px] text-[var(--color-signal-teal)]">
+                  ● CONTINUOUS MODE
+                </span>
+              </div>
             </div>
             <button
               onClick={onToggle}
@@ -171,7 +176,7 @@ export default function VoiceControlPanel({
                 className="text-[10px] text-[var(--color-text-primary)] min-h-[20px] px-2 py-1 rounded"
                 style={{ backgroundColor: 'var(--color-void)' }}
               >
-                {fullTranscript || 'Say "Hey Deep" + command...'}
+                {fullTranscript || (state === 'speaking' ? '🔊 Speaking response...' : '👂 Say "Hey Deep" + command...')}
               </div>
             </div>
 

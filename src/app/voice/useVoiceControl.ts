@@ -112,14 +112,16 @@ export function useVoiceControl({ onCommand, onAIFallback, enabled = true }: Use
       console.log('📤 Sending command:', cmd);
       onCommand(cmd);
     }
-    
-    // Reset for next wake word after a delay
+
+    // Reset for next wake word immediately - keep listening!
     setTimeout(() => {
       wakeDetectedRef.current = false;
       commandBufferRef.current = '';
       isProcessingRef.current = false;
-      console.log('🔄 Ready for next wake word');
-    }, 3000);
+      setState('idle'); // Back to idle but still listening
+      setTranscript('');
+      console.log('🔄 Ready for next wake word - still listening!');
+    }, 1000); // Shorter delay so it's ready faster
   }, [parseEmergencyCommand, onCommand, onAIFallback]);
 
   useEffect(() => {

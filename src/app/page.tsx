@@ -509,10 +509,13 @@ export default function DashboardPage() {
     if (response) setLastResponse(response);
 
     console.log('🔊 Speaking response:', response);
+    // Just speak the response - voice control hook manages state
     if (response) {
-      voiceState.setState('speaking');
-      speak(response).then(() => voiceState.setState('idle'));
+      speak(response);
+      console.log('✅ Speaking response, voice control continues listening');
     }
+
+    console.log('✅ Command executed, voice control remains active');
   }, [speak, totalAgents, selectedPinId, allPins, setToggles, setShowGraph, setOdysseyPin, setSelectedPinId, setActiveView, setZoom, setLastAction, setLastResponse]);
 
   const handleAIFallback = useCallback(async (speech: string): Promise<VoiceCommand> => {
