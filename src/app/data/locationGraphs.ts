@@ -1211,7 +1211,123 @@ export function buildLocationGraph(locationId: string): LocationGraph {
     problems.push(problem);
   });
 
-  // Create intricate causal links between problems
+  // Create multiple constellations (clusters) with root nodes
+  // Each constellation has dense internal connections and sparse cross-constellation links
+  const createConstellations = (locationId: string, problemIds: string[]): ProblemLink[] => {
+    const constellationLinks: ProblemLink[] = [];
+    
+    // Define constellations for each location (group problems into 2-4 clusters)
+    const constellationConfigs: Record<string, string[][]> = {
+      'loc-sf': [
+        ['prob-sf-sewage', 'prob-sf-contamination', 'prob-sf-algal', 'prob-sf-sediment'], // Water quality cluster
+        ['prob-sf-microplastics', 'prob-sf-oil', 'prob-sf-noise', 'prob-sf-habitat'], // Marine ecosystem cluster
+      ],
+      'loc-la': [
+        ['prob-la-smog', 'prob-la-ozone', 'prob-la-heat', 'prob-la-air'], // Air quality cluster
+        ['prob-la-runoff', 'prob-la-oil', 'prob-la-beach', 'prob-la-drought'], // Water/coastal cluster
+        ['prob-la-wildlife', 'prob-la-noise'], // Wildlife cluster
+      ],
+      'loc-gulf': [
+        ['prob-gulf-refinery', 'prob-gulf-nutrients', 'prob-gulf-algal', 'prob-gulf-fishkill'], // Industrial pollution cluster
+        ['prob-gulf-oil', 'prob-gulf-sediment', 'prob-gulf-erosion', 'prob-gulf-habitat'], // Coastal degradation cluster
+        ['prob-gulf-plastic', 'prob-gulf-invasive'], // Marine debris cluster
+      ],
+      'loc-ever': [
+        ['prob-ever-drought', 'prob-ever-water', 'prob-ever-salt', 'prob-ever-habitat'], // Water flow cluster
+        ['prob-ever-nutrients', 'prob-ever-bleaching', 'prob-ever-mercury'], // Water quality cluster
+        ['prob-ever-invasive'], // Invasive species cluster (standalone but connected)
+      ],
+      'loc-pnw': [
+        ['prob-pnw-logging', 'prob-pnw-smoke', 'prob-pnw-wildfire'], // Forest cluster
+        ['prob-pnw-salmon', 'prob-pnw-habitat', 'prob-pnw-acid', 'prob-pnw-runoff'], // Marine/fisheries cluster
+        ['prob-pnw-invasive', 'prob-pnw-algal'], // Ecosystem disruption cluster
+      ],
+      'loc-ny': [
+        ['prob-ny-sewage', 'prob-ny-runoff', 'prob-ny-water', 'prob-ny-beach'], // Water quality cluster
+        ['prob-ny-sediment', 'prob-ny-habitat', 'prob-ny-plastic', 'prob-ny-invasive'], // Harbor ecosystem cluster
+        ['prob-ny-noise', 'prob-ny-air'], // Urban impacts cluster
+      ],
+      'loc-chi': [
+        ['prob-chi-sewage', 'prob-chi-runoff', 'prob-chi-water'], // Water quality cluster
+        ['prob-chi-algal', 'prob-chi-sediment', 'prob-chi-habitat'], // Lake ecosystem cluster
+      ],
+      'loc-den': [
+        ['prob-den-drought', 'prob-den-wildfire', 'prob-den-water'], // Climate cluster
+        ['prob-den-air', 'prob-den-runoff', 'prob-den-habitat', 'prob-den-noise'], // Urban impacts cluster
+      ],
+      'loc-phx': [
+        ['prob-phx-drought', 'prob-phx-water', 'prob-phx-heat', 'prob-phx-dust'], // Climate cluster
+        ['prob-phx-air', 'prob-phx-habitat', 'prob-phx-invasive', 'prob-phx-runoff'], // Urban ecosystem cluster
+      ],
+      'loc-atl': [
+        ['prob-atl-runoff', 'prob-atl-sewage', 'prob-atl-water', 'prob-atl-algal'], // Water quality cluster
+        ['prob-atl-habitat', 'prob-atl-invasive'], // Ecosystem cluster
+      ],
+    };
+
+    const constellations = constellationConfigs[locationId] || [];
+    
+    // For each constellation, create dense internal connections
+    constellations.forEach((constellation, clusterIdx) => {
+      if (constellation.length < 2) return;
+      
+      // Find the root node (most critical or first problem)
+      const rootNode = constellation[0];
+      
+      // Connect root to all other nodes in constellation
+      for (let i = 1; i < constellation.length; i++) {
+        constellationLinks.push({
+          source: rootNode,
+          target: constellation[i],
+          label: 'connects to',
+          type: 'causes',
+          strength: 0.6 + (Math.random() * 0.2),
+        });
+      }
+      
+      // Create additional connections within constellation (mesh network)
+      for (let i = 1; i < constellation.length; i++) {
+        for (let j = i + 1; j < constellation.length; j++) {
+          // 60% chance of connection between non-root nodes
+          if (Math.random() < 0.6) {
+            constellationLinks.push({
+              source: constellation[i],
+              target: constellation[j],
+              label: 'relates to',
+              type: Math.random() < 0.5 ? 'amplifies' : 'correlates',
+              strength: 0.4 + (Math.random() * 0.3),
+            });
+          }
+        }
+      }
+    });
+    
+    // Create sparse cross-constellation links (1-2 per pair of constellations)
+    for (let i = 0; i < constellations.length; i++) {
+      for (let j = i + 1; j < constellations.length; j++) {
+        const cluster1 = constellations[i];
+        const cluster2 = constellations[j];
+        
+        // 1-2 cross-constellation links
+        const numCrossLinks = Math.min(2, Math.max(1, Math.floor(Math.random() * 2) + 1));
+        for (let k = 0; k < numCrossLinks; k++) {
+          const node1 = cluster1[Math.floor(Math.random() * cluster1.length)];
+          const node2 = cluster2[Math.floor(Math.random() * cluster2.length)];
+          constellationLinks.push({
+            source: node1,
+            target: node2,
+            label: 'influences',
+            type: 'correlates',
+            strength: 0.3 + (Math.random() * 0.2),
+          });
+        }
+      }
+    }
+    
+    return constellationLinks;
+  };
+
+  // Create intricate causal links between problems (legacy - keeping for reference but using constellations)
   const linkConfigs: Record<string, Array<{ source: string; target: string; label: string; type: ProblemLink['type']; strength: number }>> = {
     'loc-sf': [
       { source: 'prob-sf-contamination', target: 'prob-sf-algal', label: 'contributes to', type: 'causes', strength: 0.7 },
@@ -1324,15 +1440,33 @@ export function buildLocationGraph(locationId: string): LocationGraph {
     ],
   };
 
+  // Use constellation-based linking for multiple root nodes
+  const problemIds = problems.map(p => p.id);
+  const constellationLinks = createConstellations(locationId, problemIds);
+  links.push(...constellationLinks);
+
+  // Also add some specific high-strength links from original config for key relationships
   const config = linkConfigs[locationId] || [];
-  config.forEach((cfg) => {
-    links.push({
-      source: cfg.source,
-      target: cfg.target,
-      label: cfg.label,
-      type: cfg.type,
-      strength: cfg.strength,
-    });
+  // Only add top 3-5 strongest links from original config to maintain some key relationships
+  const topLinks = config
+    .sort((a, b) => b.strength - a.strength)
+    .slice(0, Math.min(5, config.length));
+  
+  topLinks.forEach((cfg) => {
+    // Only add if not already in constellation links
+    const exists = constellationLinks.some(
+      l => (l.source === cfg.source && l.target === cfg.target) ||
+           (l.source === cfg.target && l.target === cfg.source)
+    );
+    if (!exists) {
+      links.push({
+        source: cfg.source,
+        target: cfg.target,
+        label: cfg.label,
+        type: cfg.type,
+        strength: cfg.strength,
+      });
+    }
   });
 
   return { locationId, problems, links };
