@@ -207,7 +207,7 @@ export default function DashboardPage() {
   const [lastCommand, setLastCommand] = useState<string>('');
   const [lastAction, setLastAction] = useState<string>('');
   const [lastResponse, setLastResponse] = useState<string>('');
-  const [isTestMode, setIsTestMode] = useState(true); // Enable test mode by default
+  const [isTestMode, setIsTestMode] = useState(false); // Test mode disabled
 
   // Poll Slack uploads and convert to PinReports
   useEffect(() => {
