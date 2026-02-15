@@ -244,70 +244,37 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, LocationGraph3DProps>(
 
     useEffect(() => {
       const fg = fgRef.current;
-      if (!fg || graphNodes.nodes.length === 0) return;
+      if (!fg) return;
 
-      // Wait for graph to be ready before initializing
-      const initGraph = () => {
-        try {
-          fg.cameraPosition({ x: 0, y: 0, z: 300 });
+      fg.cameraPosition({ x: 0, y: 0, z: 300 });
 
-          const controls = fg.controls();
-          if (controls) {
-            controls.zoomSpeed = 1.5;
-            controls.rotateSpeed = 2.0;
-            controls.noPan = false;
-            if ('minDistance' in controls) controls.minDistance = 10;
-            if ('maxDistance' in controls) controls.maxDistance = 1000;
-          }
+      // Configure trackball controls for smooth zoom at any distance
+      const controls = fg.controls();
+      if (controls) {
+        controls.zoomSpeed = 1.5;
+        controls.rotateSpeed = 2.0;
+        controls.noPan = false;
+        if ('minDistance' in controls) controls.minDistance = 10;
+        if ('maxDistance' in controls) controls.maxDistance = 1000;
+      }
 
-          const scene = fg.scene();
-          if (scene) {
-            scene.fog = new THREE.FogExp2(0x08090c, 0.0008);
-            scene.background = new THREE.Color(0x08090c);
-            scene.add(new THREE.AmbientLight(0x444466, 1.0));
+      const scene = fg.scene();
+      scene.fog = new THREE.FogExp2(0x08090c, 0.0008);
+      scene.background = new THREE.Color(0x08090c);
+      scene.add(new THREE.AmbientLight(0x444466, 1.0));
 
-            const teal = new THREE.PointLight(0x0ff5c4, 1.2, 600);
-            teal.position.set(80, 80, 200);
-            scene.add(teal);
-            const red = new THREE.PointLight(0xff3b4f, 0.6, 400);
-            red.position.set(-100, -60, 150);
-            scene.add(red);
-          }
+      const teal = new THREE.PointLight(0x0ff5c4, 1.2, 600);
+      teal.position.set(80, 80, 200);
+      scene.add(teal);
+      const red = new THREE.PointLight(0xff3b4f, 0.6, 400);
+      red.position.set(-100, -60, 150);
+      scene.add(red);
 
-          // Initialize forces - must be done after graph data is set
-          const chargeForce = fg.d3Force('charge');
-          if (chargeForce) {
-            chargeForce.strength(-120).distanceMax(300);
-          }
-
-          const linkForce = fg.d3Force('link');
-          if (linkForce) {
-            linkForce.distance(60).strength(0.3);
-          }
-
-          const centerForce = fg.d3Force('center');
-          if (centerForce) {
-            centerForce.strength(0.05);
-          }
-
-          // Reheat simulation after a brief delay to ensure everything is initialized
-          setTimeout(() => {
-            try {
-              fg.d3ReheatSimulation();
-            } catch (e) {
-              console.warn('Could not reheat simulation:', e);
-            }
-          }, 100);
-        } catch (e) {
-          console.error('Error initializing graph:', e);
-        }
-      };
-
-      // Use requestAnimationFrame to ensure graph is fully mounted
-      requestAnimationFrame(() => {
-        setTimeout(initGraph, 50);
-      });
-    }, [graphNodes]);
+      // Forces — reasonable spacing (EXACTLY like original)
+      fg.d3Force('charge').strength(-80).distanceMax(250);
+      fg.d3Force('link').distance(40).strength(0.2);
+      fg.d3Force('center').strength(0.04);
+    }, []);
 
     // ── Hover ──────────────────────────────────────────────────────────
 
@@ -383,7 +350,7 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, LocationGraph3DProps>(
           );
         }
 
-        // Labels
+        // Labels - show for all problems when highlighted (like threats in original)
         if (isHl) {
           const label = createTextSprite(node.name, isHover ? '#fff' : color, 2.4);
           label.position.set(0, r + 5, 0);
@@ -402,11 +369,7 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, LocationGraph3DProps>(
     // ── Link accessors ─────────────────────────────────────────────────
 
     const linkColor = useCallback(
-      (link: GraphLink) => {
-        if (highlightLinks.has(link)) return '#0ff5c4';
-        // Make links visible by default - use the link's color or a visible default
-        return link.color || '#3b82f6';
-      },
+      (link: GraphLink) => (highlightLinks.has(link) ? '#0ff5c4' : link.color || '#1a1d2a'),
       [highlightLinks],
     );
 
@@ -416,33 +379,11 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, LocationGraph3DProps>(
     );
 
     const linkParticles = useCallback(
-      (link: GraphLink) => {
-        if (highlightLinks.has(link)) return 5;
-        // Show particles on all links for visual interest
-        return (link as any).particles || 1;
-      },
+      (link: GraphLink) => (highlightLinks.has(link) ? 5 : (link as any).particles || 0),
       [highlightLinks],
     );
 
     // ── Render ─────────────────────────────────────────────────────────
-
-    // Don't render if no nodes
-    if (!graphNodes || graphNodes.nodes.length === 0) {
-      return (
-        <div style={{ 
-          width: '100%', 
-          height: '100%', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          color: '#8b8fa4',
-          fontFamily: "'JetBrains Mono', monospace",
-          fontSize: 12
-        }}>
-          Loading graph data...
-        </div>
-      );
-    }
 
     return (
       <ForceGraph3D
@@ -455,17 +396,16 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, LocationGraph3DProps>(
         nodeResolution={20}
         linkColor={linkColor}
         linkWidth={linkWidth}
-        linkOpacity={0.6}
-        linkCurvature={0.15}
+        linkOpacity={0.5}
+        linkCurvature={0.12}
         linkDirectionalParticles={linkParticles}
-        linkDirectionalParticleWidth={2}
-        linkDirectionalParticleSpeed={0.008}
-        linkDirectionalParticleColor={(link: any) => link.color || '#0ff5c4'}
-        d3AlphaDecay={0.022}
-        d3VelocityDecay={0.4}
-        warmupTicks={100}
-        cooldownTime={8000}
-        showNavInfo={false}
+        linkDirectionalParticleWidth={1.5}
+        linkDirectionalParticleSpeed={0.005}
+        linkDirectionalParticleColor={() => '#0ff5c4'}
+        d3AlphaDecay={0.025}
+        d3VelocityDecay={0.35}
+        warmupTicks={60}
+        cooldownTime={4000}
         onNodeHover={handleNodeHover as any}
         onNodeClick={handleNodeClick as any}
         onBackgroundClick={handleBgClick}
@@ -473,17 +413,6 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, LocationGraph3DProps>(
         enableNavigationControls={true}
         controlType="trackball"
         backgroundColor="#08090c"
-        onEngineStop={() => {
-          // Ensure simulation stays active
-          const fg = fgRef.current;
-          if (fg && graphNodes.nodes.length > 0) {
-            try {
-              fg.d3ReheatSimulation();
-            } catch (e) {
-              // Ignore errors during reheat
-            }
-          }
-        }}
       />
     );
   },
