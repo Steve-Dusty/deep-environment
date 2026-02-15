@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MapPin, AlertTriangle, TrendingUp, TrendingDown, Minus, ChevronRight } from 'lucide-react';
+import { MapPin, ChevronRight } from 'lucide-react';
 import { locationSummaries, type LocationSummary } from '../data/locationGraphs';
 import { THREAT_COLORS, THREAT_LABELS } from '../data/locations';
 
@@ -43,11 +43,6 @@ export default function LocationsDashboard({ onSelectLocation, onClose }: Locati
         <div style={S.grid}>
           {locationSummaries.map((location) => {
             const threatColor = THREAT_COLORS[location.overallSeverity];
-            const TrendIcon = location.overallSeverity === 'critical' || location.overallSeverity === 'high' 
-              ? TrendingUp 
-              : location.overallSeverity === 'low' 
-              ? TrendingDown 
-              : Minus;
 
             return (
               <div

@@ -30,7 +30,13 @@ export default function LocationDetailView({ locationId, onClose }: LocationDeta
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const location = locationSummaries.find((l) => l.id === locationId);
-  const graphData = buildLocationGraph(locationId);
+  let graphData;
+  try {
+    graphData = buildLocationGraph(locationId);
+  } catch (error) {
+    console.error('Error building location graph:', error);
+    graphData = { locationId, problems: [], links: [] };
+  }
 
   const [selectedProblem, setSelectedProblem] = useState<ProblemNode | null>(null);
   const [graphStats, setGraphStats] = useState({ nodes: graphData.problems.length, links: graphData.links.length });
