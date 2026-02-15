@@ -41,14 +41,16 @@ export interface VoiceCommand {
   raw: string;
   action: string;
   target?: string;
+  fromAI?: boolean; // Flag if command came from AI interpretation
 }
 
 interface UseVoiceControlOptions {
   onCommand: (cmd: VoiceCommand) => void;
+  onAIFallback?: (speech: string) => Promise<VoiceCommand>; // AI interpretation fallback
   enabled?: boolean;
 }
 
-export function useVoiceControl({ onCommand, enabled = true }: UseVoiceControlOptions) {
+export function useVoiceControl({ onCommand, onAIFallback, enabled = true }: UseVoiceControlOptions) {
   const [state, setState] = useState<VoiceState>('idle');
   const [transcript, setTranscript] = useState('');
   const [fullTranscript, setFullTranscript] = useState(''); // Full ongoing transcript
@@ -60,98 +62,65 @@ export function useVoiceControl({ onCommand, enabled = true }: UseVoiceControlOp
   const restartTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isProcessingRef = useRef(false);
 
-  const parseCommand = useCallback((raw: string): VoiceCommand | null => {
+  // Minimal fallback commands that work without AI (emergencies only)
+  const parseEmergencyCommand = useCallback((raw: string): VoiceCommand | null => {
     const text = raw.toLowerCase().trim();
-
-    // Toggle commands - more natural patterns
-    const toggleMatch = text.match(/^(enable|disable|toggle|turn on|turn off|show|hide|activate|deactivate)\s+(.+)$/);
-    if (toggleMatch) {
-      const action = ['enable', 'turn on', 'show', 'activate'].includes(toggleMatch[1]) ? 'enable' : 'disable';
-      const targetMap: Record<string, string> = {
-        globe: 'globe', 
-        terrain: 'terrain', 
-        satellite: 'satellite', 
-        sat: 'satellite',
-        threat: 'heatmap', 
-        threats: 'heatmap',
-        heatmap: 'heatmap', 
-        'heat map': 'heatmap',
-        weather: 'weather', 
-        precipitation: 'weather', 
-        precip: 'weather',
-        rain: 'weather',
-      };
-      const target = targetMap[toggleMatch[2]] || toggleMatch[2];
-      return { raw, action, target };
+    
+    // Critical commands that must work even if OpenAI is down
+    if (text === 'stop' || text === 'cancel' || text === 'abort') {
+      return { raw, action: 'stop' };
     }
-
-    // View commands
-    if (text.match(/show|open|display|view|switch to/)) {
-      if (text.includes('graph') || text.includes('knowledge')) return { raw, action: 'show-graph' };
-      if (text.includes('map') || text.includes('globe')) return { raw, action: 'show-map' };
-      if (text.includes('odyssey') || text.includes('world model')) return { raw, action: 'show-odyssey' };
-    }
-
-    // Zoom commands
-    if (text.match(/zoom in|closer|zoom/)) return { raw, action: 'zoom-in' };
-    if (text.match(/zoom out|further|back/)) return { raw, action: 'zoom-out' };
-    if (text.match(/reset view|reset zoom/)) return { raw, action: 'reset-view' };
-
-    // Location selection - multiple patterns
-    const locationPatterns = [
-      /(?:go to|select|show me|focus on|navigate to|find)\s+(.+)/,
-      /(?:where is|what about|tell me about|info on)\s+(.+)/,
-    ];
-    for (const pattern of locationPatterns) {
-      const match = text.match(pattern);
-      if (match) return { raw, action: 'select-location', target: match[1] };
-    }
-
-    // Clear selection
-    if (text.match(/clear|deselect|close|back/)) return { raw, action: 'clear-selection' };
-
-    // Status queries
-    if (text.includes('status') || text.includes('report') || text.includes('summary')) {
-      return { raw, action: 'status' };
-    }
-
-    // List commands
-    if (text.match(/list|show all|what are/)) {
-      if (text.includes('critical') || text.includes('urgent')) return { raw, action: 'list-critical' };
-      if (text.includes('location') || text.includes('place') || text.includes('site')) return { raw, action: 'list-locations' };
-      return { raw, action: 'list-all' };
-    }
-
-    // Help
-    if (text.includes('help') || text.includes('commands') || text.includes('what can')) {
+    if (text === 'help' || text === 'what can you do') {
       return { raw, action: 'help' };
     }
-
-    return { raw, action: 'unknown' };
+    
+    // Everything else goes to AI
+    return null;
   }, []);
 
-  const processCommand = useCallback((text: string) => {
+  const processCommand = useCallback(async (text: string) => {
     if (isProcessingRef.current) {
       console.log('⏭️ Already processing, skipping...');
       return;
     }
     
     isProcessingRef.current = true;
-    const cmd = parseCommand(text);
+    setState('processing');
+    setTranscript(text);
+    
+    // First check emergency commands (work even if OpenAI is down)
+    let cmd = parseEmergencyCommand(text);
+    
+    // If not an emergency command, use AI for everything
+    if (!cmd && onAIFallback) {
+      console.log('🤖 Sending to AI for interpretation...');
+      try {
+        const aiCmd = await onAIFallback(text);
+        cmd = { ...aiCmd, fromAI: true };
+        console.log('✨ AI interpreted command:', cmd);
+      } catch (e) {
+        console.error('❌ AI interpretation failed:', e);
+        // Provide fallback error command
+        cmd = { raw: text, action: 'error', target: 'AI unavailable' };
+      }
+    } else if (!cmd) {
+      console.warn('⚠️ No AI fallback available and not an emergency command');
+      cmd = { raw: text, action: 'error', target: 'No AI fallback configured' };
+    }
+    
     if (cmd) {
-      setState('processing');
-      setTranscript(text);
       console.log('📤 Sending command:', cmd);
       onCommand(cmd);
     }
+    
     // Reset for next wake word after a delay
     setTimeout(() => {
       wakeDetectedRef.current = false;
       commandBufferRef.current = '';
       isProcessingRef.current = false;
       console.log('🔄 Ready for next wake word');
-    }, 3000); // Wait 3 seconds before listening for next wake word
-  }, [parseCommand, onCommand]);
+    }, 3000);
+  }, [parseEmergencyCommand, onCommand, onAIFallback]);
 
   useEffect(() => {
     if (!enabled) {

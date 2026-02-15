@@ -86,6 +86,10 @@ interface LeftSidebarProps {
   onViewChange: (v: NavView) => void;
   onShowGraph?: () => void;
   onEnterOdyssey?: (pin: PinReport, imageUrl?: string) => void;
+  categoryFilter?: string;
+  onCategoryFilterChange?: (cat: string) => void;
+  severityFilter?: string;
+  onSeverityFilterChange?: (sev: string) => void;
 }
 
 export default function LeftSidebar({
@@ -96,12 +100,33 @@ export default function LeftSidebar({
   onViewChange,
   onShowGraph,
   onEnterOdyssey,
+  categoryFilter: externalCategoryFilter,
+  onCategoryFilterChange,
+  severityFilter: externalSeverityFilter,
+  onSeverityFilterChange,
 }: LeftSidebarProps) {
-  const [categoryFilter, setCategoryFilter] = useState('All');
+  const [internalCategoryFilter, setInternalCategoryFilter] = useState('All');
+  const categoryFilter = externalCategoryFilter ?? internalCategoryFilter;
+  const setCategoryFilter = (cat: string) => {
+    setInternalCategoryFilter(cat);
+    onCategoryFilterChange?.(cat);
+  };
+
+  const [internalSeverityFilter, setInternalSeverityFilter] = useState('all');
+  const severityFilter = externalSeverityFilter ?? internalSeverityFilter;
+  const setSeverityFilter = (sev: string) => {
+    setInternalSeverityFilter(sev);
+    onSeverityFilterChange?.(sev);
+  };
 
   const filteredPins = useMemo(
-    () => (categoryFilter === 'All' ? pins : pins.filter((p) => p.category === categoryFilter)),
-    [pins, categoryFilter],
+    () => {
+      let result = pins;
+      if (categoryFilter !== 'All') result = result.filter((p) => p.category === categoryFilter);
+      if (severityFilter !== 'all') result = result.filter((p) => p.severity === severityFilter);
+      return result;
+    },
+    [pins, categoryFilter, severityFilter],
   );
 
   const categories = ['All', 'Water', 'Air', 'Soil', 'Bio', 'Climate'];
@@ -232,6 +257,27 @@ export default function LeftSidebar({
                         {cat === 'All' ? 'ALL' : cat.toUpperCase()}
                       </button>
                     ))}
+                  </div>
+
+                  {/* severity chips */}
+                  <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide mt-1">
+                    {(['all', 'critical', 'high', 'elevated', 'moderate', 'low'] as const).map((sev) => {
+                      const sevColor = sev === 'all' ? 'var(--color-signal-teal)' : THREAT_COLORS[sev as ThreatLevel] || 'var(--color-text-muted)';
+                      return (
+                        <button
+                          key={sev}
+                          onClick={() => setSeverityFilter(sev)}
+                          className={`text-[8px] tracking-wider px-2 py-1 rounded-full whitespace-nowrap cursor-pointer transition-all ${
+                            severityFilter === sev
+                              ? 'bg-[rgba(15,245,196,0.1)] border'
+                              : 'text-[var(--color-text-muted)] border border-[var(--color-border-subtle)] hover:border-[var(--color-border)] hover:text-[var(--color-text-secondary)]'
+                          }`}
+                          style={severityFilter === sev ? { color: sevColor, borderColor: `${sevColor}33` } : undefined}
+                        >
+                          {sev === 'all' ? 'ALL' : THREAT_LABELS[sev as ThreatLevel] || sev.toUpperCase()}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
