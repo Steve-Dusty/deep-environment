@@ -91,6 +91,9 @@ export default function StatusBar({
         <span className="text-[8px] text-[var(--color-text-muted)] tracking-wider">
           MAPBOX GL
         </span>
+        <span className="text-[8px] text-[var(--color-text-muted)] tracking-wider">
+          GEMINI 2.0
+        </span>
       </div>
     </div>
   );

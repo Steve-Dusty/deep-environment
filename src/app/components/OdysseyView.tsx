@@ -26,127 +26,126 @@ interface Decision {
 }
 
 function generateDecisions(pin: PinReport): Decision[] {
+  const loc = `${pin.neighborhood}, ${pin.city}`;
+
   const trees: Record<string, Decision[]> = {
     Water: [
       {
-        narrative: `Contamination detected in ${pin.neighborhood}. First responders await your orders.`,
+        narrative: 'How should we begin restoring this waterway?',
         choices: [
-          { label: 'DEPLOY CONTAINMENT', sub: 'Send booms and barriers immediately', prompt: `Emergency containment booms are being deployed across the contaminated water in ${pin.neighborhood}, ${pin.city}. Workers in hazmat suits stretch bright orange barriers across the waterway. The contamination is being contained.`, consequence: 'Containment teams mobilized', type: 'positive' },
-          { label: 'TRACE THE SOURCE', sub: 'Find where it\'s coming from first', prompt: `Camera follows the contamination upstream through ${pin.neighborhood}, ${pin.city}, tracing pipes and drainage channels, revealing the industrial source of the pollution. Dark water flows from a cracked pipe.`, consequence: 'Source identified upstream', type: 'neutral' },
-          { label: 'DO NOTHING', sub: 'Resources are limited — monitor only', prompt: `Time passes. The contamination in ${pin.neighborhood} spreads unchecked across the entire waterway. Dead fish float to the surface. The water turns dark and toxic. No intervention was made.`, consequence: 'The contamination spreads freely', type: 'negative' },
+          { label: 'REMOVE POLLUTANTS', sub: 'Filter contaminants from the water', prompt: `The water in ${loc} is now clear and clean. All pollutants removed. Sunlight penetrates the surface. The waterway is pristine. Photorealistic clean water transformation.`, consequence: 'Water runs clear again', type: 'positive' },
+          { label: 'RESTORE SHORELINE', sub: 'Rebuild the natural water\'s edge', prompt: `The shoreline of ${loc} restored. Native reeds and wetland plants grow thick along the banks. Natural, lush, photorealistic.`, consequence: 'Natural shoreline restored', type: 'positive' },
+          { label: 'NO INTERVENTION', sub: 'See how it degrades further', prompt: `The water in ${loc} deteriorates. More pollutants accumulate. Algae blooms choke the waterway. Photorealistic environmental decline.`, consequence: 'Pollution accelerates unchecked', type: 'negative' },
         ],
       },
       {
-        narrative: 'The situation is escalating. Downstream communities are at risk.',
+        narrative: 'The water is responding. What comes next?',
         choices: [
-          { label: 'EMERGENCY CLEANUP', sub: 'Activate full hazmat response', prompt: 'Massive cleanup operation underway. Dozens of boats, vacuum trucks, and remediation crews work around the clock. Chemical neutralizers are being applied. The water is slowly clearing.', consequence: 'Cleanup operations in full swing', type: 'positive' },
-          { label: 'EVACUATE WILDLIFE', sub: 'Relocate affected species', prompt: 'Wildlife rescue teams carefully capture and relocate fish, birds, and turtles from the contaminated zone. Portable tanks and crates line the shore. Animals being saved one by one.', consequence: 'Wildlife relocation underway', type: 'neutral' },
-          { label: 'CUT LOSSES', sub: 'This zone is already gone', prompt: 'The contaminated zone is abandoned. Warning signs are posted. The water grows thick with algae and pollution. A once-vibrant waterway becomes a dead zone. Nature reclaims nothing here.', consequence: 'Zone declared unrecoverable', type: 'negative' },
+          { label: 'BRING BACK WILDLIFE', sub: 'Reintroduce native species', prompt: `${loc} waterway teeming with life. Fish, herons, turtles, dragonflies. The aquatic ecosystem restored. Photorealistic nature scene.`, consequence: 'Ecosystem springs back to life', type: 'positive' },
+          { label: 'BUILD WETLANDS', sub: 'Create natural water filtration', prompt: `Constructed wetland along ${loc}. Pools of filtered water cascade through marsh plants. Living filter. Photorealistic restored wetland.`, consequence: 'Natural filtration system thriving', type: 'positive' },
         ],
       },
       {
-        narrative: 'Six months later. Your decisions have shaped this place.',
+        narrative: 'Full restoration. See what is possible.',
         choices: [
-          { label: 'FULL RESTORATION', sub: 'Invest everything in recovery', prompt: `${pin.neighborhood} transformed. Crystal clear water flows through restored wetlands. Native plants line the banks. Fish jump. Birds nest. The ecosystem has been fully restored through dedicated investment.`, consequence: 'Ecosystem fully restored', type: 'positive' },
-          { label: 'MANAGED RETREAT', sub: 'Accept the new reality', prompt: `The waterway in ${pin.neighborhood} is partially recovered. Some areas remain off-limits. New barriers separate clean from contaminated zones. A compromise between nature and industry.`, consequence: 'Partial recovery achieved', type: 'neutral' },
+          { label: 'VIEW RESTORED SITE', sub: 'The fully recovered environment', prompt: `${loc} fully restored. Crystal clear water, dense vegetation, birds nesting, fish jumping. Golden hour, photorealistic.`, consequence: 'Complete environmental recovery', type: 'positive' },
+          { label: 'COMPARE BEFORE/AFTER', sub: 'See the contrast', prompt: `Split view of ${loc}. Polluted waterway vs. clean, green, alive. Photorealistic comparison.`, consequence: 'The power of restoration revealed', type: 'positive' },
         ],
       },
     ],
     Air: [
       {
-        narrative: `Air quality plummeting over ${pin.city}. Millions of lungs at stake.`,
+        narrative: 'How do we clear these skies?',
         choices: [
-          { label: 'SHELTER IN PLACE', sub: 'Order everyone indoors now', prompt: `${pin.city} goes quiet. Streets empty. Windows sealed. Emergency broadcasts loop on every channel. The thick haze blankets empty roads. An eerie silence over the city as people shelter inside.`, consequence: 'City locked down', type: 'neutral' },
-          { label: 'MASS EVACUATION', sub: 'Get people out of the danger zone', prompt: `Highways packed bumper to bumper leaving ${pin.city}. Emergency vehicles lead convoys. Buses evacuate neighborhoods. A river of headlights streaming away from the toxic cloud.`, consequence: 'Evacuation routes overwhelmed', type: 'neutral' },
-          { label: 'DEPLOY MONITORS ONLY', sub: 'We need more data first', prompt: `Air quality monitoring stations are set up across ${pin.city} while the toxic cloud thickens. Scientists in masks take readings. The numbers are alarming and getting worse. People cough on the streets.`, consequence: 'Data collected but exposure continues', type: 'negative' },
+          { label: 'CLEAR THE SKIES', sub: 'Remove the smoke and haze', prompt: `Skies over ${loc} completely clear. Deep blue sky, crisp visibility, mountains visible. Photorealistic clear day.`, consequence: 'Skies are crystal clear', type: 'positive' },
+          { label: 'ADD GREEN CANOPY', sub: 'Plant trees to filter the air', prompt: `${loc} lined with mature trees. Thick green canopy shades streets. Dappled light. Photorealistic urban forest.`, consequence: 'Urban forest filters the air', type: 'positive' },
+          { label: 'NO INTERVENTION', sub: 'See how pollution compounds', prompt: `Air quality in ${loc} worsens. Thick smog blankets everything. Visibility drops. Photorealistic severe air pollution.`, consequence: 'Air becomes hazardous', type: 'negative' },
         ],
       },
       {
-        narrative: 'The source has been identified. It can be stopped — but at a cost.',
+        narrative: 'The air is clearing. How do we make it permanent?',
         choices: [
-          { label: 'SHUT IT DOWN', sub: 'Close the source permanently', prompt: `The factory smokestacks go dark. Emergency shutdown initiated. Workers file out. The smoke plume thins and slowly dissipates over ${pin.city}. Clean blue sky begins to break through.`, consequence: 'Source eliminated — sky clearing', type: 'positive' },
-          { label: 'NEGOTIATE REDUCTION', sub: 'Phase out over 6 months — save jobs', prompt: `Emissions slowly decrease over months. The haze thins gradually. Some days are clear, others awful. A compromise that satisfies no one fully. Workers keep their jobs but communities still suffer.`, consequence: 'Slow improvement, ongoing harm', type: 'neutral' },
-          { label: 'IGNORE THE SOURCE', sub: 'It\'s not our jurisdiction', prompt: `Nothing changes. The smoke continues to pour. AQI readings hit new records. Hospitals fill with respiratory patients. The sky over ${pin.city} turns a permanent grey-brown.`, consequence: 'Health crisis deepens', type: 'negative' },
+          { label: 'SOLAR TRANSITION', sub: 'Replace all fossil fuel sources', prompt: `${loc} with clean energy. Solar panels everywhere. No smokestacks. Pristine air. Photorealistic clean city.`, consequence: 'Zero emissions achieved', type: 'positive' },
+          { label: 'GREEN INFRASTRUCTURE', sub: 'Living walls and rooftop gardens', prompt: `Buildings in ${loc} covered with living green walls and rooftop gardens. Clean air flows between buildings. Photorealistic sustainable architecture.`, consequence: 'The city itself cleans the air', type: 'positive' },
         ],
       },
       {
-        narrative: 'One year later. The air tells the story of your choices.',
+        narrative: 'Full recovery. The potential of clean air.',
         choices: [
-          { label: 'BREATHE FREELY', sub: 'Invest in permanent clean air', prompt: `Clear blue skies over ${pin.city}. Children play in parks. Mountains visible for the first time in years. Clean air monitors show green across the board. A city reborn.`, consequence: 'Clean air restored', type: 'positive' },
-          { label: 'ACCEPT THE HAZE', sub: 'Some pollution is the price of progress', prompt: `${pin.city} adapts to permanent haze. Mask dispensers on street corners. Indoor air purifiers in every home. People check AQI apps like weather. A new normal no one wanted.`, consequence: 'A diminished future', type: 'negative' },
+          { label: 'VIEW CLEAN FUTURE', sub: 'See the pollution-free city', prompt: `${loc} perfectly clear day. Blue sky, sharp horizon, children playing. Golden hour photorealism.`, consequence: 'A breathable future realized', type: 'positive' },
+          { label: 'COMPARE BEFORE/AFTER', sub: 'Contrast the transformation', prompt: `Same view of ${loc} — haze vs. pristine blue sky. Photorealistic comparison.`, consequence: 'Clean air changes everything', type: 'positive' },
         ],
       },
     ],
     Bio: [
       {
-        narrative: `Invasive threat detected near critical habitat in ${pin.neighborhood}.`,
+        narrative: 'How do we restore the native ecosystem?',
         choices: [
-          { label: 'REMOVAL OPERATION', sub: 'Deploy trained extraction teams', prompt: `Specialized wildlife removal teams move through ${pin.neighborhood}. Traps set carefully around nesting areas. Invasive species captured one by one. Native birds watch from protected zones nearby.`, consequence: 'Extraction teams deployed', type: 'positive' },
-          { label: 'ESTABLISH BARRIER', sub: 'Build a protective perimeter', prompt: `Fencing and sensor networks erected around the endangered habitat in ${pin.neighborhood}. A technological fortress protecting native species. Cameras and motion sensors cover every angle.`, consequence: 'Protection perimeter active', type: 'neutral' },
-          { label: 'LET NATURE DECIDE', sub: 'Evolution will find a way', prompt: `No intervention. The invasive species spreads rapidly through ${pin.neighborhood}. Native nests are raided. Eggs destroyed. The once-thriving colony dwindles. Nature's balance tips irreversibly.`, consequence: 'Native species declining fast', type: 'negative' },
+          { label: 'REMOVE INVASIVE SPECIES', sub: 'Clear out what doesn\'t belong', prompt: `${loc} cleared of invasive species. Native plants growing. Balanced, healthy ground cover. Photorealistic restored habitat.`, consequence: 'Native habitat reclaimed', type: 'positive' },
+          { label: 'RESTORE NATIVE PLANTS', sub: 'Replant the original ecosystem', prompt: `${loc} covered in native vegetation. Wildflowers, grasses, butterflies, bees. Photorealistic native ecosystem.`, consequence: 'Original ecosystem returns', type: 'positive' },
+          { label: 'NO INTERVENTION', sub: 'Let the invasives spread', prompt: `${loc} overrun by invasive monoculture. No diversity. Functionally dead. Photorealistic ecological collapse.`, consequence: 'Biodiversity collapses', type: 'negative' },
         ],
       },
       {
-        narrative: 'The ecosystem is approaching a tipping point. Every hour counts.',
+        narrative: 'The habitat is recovering. What about the wildlife?',
         choices: [
-          { label: 'EMERGENCY BREEDING', sub: 'Captive breeding for endangered species', prompt: 'Emergency breeding facility activated. Biologists carefully tend to endangered eggs and hatchlings. Incubators glow warmly. New life emerges under human protection. Hope in a controlled environment.', consequence: 'Breeding program launched', type: 'positive' },
-          { label: 'GENETIC BIOCONTROL', sub: 'Release engineered countermeasures', prompt: 'Scientists release targeted biological agents that affect only the invasive species. Over weeks, the invasive population declines while native species thrive untouched. A surgical ecological strike.', consequence: 'Biocontrol agents deployed', type: 'neutral' },
-          { label: 'DOCUMENT THE LOSS', sub: 'Record it for future generations', prompt: 'Camera drones document the collapse. The last native animals in the area are photographed and catalogued. An ecosystem obituary written in data. The habitat goes quiet forever.', consequence: 'Extinction documented', type: 'negative' },
+          { label: 'BRING BACK WILDLIFE', sub: 'Reintroduce native species', prompt: `${loc} alive with wildlife. Birds nesting, pollinators swarming. Complete food chain. Photorealistic wildlife sanctuary.`, consequence: 'The food chain is whole again', type: 'positive' },
+          { label: 'CREATE CORRIDORS', sub: 'Connect isolated habitat patches', prompt: `Green wildlife corridors through ${loc} connecting parks. Wildlife moves freely. Photorealistic ecological corridors.`, consequence: 'Habitats reconnected', type: 'positive' },
         ],
       },
       {
-        narrative: 'The long game. What kind of world do we leave behind?',
+        narrative: 'Full ecological restoration.',
         choices: [
-          { label: 'REWILD EVERYTHING', sub: 'Return this land to nature', prompt: `${pin.neighborhood} transformed into a thriving wildlife sanctuary. Fences removed. Native species repopulated. Dense vegetation, birdsong, clean water. An ecosystem restored to its pre-invasion glory.`, consequence: 'Wilderness restored', type: 'positive' },
-          { label: 'MANAGED COEXISTENCE', sub: 'Humans and nature, side by side', prompt: `A carefully managed landscape in ${pin.neighborhood}. Boardwalks through wetlands. Viewing platforms for wildlife. Nature and community in balance. Not pristine, but alive and shared.`, consequence: 'Balance achieved', type: 'neutral' },
+          { label: 'VIEW THRIVING HABITAT', sub: 'The fully recovered ecosystem', prompt: `${loc} thriving nature sanctuary. Dense native vegetation, abundant wildlife, clean water. Sunset, photorealistic.`, consequence: 'Biodiversity fully restored', type: 'positive' },
+          { label: 'COMPARE BEFORE/AFTER', sub: 'See degraded vs. restored', prompt: `${loc} before and after. Degraded habitat vs. thriving native life. Photorealistic comparison.`, consequence: 'Nature can recover', type: 'positive' },
         ],
       },
     ],
     Soil: [
       {
-        narrative: `The ground beneath ${pin.neighborhood} is shifting. Time is running out.`,
+        narrative: 'How do we heal this ground?',
         choices: [
-          { label: 'REINFORCE NOW', sub: 'Emergency seawalls and barriers', prompt: `Heavy machinery arrives at ${pin.neighborhood}. Concrete barriers and steel reinforcements are placed against the eroding coastline. Engineers race against the tide to stabilize the ground.`, consequence: 'Emergency barriers deployed', type: 'positive' },
-          { label: 'NATURAL BARRIERS', sub: 'Plant mangroves and restore dunes', prompt: `Thousands of mangrove seedlings planted along the eroding shore of ${pin.neighborhood}. Sand dunes rebuilt with native grasses. A living wall of vegetation grows to protect the coast naturally.`, consequence: 'Living shoreline initiated', type: 'neutral' },
-          { label: 'ABANDON THE COAST', sub: 'Retreat inland — this land is lost', prompt: `Buildings evacuated along the coast of ${pin.neighborhood}. Furniture carried out. Doors locked for the last time. The ocean claims another strip of human settlement. Waves crash through empty rooms.`, consequence: 'Strategic retreat executed', type: 'negative' },
+          { label: 'REMEDIATE THE SOIL', sub: 'Remove contaminants and toxins', prompt: `Soil in ${loc} now clean and healthy. Rich dark fertile earth. New plants sprouting. Photorealistic soil restoration.`, consequence: 'Clean soil, new growth', type: 'positive' },
+          { label: 'STOP THE EROSION', sub: 'Stabilize the terrain', prompt: `Eroding landscape of ${loc} stabilized. Deep-rooted native plants anchor the ground. Green and stable. Photorealistic erosion control.`, consequence: 'Ground stabilized naturally', type: 'positive' },
+          { label: 'NO INTERVENTION', sub: 'Let degradation continue', prompt: `Soil in ${loc} continues to erode. Bare cracked earth. Dust and barren lifelessness. Photorealistic land degradation.`, consequence: 'The ground keeps washing away', type: 'negative' },
         ],
       },
       {
-        narrative: 'A major storm is approaching. Your defenses will be tested.',
+        narrative: 'The ground is healing. What grows here now?',
         choices: [
-          { label: 'FORTIFY DEFENSES', sub: 'Double down on protection', prompt: 'Sandbags stacked. Pumps activated. Storm surge barriers raised. The community braces as dark clouds gather. Wind howls but the barriers hold. Water rises and is redirected.', consequence: 'Defenses holding... for now', type: 'positive' },
-          { label: 'EMERGENCY EVACUATION', sub: 'Get everyone to high ground', prompt: 'Sirens wail. Buses and trucks carry families to higher ground. Pets in carriers, children wrapped in blankets. The coast empties just as the storm surge crashes over the barriers.', consequence: 'Everyone safe — but at what cost', type: 'neutral' },
+          { label: 'PLANT A FOOD FOREST', sub: 'Grow productive trees and gardens', prompt: `${loc} transformed into lush food forest. Fruit trees, vegetable gardens. Photorealistic urban agriculture.`, consequence: 'Productive land from barren ground', type: 'positive' },
+          { label: 'RESTORE NATIVE GROUND COVER', sub: 'Let nature rebuild the soil', prompt: `${loc} covered in native ground vegetation. Thick grass, mosses, rich humus. Photorealistic natural soil recovery.`, consequence: 'Living soil ecosystem returns', type: 'positive' },
         ],
       },
       {
-        narrative: 'After the storm. The landscape has changed forever.',
+        narrative: 'Complete soil restoration.',
         choices: [
-          { label: 'REBUILD STRONGER', sub: 'Invest in resilient infrastructure', prompt: `${pin.neighborhood} rises from the storm. New elevated buildings, green infrastructure, rain gardens. A community designed for the climate of the future. Stronger, smarter, sustainable.`, consequence: 'Resilient future built', type: 'positive' },
-          { label: 'ACCEPT THE NEW SHORE', sub: 'The map has been redrawn', prompt: `The new coastline of ${pin.neighborhood}. Where buildings stood, now marshland. Where roads ran, now channels. Nature has redrawn the boundary. Humanity adapts to the new geography.`, consequence: 'Adaptation complete', type: 'neutral' },
+          { label: 'VIEW RESTORED LAND', sub: 'Healthy ground supporting life', prompt: `${loc} fully restored healthy soil. Rich vegetation, tall trees, wildflowers. Golden hour, photorealistic.`, consequence: 'Healthy soil supports all life', type: 'positive' },
+          { label: 'COMPARE BEFORE/AFTER', sub: 'Barren ground vs. living soil', prompt: `${loc} before and after. Cracked contaminated ground vs. rich dark soil with dense vegetation. Photorealistic comparison.`, consequence: 'From barren to abundant', type: 'positive' },
         ],
       },
     ],
     Climate: [
       {
-        narrative: `Extreme conditions gripping ${pin.city}. Infrastructure buckling under stress.`,
+        narrative: 'How do we make this place resilient?',
         choices: [
-          { label: 'EMERGENCY COOLING', sub: 'Deploy misting stations and shelters', prompt: `Cooling stations spring up across ${pin.city}. Misting arcs spray over sidewalks. Public buildings open as refuges. The shimmering heat haze meets human ingenuity in a battle for survival.`, consequence: 'Cooling infrastructure deployed', type: 'positive' },
-          { label: 'PROTECT THE GRID', sub: 'Prevent cascading power failure', prompt: `Engineers work frantically at the power plant. Load shedding begins across ${pin.city}. Rolling blackouts in some neighborhoods to prevent total grid collapse. A calculated sacrifice.`, consequence: 'Grid stabilized with tradeoffs', type: 'neutral' },
-          { label: 'RIDE IT OUT', sub: 'It\'ll pass — it always does', prompt: `No action taken. The heat intensifies across ${pin.city}. Pavement buckles. Power lines sag. The grid fails completely. Darkness and heat. Emergency rooms overflow. A preventable catastrophe.`, consequence: 'Critical systems failing', type: 'negative' },
+          { label: 'COOL THE CITY', sub: 'Shade, water features, green space', prompt: `${loc} cooled. Mature shade trees, reflective roofs, green parks. No heat shimmer. Photorealistic urban cooling.`, consequence: 'Temperature drops significantly', type: 'positive' },
+          { label: 'FLOOD-PROOF THE AREA', sub: 'Build for extreme weather', prompt: `${loc} redesigned for resilience. Rain gardens, permeable surfaces, bioswales. No flooding. Photorealistic climate adaptation.`, consequence: 'Built to handle extremes', type: 'positive' },
+          { label: 'NO ADAPTATION', sub: 'See what happens without action', prompt: `${loc} battered by extreme weather. Flooded streets, buckled pavement, dead trees. Photorealistic climate damage.`, consequence: 'Infrastructure keeps failing', type: 'negative' },
         ],
       },
       {
-        narrative: 'Vulnerable communities are calling for help. Resources are limited.',
+        narrative: 'How do we future-proof this community?',
         choices: [
-          { label: 'DEPLOY AID TEAMS', sub: 'Door-to-door wellness checks', prompt: 'Aid workers and volunteers fan out through neighborhoods. Knocking on doors. Delivering water. Checking on elderly residents. A human chain of compassion in the face of climate extremes.', consequence: 'Lives saved through action', type: 'positive' },
-          { label: 'TRIAGE RESOURCES', sub: 'Focus on the most critical areas only', prompt: 'Resources concentrated in the hardest-hit zones. Some neighborhoods get everything they need. Others wait. The moral weight of choosing who gets help first.', consequence: 'Hard choices, uneven outcomes', type: 'neutral' },
+          { label: 'RENEWABLE ENERGY', sub: 'Power everything with clean sources', prompt: `${loc} powered by renewables. Solar panels, battery storage. Clean, resilient grid. Photorealistic clean energy city.`, consequence: 'Energy independence achieved', type: 'positive' },
+          { label: 'GREEN CORRIDORS', sub: 'Nature-based climate solutions', prompt: `${loc} interwoven with green corridors. Tree-lined boulevards, urban streams, wetlands. Photorealistic green urbanism.`, consequence: 'Nature cools and protects the city', type: 'positive' },
         ],
       },
       {
-        narrative: 'The crisis passes. But the next one is already forming. What now?',
+        narrative: 'Full climate adaptation.',
         choices: [
-          { label: 'GREEN TRANSFORMATION', sub: 'Rebuild the city around nature', prompt: `${pin.city} transformed. Every street lined with trees. Green roofs on every building. Solar canopies shade sidewalks. Temperature drops 10 degrees in the urban core. A city that breathes.`, consequence: 'A green future secured', type: 'positive' },
-          { label: 'BUSINESS AS USUAL', sub: 'We survived — back to normal', prompt: `${pin.city} returns to normal. Same concrete. Same heat traps. Same vulnerable communities. Until next time. And next time comes sooner, and harder, and hotter.`, consequence: 'The cycle continues', type: 'negative' },
+          { label: 'VIEW RESILIENT FUTURE', sub: 'See the climate-adapted city', prompt: `${loc} fully adapted. Green, cool, solar roofs, rain gardens, thriving public spaces. Sunset, photorealistic.`, consequence: 'A city designed for the future', type: 'positive' },
+          { label: 'COMPARE BEFORE/AFTER', sub: 'Climate-stressed vs. adapted', prompt: `${loc} before and after adaptation. Heat-stressed vs. green, cool, resilient. Photorealistic comparison.`, consequence: 'Adaptation transforms everything', type: 'positive' },
         ],
       },
     ],
@@ -233,6 +232,56 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
   const [hudVisible, setHudVisible] = useState(false);
   const [timerPct, setTimerPct] = useState(100);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Voice narration
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  // Speak pre-written text directly via TTS
+  const speak = useCallback(async (text: string) => {
+    if (!voiceEnabled) return;
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+    setIsSpeaking(true);
+    try {
+      const res = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      if (!res.ok) { setIsSpeaking(false); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      audio.onended = () => { setIsSpeaking(false); URL.revokeObjectURL(url); audioRef.current = null; };
+      audio.onerror = () => { setIsSpeaking(false); URL.revokeObjectURL(url); audioRef.current = null; };
+      await audio.play();
+    } catch { setIsSpeaking(false); }
+  }, [voiceEnabled]);
+
+  // Generate AI narration then speak it — adapts to any pin dynamically
+  const narrateAI = useCallback(async (type: 'opening' | 'consequence' | 'finale', extra?: { choiceLabel?: string; choiceType?: string }) => {
+    if (!voiceEnabled) return;
+    try {
+      const res = await fetch('/api/narrate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: { neighborhood: pin.neighborhood, city: pin.city, title: pin.title, category: pin.category, summary: pin.summary }, type, ...extra }),
+      });
+      if (!res.ok) return;
+      const { text } = await res.json();
+      if (text) speak(text);
+    } catch { /* silent fail */ }
+  }, [voiceEnabled, pin, speak]);
+
+  const stopSpeaking = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    setIsSpeaking(false);
+  }, []);
 
   // Custom prompt input
   const [promptInput, setPromptInput] = useState('');
@@ -349,7 +398,7 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
           setStoryPhase('cinematic');
           setStatusText('');
           setTimeout(() => setHudVisible(true), 600);
-          setTimeout(() => setStoryPhase('narrating'), 5000);
+          setTimeout(() => setStoryPhase('narrating'), 8000);
         },
         onInteractAcknowledged: (prompt: string) => {
           console.log('[Odyssey] Interact acknowledged:', prompt.slice(0, 60));
@@ -379,20 +428,30 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
 
   // ── Story transitions ────────────────────────────────────────────────
 
-  // Narrating → Choosing (after text is visible for 2s)
+  // AI-generated opening narration when streaming starts
+  const hasSpokenOpening = useRef(false);
+  useEffect(() => {
+    if (phase === 'streaming' && !hasSpokenOpening.current) {
+      hasSpokenOpening.current = true;
+      narrateAI('opening');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
+
+  // Narrating → Choosing (give time for voice to finish scene narration)
   useEffect(() => {
     if (storyPhase !== 'narrating') return;
     const t = setTimeout(() => {
       setStoryPhase('choosing');
       setTimerPct(100);
-      // Start countdown timer (20 seconds)
+      // Start countdown timer (25 seconds)
       let pct = 100;
       if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = setInterval(() => {
-        pct -= 0.5;
+        pct -= 0.4;
         setTimerPct(Math.max(0, pct));
       }, 100);
-    }, 2200);
+    }, 3000);
     return () => clearTimeout(t);
   }, [storyPhase]);
 
@@ -413,6 +472,9 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
       setConsequenceText(choice.consequence);
       setChoicesMade((prev) => [...prev, { label: choice.label, type: choice.type }]);
 
+      // AI-generated narration for this specific choice
+      narrateAI('consequence', { choiceLabel: choice.label, choiceType: choice.type });
+
       // Send interact prompt to Odyssey
       const client = clientRef.current;
       if (client) {
@@ -427,12 +489,11 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
         } else {
           setDecisionIndex(nextIdx);
           setStoryPhase('cinematic');
-          // Show next decision after 4s of cinematic
-          setTimeout(() => setStoryPhase('narrating'), 4000);
+          setTimeout(() => setStoryPhase('narrating'), 6000);
         }
       }, 6000);
     },
-    [decisionIndex, decisions.length],
+    [decisionIndex, decisions.length, narrateAI],
   );
 
   // ── Custom prompt ──────────────────────────────────────────────────
@@ -485,10 +546,24 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
   const negativeCount = choicesMade.filter((c) => c.type === 'negative').length;
   const finaleVerdict =
     positiveCount > negativeCount
-      ? { text: 'THE ECOSYSTEM RECOVERS', color: '#0ff5c4', sub: 'Your decisions gave this place a future.' }
+      ? { text: 'ENVIRONMENT RESTORED', color: '#0ff5c4', sub: `This is what ${pin.neighborhood} could look like with action.` }
       : negativeCount > positiveCount
-        ? { text: 'THE DAMAGE IS DONE', color: '#ff3b4f', sub: 'Some choices can\'t be undone.' }
-        : { text: 'AN UNCERTAIN FUTURE', color: '#f5a623', sub: 'The outcome hangs in the balance.' };
+        ? { text: 'DEGRADATION CONTINUES', color: '#ff3b4f', sub: 'Without intervention, the environment keeps declining.' }
+        : { text: 'PARTIAL RECOVERY', color: '#f5a623', sub: 'Some improvement, but more action is needed.' };
+
+  // AI-generated finale narration
+  useEffect(() => {
+    if (storyPhase === 'finale') {
+      const overall = positiveCount > negativeCount ? 'positive' : negativeCount > positiveCount ? 'negative' : 'neutral';
+      narrateAI('finale', { choiceType: overall });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storyPhase]);
+
+  // Clean up audio on unmount
+  useEffect(() => {
+    return () => { stopSpeaking(); };
+  }, [stopSpeaking]);
 
   // ═══════════════════════════════════════════════════════════════════════
   // RENDER
@@ -573,6 +648,22 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
               )}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button
+                onClick={() => { setVoiceEnabled((v) => { if (v) stopSpeaking(); return !v; }); }}
+                style={{
+                  ...S.exitBtn,
+                  width: 'auto', padding: '0 8px',
+                  background: voiceEnabled ? 'rgba(15,245,196,0.12)' : 'rgba(255,255,255,0.05)',
+                  borderColor: voiceEnabled ? 'rgba(15,245,196,0.3)' : 'rgba(255,255,255,0.1)',
+                  color: voiceEnabled ? '#0ff5c4' : '#555870',
+                  fontSize: 8, letterSpacing: 1.5, fontWeight: 600,
+                  display: 'flex', alignItems: 'center', gap: 5,
+                }}
+                title={voiceEnabled ? 'Mute narration' : 'Enable narration'}
+              >
+                {voiceEnabled ? (isSpeaking ? '◉' : '♫') : '♫̶'}
+                <span>{voiceEnabled ? 'VOICE ON' : 'VOICE OFF'}</span>
+              </button>
               <span style={{ fontSize: 9, color: '#8b8fa4' }}>{pin.city}</span>
               <span style={{ fontSize: 8, letterSpacing: 1, padding: '2px 6px', borderRadius: 3, color: threatColor, background: `${threatColor}15`, border: `1px solid ${threatColor}30` }}>
                 {pin.severity.toUpperCase()}
@@ -655,7 +746,7 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
             <div style={S.consequenceContainer}>
               <div style={S.consequenceFlash} />
               <div style={{ fontSize: 9, letterSpacing: 4, color: '#555870', marginBottom: 8 }}>
-                THE ENVIRONMENT RESPONDS
+                VISUALIZING TRANSFORMATION
               </div>
               <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: 2, color: '#e4e6ef' }}>
                 {consequenceText}

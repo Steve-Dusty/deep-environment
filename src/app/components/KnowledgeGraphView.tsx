@@ -229,7 +229,7 @@ export default function KnowledgeGraphView({ onClose }: KnowledgeGraphViewProps)
       <div style={S.rightPanel}>
         <div style={{ fontSize: 8, fontWeight: 600, letterSpacing: 2.5, color: '#0ff5c4', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
           <span>AI QUERY</span>
-          <span style={{ color: '#555870', fontWeight: 400, letterSpacing: 1 }}>GPT-4o-mini</span>
+          <span style={{ color: '#555870', fontWeight: 400, letterSpacing: 1 }}>Gemini-2.0-flash</span>
         </div>
 
         {/* Chat messages */}
@@ -324,7 +324,7 @@ export default function KnowledgeGraphView({ onClose }: KnowledgeGraphViewProps)
           <span>UPTIME <span style={{ color: '#8b8fa4' }}>{fmt(elapsed)}</span></span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span>3D FORCE · d3 · three.js · OpenAI</span>
+          <span>3D FORCE · d3 · three.js · Gemini</span>
           <span style={{ color: '#252838' }}>|</span>
           {autoUpdate
             ? <span style={{ color: '#0ff5c4' }}>STREAMING</span>

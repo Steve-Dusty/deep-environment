@@ -1,18 +1,83 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import TopBar from './components/TopBar';
 import SidePanel from './components/SidePanel';
 import LeftSidebar from './components/LeftSidebar';
+import LocationCarousel from './components/LocationCarousel';
 import type { NavView } from './components/LeftSidebar';
 import StatusBar from './components/StatusBar';
-import { pinReports, type PinReport } from './data/locations';
-import { useVoiceControl, type VoiceCommand } from './voice/useVoiceControl';
-import { useTTS } from './voice/useTTS';
-import VoiceIndicator from './voice/VoiceIndicator';
-import ChatBox from './components/ChatBox';
-import { interpretVoiceCommand } from './data/ai';
+import { pinReports as staticPinReports, type PinReport, type ThreatLevel, CATEGORY_COLORS, LOCATION_COORDS } from './data/locations';
+import type { PDFViewData } from './components/ChatView';
+
+// Map bot classification categories → dashboard categories
+const CLASSIFY_TO_CATEGORY: Record<string, string> = {
+  pollution: 'Water', deforestation: 'Bio', runoff: 'Water', wildfire: 'Air',
+  litter: 'Soil', erosion: 'Soil', invasive: 'Bio', drought: 'Climate',
+  contamination: 'Water', other: 'Climate',
+};
+
+/** Convert a Slack upload with classification into a PinReport */
+// Hardcoded SF-area coordinates for Slack uploads — real neighborhoods on land
+const SF_SPOTS: [number, number][] = [
+  [-122.4194, 37.7749], // Downtown SF
+  [-122.4089, 37.7836], // Chinatown
+  [-122.4534, 37.7694], // Golden Gate Park
+  [-122.3894, 37.7866], // Embarcadero
+  [-122.4376, 37.7590], // Twin Peaks
+  [-122.4862, 37.7694], // Ocean Beach
+  [-122.4058, 37.8024], // Fisherman's Wharf
+  [-122.3999, 37.7956], // North Beach
+  [-122.4167, 37.7620], // Mission District
+  [-122.4330, 37.7880], // Pacific Heights
+];
+
+const LA_SPOTS: [number, number][] = [
+  [-118.2437, 34.0522], // Downtown LA
+  [-118.3287, 34.0928], // Hollywood
+  [-118.4965, 34.0195], // Santa Monica
+  [-118.2508, 34.0566], // Arts District
+  [-118.3525, 34.0689], // Beverly Hills
+];
+
+function slackUploadToPinReport(upload: any, index: number): PinReport | null {
+  const c = upload.classification;
+  if (!c) return null;
+
+  // Place pins at real neighborhood coordinates based on location_id
+  const locId = c.location_id || '';
+  let coords: [number, number];
+  if (locId === 'loc-la' || locId.includes('la')) {
+    coords = LA_SPOTS[index % LA_SPOTS.length];
+  } else {
+    // Default to SF spots
+    coords = SF_SPOTS[index % SF_SPOTS.length];
+  }
+
+  const severityMap: Record<string, ThreatLevel> = { low: 'low', moderate: 'moderate', elevated: 'elevated', high: 'high', critical: 'critical' };
+  return {
+    id: `slack-${upload.timestamp}`,
+    coordinates: coords,
+    city: c.resolved_location || upload.user_city || 'Field Report',
+    neighborhood: c.resolved_location || upload.user_city || 'Field Report',
+    state: '',
+    user: upload.user || 'field-agent',
+    timestamp: new Date(upload.timestamp * 1000).toLocaleString(),
+    title: c.problem_name,
+    summary: c.problem_description,
+    analysisDetails: c.indicators || [],
+    category: CLASSIFY_TO_CATEGORY[c.category] || 'Climate',
+    severity: severityMap[c.severity] || 'moderate',
+    confidence: 85,
+    metrics: [],
+    impactStatement: c.problem_description,
+    agentsActive: 3,
+    correlatedWith: [],
+    source: 'slack',
+    imageUrl: upload.filename ? `/api/slack-uploads/image?f=${encodeURIComponent(upload.filename)}` : undefined,
+  };
+}
 
 const MapView = dynamic(() => import('./components/MapView'), {
   ssr: false,
@@ -36,6 +101,62 @@ const KnowledgeGraphView = dynamic(() => import('./components/KnowledgeGraphView
         <div className="w-3 h-3 rounded-full bg-[var(--color-signal-teal)] data-live" />
         <span className="text-[10px] tracking-[0.3em] text-[var(--color-text-muted)]">
           INITIALIZING KNOWLEDGE GRAPH
+        </span>
+      </div>
+    </div>
+  ),
+});
+
+const LocationsDashboard = dynamic(() => import('./components/LocationsDashboard'), {
+  ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 flex items-center justify-center bg-[var(--color-void)] z-50">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-3 h-3 rounded-full bg-[var(--color-signal-teal)] data-live" />
+        <span className="text-[10px] tracking-[0.3em] text-[var(--color-text-muted)]">
+          LOADING LOCATIONS
+        </span>
+      </div>
+    </div>
+  ),
+});
+
+const LocationDetailView = dynamic(() => import('./components/LocationDetailView'), {
+  ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 flex items-center justify-center bg-[var(--color-void)] z-50">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-3 h-3 rounded-full bg-[var(--color-signal-teal)] data-live" />
+        <span className="text-[10px] tracking-[0.3em] text-[var(--color-text-muted)]">
+          LOADING LOCATION GRAPH
+        </span>
+      </div>
+    </div>
+  ),
+});
+
+const ChatView = dynamic(() => import('./components/ChatView'), {
+  ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 flex items-center justify-center bg-[var(--color-void)] z-50">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-3 h-3 rounded-full bg-[var(--color-signal-teal)] data-live" />
+        <span className="text-[10px] tracking-[0.3em] text-[var(--color-text-muted)]">
+          INITIALIZING AI ASSISTANT
+        </span>
+      </div>
+    </div>
+  ),
+});
+
+const PDFReportView = dynamic(() => import('./components/PDFReportView'), {
+  ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 flex items-center justify-center bg-[var(--color-void)] z-50">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-3 h-3 rounded-full bg-[var(--color-signal-teal)] data-live" />
+        <span className="text-[10px] tracking-[0.3em] text-[var(--color-text-muted)]">
+          LOADING PDF VIEWER
         </span>
       </div>
     </div>
@@ -70,387 +191,34 @@ export default function DashboardPage() {
   const [mapReady, setMapReady] = useState(false);
   const [activeView, setActiveView] = useState<NavView>(null);
   const [showGraph, setShowGraph] = useState(false);
+  const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [odysseyPin, setOdysseyPin] = useState<PinReport | null>(null);
   const [odysseyImageUrl, setOdysseyImageUrl] = useState<string | undefined>(undefined);
-  const [voiceEnabled, setVoiceEnabled] = useState(false);
-  const [categoryFilter, setCategoryFilter] = useState('All');
-  const [severityFilter, setSeverityFilter] = useState('all');
+  const [showChat, setShowChat] = useState(false);
+  const [pdfViewData, setPdfViewData] = useState<PDFViewData | null>(null);
+  const [slackPins, setSlackPins] = useState<PinReport[]>([]);
 
-  const totalAgents = pinReports.reduce((sum, p) => sum + p.agentsActive, 0);
-
-  const { speak } = useTTS();
-
-  const handleVoiceCommand = useCallback((cmd: VoiceCommand) => {
-    console.log('🎯 Processing command:', cmd);
-    let response = '';
-
-    // Add AI interpretation acknowledgment
-    if (cmd.fromAI) {
-      console.log('✨ Command interpreted by AI');
+  // Poll Slack uploads and convert to PinReports
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchSlackPins() {
+      try {
+        const res = await fetch('/api/slack-uploads', { cache: 'no-store' });
+        if (!res.ok || cancelled) return;
+        const uploads = await res.json();
+        const pins = uploads
+          .map((u: any, i: number) => slackUploadToPinReport(u, i))
+          .filter((p: PinReport | null): p is PinReport => p !== null);
+        setSlackPins(pins);
+      } catch { /* silent */ }
     }
-
-    switch (cmd.action) {
-      case 'error': {
-        response = `Sorry, ${cmd.target || 'something went wrong'}. Please try again.`;
-        break;
-      }
-      
-      case 'stop': {
-        response = 'Voice commands stopped. Say "Hey Deep" to resume.';
-        break;
-      }
-      
-      case 'enable':
-      case 'disable': {
-        const key = cmd.target || '';
-        const validKeys = ['globe', 'terrain', 'satellite', 'heatmap', 'weather'];
-        if (validKeys.includes(key)) {
-          setToggles(prev => ({ ...prev, [key]: cmd.action === 'enable' }));
-          const friendlyNames: Record<string, string> = {
-            globe: 'globe view',
-            terrain: '3D terrain',
-            satellite: 'satellite imagery',
-            heatmap: 'threat overlay',
-            weather: 'precipitation data',
-          };
-          response = `${cmd.action === 'enable' ? 'Enabling' : 'Disabling'} ${friendlyNames[key] || key}.`;
-        } else {
-          response = `Unknown overlay: ${key}.`;
-        }
-        break;
-      }
-
-      case 'enable-all':
-        setToggles({ globe: true, terrain: true, satellite: true, heatmap: true, weather: true });
-        response = 'Enabling all overlays. Globe, terrain, satellite, threat overlay, and precipitation.';
-        break;
-
-      case 'disable-all':
-        setToggles({ globe: false, terrain: false, satellite: false, heatmap: false, weather: false });
-        response = 'Disabling all overlays.';
-        break;
-      
-      case 'view-graph':
-      case 'show-graph':
-        setShowGraph(true);
-        response = 'Opening knowledge graph.';
-        break;
-      
-      case 'view-map':
-      case 'show-map':
-        setShowGraph(false);
-        setOdysseyPin(null);
-        setSelectedPinId(null);
-        response = 'Returning to map view.';
-        break;
-        
-      case 'view-odyssey':
-      case 'show-odyssey':
-        if (selectedPinId) {
-          const pin = pinReports.find(p => p.id === selectedPinId);
-          if (pin) {
-            setOdysseyPin(pin);
-            response = `Entering Odyssey world model for ${pin.city}.`;
-          } else {
-            response = 'Please select a location first.';
-          }
-        } else {
-          response = 'Please select a location first to view in Odyssey.';
-        }
-        break;
-
-      case 'navigate':
-      case 'select-location': {
-        const target = cmd.target?.toLowerCase() || '';
-        // Try to match by ID first (from AI), then by name
-        let match = pinReports.find(p => p.id === cmd.target);
-        if (!match) {
-          match = pinReports.find(p =>
-            p.city.toLowerCase().includes(target) ||
-            p.neighborhood.toLowerCase().includes(target) ||
-            p.title.toLowerCase().includes(target) ||
-            p.state.toLowerCase().includes(target) ||
-            p.id.toLowerCase().includes(target)
-          );
-        }
-        if (match) {
-          setSelectedPinId(match.id);
-          setShowGraph(false);
-          setOdysseyPin(null);
-          response = `Navigating to ${match.neighborhood}. ${match.title}.`;
-        } else {
-          response = `Location ${cmd.target} not found.`;
-        }
-        break;
-      }
-
-      case 'odyssey-location': {
-        const target = cmd.target?.toLowerCase() || '';
-        let match = pinReports.find(p => p.id === cmd.target);
-        if (!match) {
-          match = pinReports.find(p =>
-            p.city.toLowerCase().includes(target) ||
-            p.neighborhood.toLowerCase().includes(target) ||
-            p.title.toLowerCase().includes(target)
-          );
-        }
-        if (match) {
-          setSelectedPinId(match.id);
-          setOdysseyPin(match);
-          response = `Entering Odyssey world model for ${match.city}. ${match.title}.`;
-        } else {
-          response = `Location ${cmd.target} not found.`;
-        }
-        break;
-      }
-
-      case 'view-feed':
-      case 'show-feed':
-        setActiveView('feed');
-        response = 'Opening location feed.';
-        break;
-
-      case 'show-slack':
-        setActiveView('slack');
-        response = 'Opening Slack uploads.';
-        break;
-
-      case 'close-sidebar':
-        setActiveView(null);
-        response = 'Closing sidebar.';
-        break;
-
-      case 'filter-category': {
-        const cat = cmd.target || 'All';
-        setActiveView('feed');
-        setCategoryFilter(cat);
-        if (cat === 'All') {
-          response = `Showing all categories. ${pinReports.length} locations.`;
-        } else {
-          const count = pinReports.filter(p => p.category === cat).length;
-          response = `Filtering by ${cat}. ${count} locations found.`;
-        }
-        break;
-      }
-
-      case 'filter-severity': {
-        const sev = cmd.target || 'all';
-        setActiveView('feed');
-        setSeverityFilter(sev);
-        if (sev === 'all') {
-          response = `Showing all severity levels.`;
-        } else {
-          const count = pinReports.filter(p => p.severity === sev).length;
-          response = `Filtering by ${sev} severity. ${count} locations found.`;
-        }
-        break;
-      }
-        
-      case 'zoom-in':
-        setZoom(prev => Math.min(prev + 1, 20));
-        response = 'Zooming in.';
-        break;
-        
-      case 'zoom-out':
-        setZoom(prev => Math.max(prev - 1, 1));
-        response = 'Zooming out.';
-        break;
-
-      case 'zoom-level': {
-        const level = parseInt(cmd.target || '5', 10);
-        if (level >= 1 && level <= 20) {
-          setZoom(level);
-          response = `Setting zoom to level ${level}.`;
-        } else {
-          response = 'Zoom level must be between 1 and 20.';
-        }
-        break;
-      }
-        
-      case 'reset-view':
-        setZoom(3.5);
-        setSelectedPinId(null);
-        setToggles({ globe: true, terrain: false, satellite: false, heatmap: true, weather: false });
-        response = 'Resetting view to defaults.';
-        break;
-        
-      case 'select-location': {
-        const target = cmd.target?.toLowerCase() || '';
-        const match = pinReports.find(p =>
-          p.city.toLowerCase().includes(target) ||
-          p.neighborhood.toLowerCase().includes(target) ||
-          p.state.toLowerCase().includes(target) ||
-          p.title.toLowerCase().includes(target)
-        );
-        if (match) {
-          setSelectedPinId(match.id);
-          response = `Selecting ${match.city}, ${match.state}. ${match.title}. Severity: ${match.severity}.`;
-        } else {
-          response = `Location ${cmd.target} not found.`;
-        }
-        break;
-      }
-
-      case 'describe-location': {
-        const target = cmd.target?.toLowerCase() || '';
-        const match = pinReports.find(p =>
-          p.city.toLowerCase().includes(target) ||
-          p.neighborhood.toLowerCase().includes(target) ||
-          p.title.toLowerCase().includes(target)
-        );
-        if (match) {
-          setSelectedPinId(match.id);
-          const topMetric = match.metrics[0];
-          response = `${match.title} in ${match.city}. ${match.summary.split('.')[0]}. ${topMetric.label} at ${topMetric.value} ${topMetric.unit}. Severity: ${match.severity}. ${match.agentsActive} agents analyzing.`;
-        } else {
-          response = `Location ${cmd.target} not found.`;
-        }
-        break;
-      }
-
-      case 'next-pin': {
-        const currentIdx = selectedPinId ? pinReports.findIndex(p => p.id === selectedPinId) : -1;
-        const nextIdx = (currentIdx + 1) % pinReports.length;
-        const next = pinReports[nextIdx];
-        setSelectedPinId(next.id);
-        response = `${next.city}. ${next.title}. Severity: ${next.severity}.`;
-        break;
-      }
-
-      case 'prev-pin': {
-        const currentIdx = selectedPinId ? pinReports.findIndex(p => p.id === selectedPinId) : 0;
-        const prevIdx = (currentIdx - 1 + pinReports.length) % pinReports.length;
-        const prev = pinReports[prevIdx];
-        setSelectedPinId(prev.id);
-        response = `${prev.city}. ${prev.title}. Severity: ${prev.severity}.`;
-        break;
-      }
-      
-      case 'clear-selection':
-        setSelectedPinId(null);
-        response = 'Clearing selection.';
-        break;
-        
-      case 'status': {
-        const critical = pinReports.filter(p => p.severity === 'critical').length;
-        const high = pinReports.filter(p => p.severity === 'high').length;
-        const elevated = pinReports.filter(p => p.severity === 'elevated').length;
-        response = `${pinReports.length} active locations. ${critical} critical, ${high} high, ${elevated} elevated severity. ${totalAgents} agents online. System nominal.`;
-        break;
-      }
-      
-      case 'list-critical': {
-        const critical = pinReports.filter(p => p.severity === 'critical');
-        if (critical.length === 0) {
-          response = 'No critical threats detected.';
-        } else {
-          const details = critical.slice(0, 4).map(p => `${p.city}: ${p.title}`).join('. ');
-          response = `${critical.length} critical threats. ${details}.`;
-        }
-        break;
-      }
-
-      case 'list-high': {
-        const high = pinReports.filter(p => p.severity === 'high');
-        if (high.length === 0) {
-          response = 'No high severity threats detected.';
-        } else {
-          const details = high.slice(0, 4).map(p => `${p.city}: ${p.title}`).join('. ');
-          response = `${high.length} high severity threats. ${details}.`;
-        }
-        break;
-      }
-
-      case 'list-category': {
-        const cat = cmd.target || '';
-        const matches = pinReports.filter(p => p.category === cat);
-        if (matches.length === 0) {
-          response = `No ${cat} threats detected.`;
-        } else {
-          const details = matches.slice(0, 4).map(p => `${p.city}: ${p.title}`).join('. ');
-          response = `${matches.length} ${cat} threats. ${details}.`;
-        }
-        break;
-      }
-
-      case 'list-agents': {
-        response = `${totalAgents} agents active across ${pinReports.length} locations. Average ${(totalAgents / pinReports.length).toFixed(1)} agents per location.`;
-        break;
-      }
-      
-      case 'list-locations': {
-        const cities = pinReports.map(p => p.city).slice(0, 5).join(', ');
-        response = `${pinReports.length} locations monitored. Including ${cities}, and more.`;
-        break;
-      }
-      
-      case 'list-all': {
-        const states = new Set(pinReports.map(p => p.state)).size;
-        const categories = new Set(pinReports.map(p => p.category)).size;
-        response = `Monitoring ${pinReports.length} locations across ${states} states. ${categories} threat categories active.`;
-        break;
-      }
-      
-      case 'help':
-        response = 'Voice commands available. Map controls: enable satellite, enable terrain, enable precipitation, show threat overlay, globe view, zoom in, zoom out, reset view. Navigation: go to Miami, next location, previous location, select Houston. Views: show knowledge graph, show map, enter odyssey. Filters: show water threats, filter by critical, show all categories. Info: status report, list critical threats, describe Miami, list all agents. Sidebar: open feed, open slack, close sidebar.';
-        break;
-        
-      default:
-        response = 'Command not recognized. Say help for a list of available commands.';
-    }
-
-    console.log('🔊 Speaking response:', response);
-    if (response) {
-      voiceState.setState('speaking');
-      speak(response).then(() => voiceState.setState('idle'));
-    }
-  }, [speak, totalAgents, selectedPinId, pinReports]);
-
-  const handleAIFallback = useCallback(async (speech: string): Promise<VoiceCommand> => {
-    console.log('🤖 AI fallback triggered for command:', speech);
-
-    try {
-      const aiResult = await interpretVoiceCommand(speech);
-      console.log('✨ AI result:', aiResult);
-      return {
-        raw: speech,
-        action: aiResult.action,
-        target: aiResult.target,
-        fromAI: true,
-      };
-    } catch (error) {
-      console.error('❌ AI fallback error:', error);
-      throw error;
-    }
+    fetchSlackPins();
+    const interval = setInterval(fetchSlackPins, 10000);
+    return () => { cancelled = true; clearInterval(interval); };
   }, []);
 
-  const handleTextCommand = useCallback(async (text: string) => {
-    console.log('💬 Text command:', text);
-    try {
-      const aiResult = await interpretVoiceCommand(text);
-      console.log('✨ AI interpreted text:', aiResult);
-      const cmd: VoiceCommand = {
-        raw: text,
-        action: aiResult.action,
-        target: aiResult.target,
-        fromAI: true,
-      };
-      handleVoiceCommand(cmd);
-    } catch (error) {
-      console.error('❌ Text command error:', error);
-      handleVoiceCommand({
-        raw: text,
-        action: 'error',
-        target: 'AI unavailable',
-      });
-    }
-  }, [handleVoiceCommand]);
-
-  const voiceState = useVoiceControl({
-    onCommand: handleVoiceCommand,
-    onAIFallback: handleAIFallback,
-    enabled: voiceEnabled,
-  });
+  // Merge static + live pins
+  const allPins = useMemo(() => [...staticPinReports, ...slackPins], [slackPins]);
 
   const handleToggle = useCallback((key: string) => {
     setToggles((prev) => ({ ...prev, [key]: !prev[key as keyof typeof prev] }));
@@ -461,13 +229,47 @@ export default function DashboardPage() {
     setOdysseyImageUrl(imageUrl);
   }, []);
 
+  const handleOpenPDFView = useCallback((data: PDFViewData) => {
+    setPdfViewData(data);
+  }, []);
+
+  const handleDownloadPDF = useCallback(() => {
+    if (!pdfViewData) return;
+    const a = document.createElement('a');
+    a.href = pdfViewData.url;
+    a.download = pdfViewData.filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }, [pdfViewData]);
+
+  const handleClosePDFView = useCallback(() => {
+    setPdfViewData(null);
+  }, []);
+
+  const totalAgents = allPins.reduce((sum, p) => sum + p.agentsActive, 0);
+
   // Odyssey fullscreen takes priority
   if (odysseyPin) {
     return <OdysseyView pin={odysseyPin} imageUrl={odysseyImageUrl} onClose={() => { setOdysseyPin(null); setOdysseyImageUrl(undefined); }} />;
   }
 
+  // PDF Report fullscreen view
+  if (pdfViewData) {
+    return <PDFReportView pdfUrl={pdfViewData.url} pdfFilename={pdfViewData.filename} messages={pdfViewData.messages} onClose={handleClosePDFView} onDownload={handleDownloadPDF} />;
+  }
+
+  // Full-page AI chat
+  if (showChat) {
+    return <ChatView onClose={() => setShowChat(false)} onOpenPDFView={handleOpenPDFView} />;
+  }
+
+  if (showGraph && selectedLocationId) {
+    return <LocationDetailView locationId={selectedLocationId} onEnterOdyssey={handleEnterOdyssey} onClose={() => setSelectedLocationId(null)} />;
+  }
+
   if (showGraph) {
-    return <KnowledgeGraphView onClose={() => setShowGraph(false)} />;
+    return <LocationsDashboard onSelectLocation={setSelectedLocationId} onEnterOdyssey={handleEnterOdyssey} onClose={() => setShowGraph(false)} />;
   }
 
   return (
@@ -475,6 +277,7 @@ export default function DashboardPage() {
       <div className="absolute inset-0 z-0">
         <MapView
           toggles={toggles}
+          pins={allPins}
           selectedPinId={selectedPinId}
           onSelectPin={setSelectedPinId}
           onCoordsChange={setCoordinates}
@@ -491,22 +294,26 @@ export default function DashboardPage() {
             </div>
             <div className="pointer-events-auto">
               <LeftSidebar
-                pins={pinReports}
+                pins={allPins}
                 selectedId={selectedPinId}
                 onSelect={setSelectedPinId}
                 activeView={activeView}
                 onViewChange={setActiveView}
                 onShowGraph={() => setShowGraph(true)}
                 onEnterOdyssey={handleEnterOdyssey}
-                categoryFilter={categoryFilter}
-                onCategoryFilterChange={setCategoryFilter}
-                severityFilter={severityFilter}
-                onSeverityFilterChange={setSeverityFilter}
+                onShowChat={() => setShowChat(true)}
               />
             </div>
             <div className="pointer-events-auto">
               <SidePanel
-                pins={pinReports}
+                pins={allPins}
+                selectedId={selectedPinId}
+                onSelect={setSelectedPinId}
+              />
+            </div>
+            <div className="pointer-events-auto">
+              <LocationCarousel
+                pins={allPins}
                 selectedId={selectedPinId}
                 onSelect={setSelectedPinId}
               />
@@ -517,18 +324,8 @@ export default function DashboardPage() {
                 zoom={zoom}
                 projection={toggles.globe ? 'GLOBE' : 'MERCATOR'}
                 agentsOnline={totalAgents}
-                dataStreams={pinReports.length * 4}
-                fieldReports={pinReports.length}
-              />
-            </div>
-            <div className="pointer-events-auto fixed bottom-12 right-4 z-50 flex flex-col items-end gap-3">
-              <ChatBox onCommand={handleTextCommand} />
-              <VoiceIndicator
-                state={voiceState.state}
-                enabled={voiceEnabled}
-                onToggle={() => setVoiceEnabled(v => !v)}
-                transcript={voiceState.transcript}
-                fullTranscript={voiceState.fullTranscript}
+                dataStreams={allPins.length * 4}
+                fieldReports={allPins.length}
               />
             </div>
           </div>

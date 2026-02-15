@@ -82,7 +82,8 @@ export default function SidePanel({ pins, selectedId, onSelect }: SidePanelProps
   const [collapsed, setCollapsed] = useState(false);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const selected = pins.find((p) => p.id === selectedId);
-  const images = selected ? getPinImages(selected.id) : [];
+  const staticImages = selected ? getPinImages(selected.id) : [];
+  const images = selected?.imageUrl ? [selected.imageUrl, ...staticImages] : staticImages;
 
   // Reset image index when switching pins
   useEffect(() => { setActiveImageIdx(0); }, [selectedId]);

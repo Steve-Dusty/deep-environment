@@ -3,7 +3,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import {
-  pinReports,
+  type PinReport,
   getHeatmapGeoJSON,
   getConnectionLines,
   getPinReportsGeoJSON,
@@ -17,6 +17,7 @@ mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY || '';
 
 interface MapViewProps {
   toggles: Record<string, boolean>;
+  pins: PinReport[];
   selectedPinId: string | null;
   onSelectPin: (id: string) => void;
   onCoordsChange: (coords: { lng: number; lat: number } | null) => void;
@@ -26,6 +27,7 @@ interface MapViewProps {
 
 export default function MapView({
   toggles,
+  pins,
   selectedPinId,
   onSelectPin,
   onCoordsChange,
@@ -43,54 +45,61 @@ export default function MapView({
   togglesRef.current = toggles;
 
   const createPinMarker = useCallback(
-    (pin: (typeof pinReports)[0]) => {
+    (pin: PinReport) => {
       const color = THREAT_COLORS[pin.severity];
       const catColor = CATEGORY_COLORS[pin.category] || '#8b8fa4';
       const isCritical = pin.severity === 'critical' || pin.severity === 'high';
+      const isSlack = pin.source === 'slack';
 
       const container = document.createElement('div');
       container.className = 'marker-container';
-      container.style.cssText =
-        'cursor:pointer;position:relative;width:36px;height:36px;display:flex;align-items:center;justify-content:center;';
 
-      // Outer ring
-      const ring = document.createElement('div');
-      ring.style.cssText = `position:absolute;width:32px;height:32px;border-radius:50%;border:1px solid ${color}35;`;
+      {
+        // ===== ALL PINS — same pulsing dot marker =====
+        container.style.cssText =
+          'cursor:pointer;position:relative;width:36px;height:36px;display:flex;align-items:center;justify-content:center;';
 
-      // Pulse 1
-      const pulse = document.createElement('div');
-      pulse.style.cssText = `position:absolute;width:18px;height:18px;border-radius:50%;background:${color};opacity:0;top:50%;left:50%;transform:translate(-50%,-50%);`;
-      pulse.style.animation = isCritical
-        ? 'pulse-ring-critical 1.5s ease-out infinite'
-        : 'pulse-ring 2.5s ease-out infinite';
+        // Outer ring — dashed border for Slack pins
+        const ring = document.createElement('div');
+        ring.style.cssText = isSlack
+          ? `position:absolute;width:32px;height:32px;border-radius:50%;border:2px dashed ${color}70;`
+          : `position:absolute;width:32px;height:32px;border-radius:50%;border:1px solid ${color}35;`;
 
-      // Pulse 2 offset
-      const pulse2 = document.createElement('div');
-      pulse2.style.cssText = pulse.style.cssText;
-      pulse2.style.animationDelay = isCritical ? '0.75s' : '1.25s';
+        // Pulse 1
+        const pulse = document.createElement('div');
+        pulse.style.cssText = `position:absolute;width:18px;height:18px;border-radius:50%;background:${color};opacity:0;top:50%;left:50%;transform:translate(-50%,-50%);`;
+        pulse.style.animation = isCritical
+          ? 'pulse-ring-critical 1.5s ease-out infinite'
+          : 'pulse-ring 2.5s ease-out infinite';
 
-      // Center dot
-      const dot = document.createElement('div');
-      dot.style.cssText = `width:10px;height:10px;border-radius:50%;background:${color};border:2px solid rgba(255,255,255,0.5);position:relative;z-index:2;box-shadow:0 0 14px ${color}, 0 0 28px ${color}60;`;
+        // Pulse 2 offset
+        const pulse2 = document.createElement('div');
+        pulse2.style.cssText = pulse.style.cssText;
+        pulse2.style.animationDelay = isCritical ? '0.75s' : '1.25s';
 
-      // Category ring inside dot
-      const catRing = document.createElement('div');
-      catRing.style.cssText = `position:absolute;top:-4px;right:-4px;width:6px;height:6px;border-radius:50%;background:${catColor};border:1px solid rgba(0,0,0,0.4);z-index:3;`;
+        // Center dot
+        const dot = document.createElement('div');
+        dot.style.cssText = `width:10px;height:10px;border-radius:50%;background:${color};border:2px solid rgba(255,255,255,0.5);position:relative;z-index:2;box-shadow:0 0 14px ${color}, 0 0 28px ${color}60;`;
 
-      // Label below
-      const label = document.createElement('div');
-      label.style.cssText = `position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:4px;white-space:nowrap;pointer-events:none;text-align:center;`;
-      label.innerHTML = `
-        <div style="font-size:7px;letter-spacing:0.12em;color:rgba(228,230,239,0.6);font-family:'JetBrains Mono',monospace;text-shadow:0 1px 6px rgba(0,0,0,0.95),0 0 20px rgba(0,0,0,0.8);font-weight:500;">${pin.city.toUpperCase()}</div>
-        <div style="font-size:6px;letter-spacing:0.08em;color:${color}90;font-family:'JetBrains Mono',monospace;text-shadow:0 1px 4px rgba(0,0,0,0.9);margin-top:1px;">${pin.category.toUpperCase()}</div>
-      `;
+        // Category ring inside dot
+        const catRing = document.createElement('div');
+        catRing.style.cssText = `position:absolute;top:-4px;right:-4px;width:6px;height:6px;border-radius:50%;background:${catColor};border:1px solid rgba(0,0,0,0.4);z-index:3;`;
 
-      container.appendChild(ring);
-      container.appendChild(pulse);
-      container.appendChild(pulse2);
-      container.appendChild(dot);
-      container.appendChild(catRing);
-      container.appendChild(label);
+        // Label below
+        const label = document.createElement('div');
+        label.style.cssText = `position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:4px;white-space:nowrap;pointer-events:none;text-align:center;`;
+        label.innerHTML = `
+          <div style="font-size:7px;letter-spacing:0.12em;color:rgba(228,230,239,0.6);font-family:'JetBrains Mono',monospace;text-shadow:0 1px 6px rgba(0,0,0,0.95),0 0 20px rgba(0,0,0,0.8);font-weight:500;">${pin.city.toUpperCase()}</div>
+          <div style="font-size:6px;letter-spacing:0.08em;color:${color}90;font-family:'JetBrains Mono',monospace;text-shadow:0 1px 4px rgba(0,0,0,0.9);margin-top:1px;">${isSlack ? 'FIELD REPORT' : pin.category.toUpperCase()}</div>
+        `;
+
+        container.appendChild(ring);
+        container.appendChild(pulse);
+        container.appendChild(pulse2);
+        container.appendChild(dot);
+        container.appendChild(catRing);
+        container.appendChild(label);
+      }
 
       container.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -102,7 +111,7 @@ export default function MapView({
           // Close any existing popup
           if (popupRef.current) popupRef.current.remove();
 
-          const img = getPinImage(pin.id);
+          const img = pin.imageUrl || getPinImage(pin.id);
           const threatColor = THREAT_COLORS[pin.severity];
           const threatLabel = THREAT_LABELS[pin.severity];
 
@@ -291,25 +300,16 @@ export default function MapView({
         });
       }
 
-      // Pin report glow circles
+      // Pin report glow circles — map-aligned so they stay fixed to the ground
       if (!map.getSource('pin-points')) {
         map.addSource('pin-points', { type: 'geojson', data: getPinReportsGeoJSON(), promoteId: 'id' });
       }
       if (!map.getLayer('pin-glow-outer')) {
-        map.addLayer({ id: 'pin-glow-outer', type: 'circle', source: 'pin-points', paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 0, 18, 5, 30, 10, 45], 'circle-color': ['get', 'color'], 'circle-opacity': 0.06, 'circle-blur': 1 } });
+        map.addLayer({ id: 'pin-glow-outer', type: 'circle', source: 'pin-points', paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 0, 18, 5, 30, 10, 45], 'circle-color': ['get', 'color'], 'circle-opacity': 0.06, 'circle-blur': 1, 'circle-pitch-alignment': 'map' } });
       }
       if (!map.getLayer('pin-glow-inner')) {
-        map.addLayer({ id: 'pin-glow-inner', type: 'circle', source: 'pin-points', paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 0, 8, 5, 14, 10, 22], 'circle-color': ['get', 'color'], 'circle-opacity': 0.12, 'circle-blur': 0.8 } });
+        map.addLayer({ id: 'pin-glow-inner', type: 'circle', source: 'pin-points', paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 0, 8, 5, 14, 10, 22], 'circle-color': ['get', 'color'], 'circle-opacity': 0.12, 'circle-blur': 0.8, 'circle-pitch-alignment': 'map' } });
       }
-
-      // HTML Markers for each pin report
-      markersRef.current.forEach((m) => m.remove());
-      markersRef.current = [];
-      pinReports.forEach((pin) => {
-        const el = createPinMarker(pin);
-        const marker = new mapboxgl.Marker({ element: el, anchor: 'center' }).setLngLat(pin.coordinates).addTo(map);
-        markersRef.current.push(marker);
-      });
 
       applyToggles(map, togglesRef.current);
       setMapReady(true);
@@ -347,11 +347,41 @@ export default function MapView({
     applyToggles(map, toggles);
   }, [toggles, mapReady, applyToggles]);
 
+  // Re-render markers whenever pins change (static + slack uploads)
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady) return;
+
+    markersRef.current.forEach((m) => m.remove());
+    markersRef.current = [];
+
+    pins.forEach((pin) => {
+      const el = createPinMarker(pin);
+      const marker = new mapboxgl.Marker({ element: el, anchor: 'center' }).setLngLat(pin.coordinates).addTo(map);
+      markersRef.current.push(marker);
+    });
+  }, [pins, mapReady, createPinMarker]);
+
+  // Update GeoJSON sources when pins change (so heatmap/glow/connections reflect Slack data)
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady) return;
+
+    const heatmapSource = map.getSource('threat-heatmap') as mapboxgl.GeoJSONSource | undefined;
+    if (heatmapSource) heatmapSource.setData(getHeatmapGeoJSON(pins) as any);
+
+    const pinSource = map.getSource('pin-points') as mapboxgl.GeoJSONSource | undefined;
+    if (pinSource) pinSource.setData(getPinReportsGeoJSON(pins) as any);
+
+    const connSource = map.getSource('connections') as mapboxgl.GeoJSONSource | undefined;
+    if (connSource) connSource.setData(getConnectionLines(pins) as any);
+  }, [pins, mapReady]);
+
   // Fly to selected pin
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !selectedPinId) return;
-    const pin = pinReports.find((p) => p.id === selectedPinId);
+    const pin = pins.find((p) => p.id === selectedPinId);
     if (!pin) return;
 
     userInteractedRef.current = true;
