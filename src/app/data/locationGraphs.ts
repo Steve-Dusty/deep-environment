@@ -1211,112 +1211,237 @@ export function buildLocationGraph(locationId: string): LocationGraph {
     problems.push(problem);
   });
 
-  // Create multiple constellations (clusters) with root nodes
-  // Each constellation has dense internal connections and sparse cross-constellation links
-  const createConstellations = (locationId: string, problemIds: string[]): ProblemLink[] => {
-    const constellationLinks: ProblemLink[] = [];
+  // Create multiple tree structures with root nodes (hierarchical knowledge graphs)
+  // Each tree has a root problem with child problems branching from it
+  const createTreeStructures = (locationId: string, problems: ProblemNode[]): ProblemLink[] => {
+    const treeLinks: ProblemLink[] = [];
     
-    // Define constellations for each location (group problems into 2-4 clusters)
-    const constellationConfigs: Record<string, string[][]> = {
+    // Define tree structures for each location: [root, [children], [grandchildren]]
+    // Each location has 2-4 independent trees
+    const treeConfigs: Record<string, Array<{ root: string; children: string[]; grandchildren?: Record<string, string[]> }>> = {
       'loc-sf': [
-        ['prob-sf-sewage', 'prob-sf-contamination', 'prob-sf-algal', 'prob-sf-sediment'], // Water quality cluster
-        ['prob-sf-microplastics', 'prob-sf-oil', 'prob-sf-noise', 'prob-sf-habitat'], // Marine ecosystem cluster
+        { 
+          root: 'prob-sf-sewage', 
+          children: ['prob-sf-contamination', 'prob-sf-algal', 'prob-sf-sediment'],
+          grandchildren: {
+            'prob-sf-contamination': ['prob-sf-habitat'],
+            'prob-sf-algal': ['prob-sf-habitat'],
+            'prob-sf-sediment': ['prob-sf-habitat'],
+          }
+        },
+        { 
+          root: 'prob-sf-microplastics', 
+          children: ['prob-sf-oil', 'prob-sf-noise', 'prob-sf-habitat']
+        },
       ],
       'loc-la': [
-        ['prob-la-smog', 'prob-la-ozone', 'prob-la-heat', 'prob-la-air'], // Air quality cluster
-        ['prob-la-runoff', 'prob-la-oil', 'prob-la-beach', 'prob-la-drought'], // Water/coastal cluster
-        ['prob-la-wildlife', 'prob-la-noise'], // Wildlife cluster
+        { 
+          root: 'prob-la-smog', 
+          children: ['prob-la-ozone', 'prob-la-heat', 'prob-la-air'],
+          grandchildren: {
+            'prob-la-ozone': ['prob-la-wildlife'],
+            'prob-la-heat': ['prob-la-wildlife'],
+          }
+        },
+        { 
+          root: 'prob-la-runoff', 
+          children: ['prob-la-oil', 'prob-la-beach', 'prob-la-drought']
+        },
+        { 
+          root: 'prob-la-noise', 
+          children: ['prob-la-wildlife']
+        },
       ],
       'loc-gulf': [
-        ['prob-gulf-refinery', 'prob-gulf-nutrients', 'prob-gulf-algal', 'prob-gulf-fishkill'], // Industrial pollution cluster
-        ['prob-gulf-oil', 'prob-gulf-sediment', 'prob-gulf-erosion', 'prob-gulf-habitat'], // Coastal degradation cluster
-        ['prob-gulf-plastic', 'prob-gulf-invasive'], // Marine debris cluster
+        { 
+          root: 'prob-gulf-refinery', 
+          children: ['prob-gulf-nutrients', 'prob-gulf-algal', 'prob-gulf-fishkill'],
+          grandchildren: {
+            'prob-gulf-nutrients': ['prob-gulf-algal', 'prob-gulf-fishkill'],
+            'prob-gulf-algal': ['prob-gulf-fishkill'],
+          }
+        },
+        { 
+          root: 'prob-gulf-oil', 
+          children: ['prob-gulf-sediment', 'prob-gulf-erosion', 'prob-gulf-habitat'],
+          grandchildren: {
+            'prob-gulf-sediment': ['prob-gulf-habitat'],
+            'prob-gulf-erosion': ['prob-gulf-habitat'],
+          }
+        },
+        { 
+          root: 'prob-gulf-plastic', 
+          children: ['prob-gulf-invasive', 'prob-gulf-habitat']
+        },
       ],
       'loc-ever': [
-        ['prob-ever-drought', 'prob-ever-water', 'prob-ever-salt', 'prob-ever-habitat'], // Water flow cluster
-        ['prob-ever-nutrients', 'prob-ever-bleaching', 'prob-ever-mercury'], // Water quality cluster
-        ['prob-ever-invasive'], // Invasive species cluster (standalone but connected)
+        { 
+          root: 'prob-ever-drought', 
+          children: ['prob-ever-water', 'prob-ever-salt', 'prob-ever-habitat'],
+          grandchildren: {
+            'prob-ever-water': ['prob-ever-habitat'],
+            'prob-ever-salt': ['prob-ever-habitat'],
+          }
+        },
+        { 
+          root: 'prob-ever-nutrients', 
+          children: ['prob-ever-bleaching', 'prob-ever-mercury']
+        },
+        { 
+          root: 'prob-ever-invasive', 
+          children: ['prob-ever-habitat']
+        },
       ],
       'loc-pnw': [
-        ['prob-pnw-logging', 'prob-pnw-smoke', 'prob-pnw-wildfire'], // Forest cluster
-        ['prob-pnw-salmon', 'prob-pnw-habitat', 'prob-pnw-acid', 'prob-pnw-runoff'], // Marine/fisheries cluster
-        ['prob-pnw-invasive', 'prob-pnw-algal'], // Ecosystem disruption cluster
+        { 
+          root: 'prob-pnw-logging', 
+          children: ['prob-pnw-smoke', 'prob-pnw-habitat', 'prob-pnw-salmon'],
+          grandchildren: {
+            'prob-pnw-habitat': ['prob-pnw-salmon'],
+          }
+        },
+        { 
+          root: 'prob-pnw-runoff', 
+          children: ['prob-pnw-acid', 'prob-pnw-salmon']
+        },
+        { 
+          root: 'prob-pnw-invasive', 
+          children: ['prob-pnw-habitat', 'prob-pnw-algal']
+        },
       ],
       'loc-ny': [
-        ['prob-ny-sewage', 'prob-ny-runoff', 'prob-ny-water', 'prob-ny-beach'], // Water quality cluster
-        ['prob-ny-sediment', 'prob-ny-habitat', 'prob-ny-plastic', 'prob-ny-invasive'], // Harbor ecosystem cluster
-        ['prob-ny-noise', 'prob-ny-air'], // Urban impacts cluster
+        { 
+          root: 'prob-ny-sewage', 
+          children: ['prob-ny-runoff', 'prob-ny-water', 'prob-ny-beach'],
+          grandchildren: {
+            'prob-ny-water': ['prob-ny-habitat'],
+            'prob-ny-runoff': ['prob-ny-sediment'],
+          }
+        },
+        { 
+          root: 'prob-ny-sediment', 
+          children: ['prob-ny-habitat', 'prob-ny-plastic', 'prob-ny-invasive']
+        },
+        { 
+          root: 'prob-ny-noise', 
+          children: ['prob-ny-air', 'prob-ny-habitat']
+        },
       ],
       'loc-chi': [
-        ['prob-chi-sewage', 'prob-chi-runoff', 'prob-chi-water'], // Water quality cluster
-        ['prob-chi-algal', 'prob-chi-sediment', 'prob-chi-habitat'], // Lake ecosystem cluster
+        { 
+          root: 'prob-chi-sewage', 
+          children: ['prob-chi-runoff', 'prob-chi-water']
+        },
+        { 
+          root: 'prob-chi-algal', 
+          children: ['prob-chi-sediment', 'prob-chi-habitat'],
+          grandchildren: {
+            'prob-chi-sediment': ['prob-chi-habitat'],
+            'prob-chi-water': ['prob-chi-habitat'],
+          }
+        },
       ],
       'loc-den': [
-        ['prob-den-drought', 'prob-den-wildfire', 'prob-den-water'], // Climate cluster
-        ['prob-den-air', 'prob-den-runoff', 'prob-den-habitat', 'prob-den-noise'], // Urban impacts cluster
+        { 
+          root: 'prob-den-drought', 
+          children: ['prob-den-wildfire', 'prob-den-water'],
+          grandchildren: {
+            'prob-den-wildfire': ['prob-den-air', 'prob-den-habitat'],
+          }
+        },
+        { 
+          root: 'prob-den-runoff', 
+          children: ['prob-den-water', 'prob-den-habitat']
+        },
+        { 
+          root: 'prob-den-air', 
+          children: ['prob-den-noise']
+        },
       ],
       'loc-phx': [
-        ['prob-phx-drought', 'prob-phx-water', 'prob-phx-heat', 'prob-phx-dust'], // Climate cluster
-        ['prob-phx-air', 'prob-phx-habitat', 'prob-phx-invasive', 'prob-phx-runoff'], // Urban ecosystem cluster
+        { 
+          root: 'prob-phx-drought', 
+          children: ['prob-phx-water', 'prob-phx-heat', 'prob-phx-dust'],
+          grandchildren: {
+            'prob-phx-heat': ['prob-phx-air'],
+            'prob-phx-dust': ['prob-phx-air'],
+          }
+        },
+        { 
+          root: 'prob-phx-habitat', 
+          children: ['prob-phx-invasive', 'prob-phx-runoff']
+        },
       ],
       'loc-atl': [
-        ['prob-atl-runoff', 'prob-atl-sewage', 'prob-atl-water', 'prob-atl-algal'], // Water quality cluster
-        ['prob-atl-habitat', 'prob-atl-invasive'], // Ecosystem cluster
+        { 
+          root: 'prob-atl-runoff', 
+          children: ['prob-atl-sewage', 'prob-atl-water', 'prob-atl-algal'],
+          grandchildren: {
+            'prob-atl-water': ['prob-atl-habitat'],
+            'prob-atl-algal': ['prob-atl-habitat'],
+          }
+        },
+        { 
+          root: 'prob-atl-habitat', 
+          children: ['prob-atl-invasive']
+        },
       ],
     };
 
-    const constellations = constellationConfigs[locationId] || [];
+    const trees = treeConfigs[locationId] || [];
     
-    // For each constellation, create dense internal connections
-    constellations.forEach((constellation, clusterIdx) => {
-      if (constellation.length < 2) return;
+    // Build each tree structure
+    trees.forEach((tree) => {
+      const root = tree.root;
       
-      // Find the root node (most critical or first problem)
-      const rootNode = constellation[0];
-      
-      // Connect root to all other nodes in constellation
-      for (let i = 1; i < constellation.length; i++) {
-        constellationLinks.push({
-          source: rootNode,
-          target: constellation[i],
-          label: 'connects to',
+      // Connect root to all children (level 1)
+      tree.children.forEach((child) => {
+        treeLinks.push({
+          source: root,
+          target: child,
+          label: 'causes',
           type: 'causes',
-          strength: 0.6 + (Math.random() * 0.2),
+          strength: 0.7 + (Math.random() * 0.2),
         });
-      }
+      });
       
-      // Create additional connections within constellation (mesh network)
-      for (let i = 1; i < constellation.length; i++) {
-        for (let j = i + 1; j < constellation.length; j++) {
-          // 60% chance of connection between non-root nodes
-          if (Math.random() < 0.6) {
-            constellationLinks.push({
-              source: constellation[i],
-              target: constellation[j],
-              label: 'relates to',
-              type: Math.random() < 0.5 ? 'amplifies' : 'correlates',
-              strength: 0.4 + (Math.random() * 0.3),
+      // Connect children to grandchildren (level 2) if they exist
+      if (tree.grandchildren) {
+        Object.entries(tree.grandchildren).forEach(([parent, grandchildren]) => {
+          grandchildren.forEach((grandchild) => {
+            treeLinks.push({
+              source: parent,
+              target: grandchild,
+              label: 'leads to',
+              type: 'causes',
+              strength: 0.5 + (Math.random() * 0.2),
             });
-          }
-        }
+          });
+        });
       }
     });
     
-    // Create sparse cross-constellation links (1-2 per pair of constellations)
-    for (let i = 0; i < constellations.length; i++) {
-      for (let j = i + 1; j < constellations.length; j++) {
-        const cluster1 = constellations[i];
-        const cluster2 = constellations[j];
+    // Add minimal cross-tree connections (1-2 per tree pair for visual interest)
+    for (let i = 0; i < trees.length; i++) {
+      for (let j = i + 1; j < trees.length; j++) {
+        const tree1 = trees[i];
+        const tree2 = trees[j];
         
-        // 1-2 cross-constellation links
-        const numCrossLinks = Math.min(2, Math.max(1, Math.floor(Math.random() * 2) + 1));
-        for (let k = 0; k < numCrossLinks; k++) {
-          const node1 = cluster1[Math.floor(Math.random() * cluster1.length)];
-          const node2 = cluster2[Math.floor(Math.random() * cluster2.length)];
-          constellationLinks.push({
-            source: node1,
-            target: node2,
-            label: 'influences',
+        // Connect one leaf node from tree1 to one leaf node from tree2
+        const tree1Leaves = tree1.grandchildren 
+          ? Object.values(tree1.grandchildren).flat()
+          : tree1.children.slice(-2); // Use last 2 children as leaves
+        const tree2Leaves = tree2.grandchildren
+          ? Object.values(tree2.grandchildren).flat()
+          : tree2.children.slice(-2);
+        
+        if (tree1Leaves.length > 0 && tree2Leaves.length > 0) {
+          const leaf1 = tree1Leaves[Math.floor(Math.random() * tree1Leaves.length)];
+          const leaf2 = tree2Leaves[Math.floor(Math.random() * tree2Leaves.length)];
+          treeLinks.push({
+            source: leaf1,
+            target: leaf2,
+            label: 'correlates',
             type: 'correlates',
             strength: 0.3 + (Math.random() * 0.2),
           });
@@ -1324,7 +1449,7 @@ export function buildLocationGraph(locationId: string): LocationGraph {
       }
     }
     
-    return constellationLinks;
+    return treeLinks;
   };
 
   // Create intricate causal links between problems (legacy - keeping for reference but using constellations)
@@ -1440,34 +1565,9 @@ export function buildLocationGraph(locationId: string): LocationGraph {
     ],
   };
 
-  // Use constellation-based linking for multiple root nodes
-  const problemIds = problems.map(p => p.id);
-  const constellationLinks = createConstellations(locationId, problemIds);
-  links.push(...constellationLinks);
-
-  // Also add some specific high-strength links from original config for key relationships
-  const config = linkConfigs[locationId] || [];
-  // Only add top 3-5 strongest links from original config to maintain some key relationships
-  const topLinks = config
-    .sort((a, b) => b.strength - a.strength)
-    .slice(0, Math.min(5, config.length));
-  
-  topLinks.forEach((cfg) => {
-    // Only add if not already in constellation links
-    const exists = constellationLinks.some(
-      l => (l.source === cfg.source && l.target === cfg.target) ||
-           (l.source === cfg.target && l.target === cfg.source)
-    );
-    if (!exists) {
-      links.push({
-        source: cfg.source,
-        target: cfg.target,
-        label: cfg.label,
-        type: cfg.type,
-        strength: cfg.strength,
-      });
-    }
-  });
+  // Create hierarchical tree structures with multiple root nodes
+  const treeLinks = createTreeStructures(locationId, problems);
+  links.push(...treeLinks);
 
   return { locationId, problems, links };
 }
