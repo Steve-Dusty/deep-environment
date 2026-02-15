@@ -77,8 +77,9 @@ function convertToGraphData(locationGraph: LocationGraph): { nodes: GraphNode[];
     source: link.source,
     target: link.target,
     label: link.label,
-    color: link.type === 'causes' ? '#ff3b4f' : link.type === 'amplifies' ? '#ff6b35' : '#0ff5c4',
+    color: link.type === 'causes' ? '#ff3b4f' : link.type === 'amplifies' ? '#ff6b35' : link.type === 'correlates' ? '#3b82f6' : '#0ff5c4',
     strength: link.strength,
+    particles: link.type === 'causes' ? 3 : link.type === 'amplifies' ? 2 : 1,
   }));
 
   return { nodes, links };
@@ -253,10 +254,27 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, LocationGraph3DProps>(
       red.position.set(-100, -60, 150);
       scene.add(red);
 
-      fg.d3Force('charge').strength(-80).distanceMax(250);
-      fg.d3Force('link').distance(40).strength(0.2);
-      fg.d3Force('center').strength(0.04);
+      // Forces — reasonable spacing for smooth animation
+      fg.d3Force('charge').strength(-120).distanceMax(300);
+      fg.d3Force('link').distance(60).strength(0.3);
+      fg.d3Force('center').strength(0.05);
+      
+      // Ensure simulation is active
+      fg.d3ReheatSimulation();
     }, []);
+    
+    // Reheat simulation when graph data changes to ensure smooth animation
+    useEffect(() => {
+      const fg = fgRef.current;
+      if (!fg || graphNodes.nodes.length === 0) return;
+      
+      // Reheat the simulation to restart animation
+      fg.d3ReheatSimulation();
+      
+      // Update forces when data changes
+      fg.d3Force('charge').strength(-120).distanceMax(300);
+      fg.d3Force('link').distance(60).strength(0.3);
+    }, [graphNodes]);
 
     // ── Hover ──────────────────────────────────────────────────────────
 
@@ -351,7 +369,11 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, LocationGraph3DProps>(
     // ── Link accessors ─────────────────────────────────────────────────
 
     const linkColor = useCallback(
-      (link: GraphLink) => (highlightLinks.has(link) ? '#0ff5c4' : link.color || '#1a1d2a'),
+      (link: GraphLink) => {
+        if (highlightLinks.has(link)) return '#0ff5c4';
+        // Make links visible by default - use the link's color or a visible default
+        return link.color || '#3b82f6';
+      },
       [highlightLinks],
     );
 
@@ -361,7 +383,11 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, LocationGraph3DProps>(
     );
 
     const linkParticles = useCallback(
-      (link: GraphLink) => (highlightLinks.has(link) ? 5 : 0),
+      (link: GraphLink) => {
+        if (highlightLinks.has(link)) return 5;
+        // Show particles on all links for visual interest
+        return (link as any).particles || 1;
+      },
       [highlightLinks],
     );
 
@@ -378,16 +404,17 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, LocationGraph3DProps>(
         nodeResolution={20}
         linkColor={linkColor}
         linkWidth={linkWidth}
-        linkOpacity={0.5}
-        linkCurvature={0.12}
+        linkOpacity={0.6}
+        linkCurvature={0.15}
         linkDirectionalParticles={linkParticles}
-        linkDirectionalParticleWidth={1.5}
-        linkDirectionalParticleSpeed={0.005}
-        linkDirectionalParticleColor={() => '#0ff5c4'}
-        d3AlphaDecay={0.025}
-        d3VelocityDecay={0.35}
-        warmupTicks={60}
-        cooldownTime={4000}
+        linkDirectionalParticleWidth={2}
+        linkDirectionalParticleSpeed={0.008}
+        linkDirectionalParticleColor={(link: any) => link.color || '#0ff5c4'}
+        d3AlphaDecay={0.022}
+        d3VelocityDecay={0.4}
+        warmupTicks={100}
+        cooldownTime={8000}
+        showNavInfo={false}
         onNodeHover={handleNodeHover as any}
         onNodeClick={handleNodeClick as any}
         onBackgroundClick={handleBgClick}

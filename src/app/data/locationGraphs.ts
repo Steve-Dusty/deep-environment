@@ -349,6 +349,24 @@ export function buildLocationGraph(locationId: string): LocationGraph {
   });
 
   // Create causal links between problems
+  if (locationId === 'loc-sf') {
+    links.push({
+      source: 'prob-sf-contamination',
+      target: 'prob-sf-algal',
+      label: 'contributes to',
+      type: 'causes',
+      strength: 0.7,
+    });
+  }
+  if (locationId === 'loc-la') {
+    links.push({
+      source: 'prob-la-smog',
+      target: 'prob-la-oil',
+      label: 'correlates with',
+      type: 'correlates',
+      strength: 0.5,
+    });
+  }
   if (locationId === 'loc-gulf') {
     links.push({
       source: 'prob-gulf-refinery',
@@ -356,6 +374,20 @@ export function buildLocationGraph(locationId: string): LocationGraph {
       label: 'causes',
       type: 'causes',
       strength: 0.8,
+    });
+    links.push({
+      source: 'prob-gulf-refinery',
+      target: 'prob-gulf-erosion',
+      label: 'contributes to',
+      type: 'causes',
+      strength: 0.6,
+    });
+    links.push({
+      source: 'prob-gulf-fishkill',
+      target: 'prob-gulf-erosion',
+      label: 'amplifies',
+      type: 'amplifies',
+      strength: 0.5,
     });
   }
   if (locationId === 'loc-ever') {
@@ -365,6 +397,29 @@ export function buildLocationGraph(locationId: string): LocationGraph {
       label: 'amplifies',
       type: 'amplifies',
       strength: 0.6,
+    });
+    links.push({
+      source: 'prob-ever-drought',
+      target: 'prob-ever-bleaching',
+      label: 'contributes to',
+      type: 'causes',
+      strength: 0.5,
+    });
+    links.push({
+      source: 'prob-ever-bleaching',
+      target: 'prob-ever-invasive',
+      label: 'enables',
+      type: 'amplifies',
+      strength: 0.4,
+    });
+  }
+  if (locationId === 'loc-pnw') {
+    links.push({
+      source: 'prob-pnw-logging',
+      target: 'prob-pnw-smoke',
+      label: 'correlates with',
+      type: 'correlates',
+      strength: 0.4,
     });
   }
 
