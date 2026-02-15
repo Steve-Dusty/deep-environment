@@ -24,6 +24,7 @@ import os
 import json
 import time
 import base64
+import random
 import requests
 from PIL import Image
 from dotenv import load_dotenv
@@ -105,6 +106,10 @@ def convert_image_to_png(img_bytes):
 # Conversation history per channel
 conversations = {}
 
+# Pending images waiting for user to provide their city
+# {channel: [(png_bytes, timestamp, ai_description), ...]}
+pending_location = {}
+
 
 LOCATION_SUMMARIES_PROMPT = """Available monitoring locations (use these exact IDs):
 - loc-sf: SF Bay, San Francisco, CA (37.7955, -122.3912)
@@ -119,10 +124,57 @@ LOCATION_SUMMARIES_PROMPT = """Available monitoring locations (use these exact I
 - loc-atl: Atlanta Metro, Atlanta, GA (33.7490, -84.3880)
 """
 
+LOCATION_COORDS = {
+    "loc-sf":   (37.7955, -122.3912),
+    "loc-la":   (34.0901, -118.2850),
+    "loc-gulf": (29.7580, -95.3562),
+    "loc-ever": (25.8500, -80.8320),
+    "loc-pnw":  (47.6130, -122.3380),
+    "loc-ny":   (40.7128, -74.0060),
+    "loc-chi":  (41.8781, -87.6298),
+    "loc-den":  (39.7392, -104.9903),
+    "loc-phx":  (33.4484, -112.0740),
+    "loc-atl":  (33.7490, -84.3880),
+}
 
-def classify_image(image_bytes, ai_description):
+
+def extract_city_from_text(text):
+    """Use AI to check if the user's message contains a city or location.
+    Returns the city name string if found, or None."""
+    if not text or len(text.strip()) < 2:
+        return None
+    try:
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            response_format={"type": "json_object"},
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "Extract the city or location name from the user's message. "
+                        "Only extract if the user is clearly indicating a city, region, or place name. "
+                        "Examples that HAVE a city: 'pollution in Denver', 'I'm in Chicago', 'SF Bay', 'Houston TX'. "
+                        "Examples that do NOT: 'check this out', 'what is this', 'looks bad'. "
+                        'Return JSON: {"city": "City Name"} if found, or {"city": null} if not.'
+                    ),
+                },
+                {"role": "user", "content": text},
+            ],
+        )
+        result = json.loads(response.choices[0].message.content)
+        city = result.get("city")
+        if city:
+            print(f"  Extracted city from text: {city}")
+        return city
+    except Exception as e:
+        print(f"City extraction failed: {e}")
+        return None
+
+
+def classify_image(image_bytes, ai_description, user_city):
     """Classify an uploaded image for the dashboard knowledge graph.
-    Returns a dict with location_id, category, severity, etc., or None on failure."""
+    user_city is required — the city/location the user reported from.
+    Returns a dict with location_id, coordinates, category, severity, etc., or None on failure."""
     try:
         b64 = base64.b64encode(image_bytes).decode("utf-8")
         response = openai_client.chat.completions.create(
@@ -135,9 +187,20 @@ def classify_image(image_bytes, ai_description):
                         "You are an environmental monitoring classifier. Given an image and its AI description, "
                         "classify it for our environmental dashboard.\n\n"
                         + LOCATION_SUMMARIES_PROMPT + "\n"
+                        f'LOCATION: The user reported this from "{user_city}". '
+                        "Map their city to the closest monitoring location ID from the list above. "
+                        "Do NOT guess location from the image — always use the user-provided city/place.\n\n"
+                        "COORDINATES: You must also return the approximate latitude and longitude of the "
+                        "specific place the user mentioned. For example:\n"
+                        '  - "SFSU" → 37.7219, -122.4782 (San Francisco State University)\n'
+                        '  - "Golden Gate Park" → 37.7694, -122.4862\n'
+                        '  - "downtown Houston" → 29.7604, -95.3698\n'
+                        "Use your knowledge of real-world geography. Be as precise as possible.\n\n"
                         "Respond with a JSON object containing:\n"
-                        '- "location_id": one of the location IDs above (pick the best match based on image content, '
-                        "description, or default to loc-sf if unclear)\n"
+                        '- "location_id": one of the location IDs above, mapped from the user\'s city\n'
+                        '- "latitude": approximate latitude of the specific place the user mentioned\n'
+                        '- "longitude": approximate longitude of the specific place the user mentioned\n'
+                        '- "resolved_location": the full name of the place you resolved (e.g. "San Francisco State University, CA")\n'
                         '- "category": one of: pollution, deforestation, runoff, wildfire, litter, erosion, invasive, drought, contamination, other\n'
                         '- "severity": one of: low, moderate, elevated, high, critical\n'
                         '- "problem_name": short name for the environmental problem (2-5 words)\n'
@@ -162,24 +225,58 @@ def classify_image(image_bytes, ai_description):
             ],
         )
         result = json.loads(response.choices[0].message.content)
-        # Validate required fields
+        # Validate required fields (lat/lon no longer required — we have fallback)
         required = ["location_id", "category", "severity", "problem_name", "problem_description", "indicators", "trend"]
         for key in required:
             if key not in result:
                 print(f"Classification missing field: {key}")
                 return None
+        # Coordinate fallback: if lat/lon missing or invalid, use location_id's known coords + jitter
+        loc_id = result.get("location_id", "")
+        if not result.get("latitude") or not result.get("longitude"):
+            if loc_id in LOCATION_COORDS:
+                fallback_lat, fallback_lon = LOCATION_COORDS[loc_id]
+                result["latitude"] = fallback_lat + random.uniform(-0.005, 0.005)
+                result["longitude"] = fallback_lon + random.uniform(-0.005, 0.005)
+                print(f"  Used fallback coords for {loc_id} with jitter")
+            else:
+                print(f"  No coordinates and unknown location_id: {loc_id}")
+        elif loc_id in LOCATION_COORDS:
+            # If coords match the static pin exactly, add small jitter so they don't overlap
+            known_lat, known_lon = LOCATION_COORDS[loc_id]
+            if abs(result["latitude"] - known_lat) < 0.001 and abs(result["longitude"] - known_lon) < 0.001:
+                result["latitude"] += random.uniform(-0.005, 0.005)
+                result["longitude"] += random.uniform(-0.005, 0.005)
+        print(f"  Resolved location: {result.get('resolved_location', user_city)} ({result.get('latitude', '?')}, {result.get('longitude', '?')})")
         return result
     except Exception as e:
         print(f"Classification failed: {e}")
         return None
 
 
-def save_classification(timestamp, classification):
+def build_upload_confirmation(classification):
+    """Build a clean confirmation message from classification data."""
+    loc = classification.get("resolved_location", "Unknown")
+    lat = classification.get("latitude", "?")
+    lng = classification.get("longitude", "?")
+    problem = classification.get("problem_name", "Unknown issue")
+    severity = classification.get("severity", "unknown").upper()
+    category = classification.get("category", "unknown")
+    trend = classification.get("trend", "stable")
+    return (
+        f"Uploaded from {loc} ({lat}, {lng})\n"
+        f"{problem} — {category} | Severity: {severity} | Trend: {trend}"
+    )
+
+
+def save_classification(timestamp, classification, user_city=None):
     """Save the classification result back into the upload metadata."""
     metadata = load_metadata()
     for entry in metadata:
         if entry.get("timestamp") == timestamp:
             entry["classification"] = classification
+            if user_city:
+                entry["user_city"] = user_city
             break
     save_metadata(metadata)
 
@@ -433,24 +530,54 @@ def main():
 
         print(f"[#{channel}] User {user}: {text or '[image upload]'}")
 
-        # Get AI response (with images if present)
+        # --- Check if this is a city response to pending images ---
+        if text and not image_data and channel in pending_location and pending_location[channel]:
+            city = extract_city_from_text(text)
+            if city:
+                print(f"  City response for pending images: {city}")
+                for png_bytes, ts, ai_desc in pending_location[channel]:
+                    classification = classify_image(png_bytes, ai_desc, user_city=city)
+                    if classification:
+                        save_classification(ts, classification, user_city=city)
+                        print(f"  Classified → {classification['location_id']} / {classification['category']} / {classification['severity']}")
+                        send_slack_reply(channel, build_upload_confirmation(classification))
+                del pending_location[channel]
+                return
+            else:
+                # Not a city — process as normal message but remind them
+                ai_response = get_ai_response(text, channel)
+                print(f"[#{channel}] Bot: {ai_response}\n")
+                send_slack_reply(channel, ai_response + "\n\nI still need your city to map the earlier photo. What city are you in?")
+                return
+
+        # --- Get AI response internally (used for classification context, not sent to user) ---
         ai_response = get_ai_response(
             text, channel,
             image_data=image_data if image_data else None,
             image_timestamps=image_timestamps if image_timestamps else None,
         )
-        print(f"[#{channel}] Bot: {ai_response}\n")
+        print(f"[#{channel}] AI analysis (internal): {ai_response}\n")
 
-        # Send reply
-        send_slack_reply(channel, ai_response)
-
-        # Classify images for dashboard knowledge graph (runs after reply is sent)
+        # --- Handle image uploads — need city for classification ---
         if image_data and image_timestamps:
-            for png_bytes, ts in zip(image_data, image_timestamps):
-                classification = classify_image(png_bytes, ai_response)
-                if classification:
-                    save_classification(ts, classification)
-                    print(f"  Classified → {classification['location_id']} / {classification['category']} / {classification['severity']}")
+            city = extract_city_from_text(text) if text else None
+
+            if city:
+                # User provided city with the image — classify and confirm
+                for png_bytes, ts in zip(image_data, image_timestamps):
+                    classification = classify_image(png_bytes, ai_response, user_city=city)
+                    if classification:
+                        save_classification(ts, classification, user_city=city)
+                        print(f"  Classified → {classification['location_id']} / {classification['category']} / {classification['severity']}")
+                        send_slack_reply(channel, build_upload_confirmation(classification))
+            else:
+                # No city provided — store pending and ask
+                for png_bytes, ts in zip(image_data, image_timestamps):
+                    pending_location.setdefault(channel, []).append((png_bytes, ts, ai_response))
+                send_slack_reply(channel, "Image received! What city or location are you reporting from?")
+        else:
+            # Regular text message, no images
+            send_slack_reply(channel, ai_response)
 
     subscription.wait_forever()
 
