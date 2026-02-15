@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MapPin, ChevronRight } from 'lucide-react';
+import { MapPin, ChevronRight, ArrowRight } from 'lucide-react';
 import { locationSummaries, type LocationSummary } from '../data/locationGraphs';
 import { THREAT_COLORS, THREAT_LABELS } from '../data/locations';
 
@@ -54,9 +54,7 @@ export default function LocationsDashboard({ onSelectLocation, onClose }: Locati
                     ? 'linear-gradient(135deg, rgba(12,14,20,0.98), rgba(17,19,24,0.95))' 
                     : 'linear-gradient(135deg, rgba(12,14,20,0.93), rgba(17,19,24,0.89))',
                 }}
-                onClick={() => setSelectedLocation(location.id)}
                 onMouseEnter={() => setSelectedLocation(location.id)}
-                onMouseLeave={() => setSelectedLocation(null)}
               >
                 {/* Card Header */}
                 <div style={S.cardHeader}>
@@ -109,22 +107,25 @@ export default function LocationsDashboard({ onSelectLocation, onClose }: Locati
                   <span style={S.lastUpdated}>Updated {location.lastUpdated}</span>
                   <ChevronRight size={12} style={{ color: '#555870' }} />
                 </div>
+
+                {/* Action Button - appears when selected */}
+                {selectedLocation === location.id && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectLocation(location.id);
+                    }}
+                    style={S.cardActionBtn}
+                    onMouseEnter={(e) => e.stopPropagation()}
+                  >
+                    <span>VIEW KNOWLEDGE GRAPH</span>
+                    <ArrowRight size={14} />
+                  </button>
+                )}
               </div>
             );
           })}
         </div>
-
-        {/* Action Button */}
-        {selectedLocation && (
-          <div style={S.actionBar}>
-            <button
-              onClick={() => onSelectLocation(selectedLocation)}
-              style={S.viewGraphBtn}
-            >
-              VIEW KNOWLEDGE GRAPH →
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Status Bar */}
@@ -324,25 +325,24 @@ const S = {
     color: '#555870',
     letterSpacing: 0.5,
   },
-  actionBar: {
-    position: 'fixed' as const,
-    bottom: 32,
-    left: '50%',
-    transform: 'translateX(-50%)',
-    zIndex: 90,
-  },
-  viewGraphBtn: {
-    padding: '12px 24px',
+  cardActionBtn: {
+    width: '100%',
+    marginTop: 12,
+    padding: '10px 16px',
     background: 'linear-gradient(135deg, rgba(15,245,196,0.15), rgba(15,245,196,0.06))',
     border: '1px solid rgba(15,245,196,0.3)',
-    borderRadius: 6,
+    borderRadius: 4,
     color: '#0ff5c4',
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: 600,
-    letterSpacing: 1.5,
+    letterSpacing: 1.2,
     cursor: 'pointer',
     fontFamily: "'JetBrains Mono', monospace",
     transition: 'all 0.2s ease',
+    display: 'flex' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    gap: 8,
   },
   statsBar: {
     position: 'fixed' as const,
