@@ -10,6 +10,11 @@ import type { NavView } from './components/LeftSidebar';
 import StatusBar from './components/StatusBar';
 import { pinReports as staticPinReports, type PinReport, type ThreatLevel, CATEGORY_COLORS, LOCATION_COORDS } from './data/locations';
 import type { PDFViewData } from './components/ChatView';
+import { useVoiceControl, type VoiceCommand } from './voice/useVoiceControl';
+import { useTTS } from './voice/useTTS';
+import VoiceIndicator from './voice/VoiceIndicator';
+import ChatBox from './components/ChatBox';
+import { interpretVoiceCommand } from './data/ai';
 
 // Map bot classification categories → dashboard categories
 const CLASSIFY_TO_CATEGORY: Record<string, string> = {
@@ -220,6 +225,18 @@ export default function DashboardPage() {
   // Merge static + live pins
   const allPins = useMemo(() => [...staticPinReports, ...slackPins], [slackPins]);
 
+  // Voice control hooks
+  const { speak } = useTTS();
+  const [voiceFeedback, setVoiceFeedback] = useState('');
+  
+  const handleVoiceCommand = useCallback(async (cmd: VoiceCommand) => {
+    const response = await interpretVoiceCommand(cmd.transcript, allPins);
+    setVoiceFeedback(response);
+    speak(response);
+  }, [allPins, speak]);
+
+  const { isListening, transcript } = useVoiceControl({ onCommand: handleVoiceCommand });
+
   const handleToggle = useCallback((key: string) => {
     setToggles((prev) => ({ ...prev, [key]: !prev[key as keyof typeof prev] }));
   }, []);
@@ -328,6 +345,10 @@ export default function DashboardPage() {
                 fieldReports={allPins.length}
               />
             </div>
+            
+            {/* Voice Control UI */}
+            <VoiceIndicator isListening={isListening} transcript={transcript} />
+            <ChatBox message={voiceFeedback} onClear={() => setVoiceFeedback('')} />
           </div>
         </>
       )}
