@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Send, X, FileText, Loader2, Sparkles, Bot, Download, ExternalLink } from 'lucide-react';
-import { queryGlobalKnowledgeGraph, generateGlobalPDF } from '../data/globalAI';
+import { queryGlobalKnowledgeGraph, generateGlobalPDF } from '@/data/globalAI';
 
 interface Message {
   role: 'user' | 'ai';

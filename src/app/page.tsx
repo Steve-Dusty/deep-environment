@@ -2,20 +2,20 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import TopBar from './components/TopBar';
-import SidePanel from './components/SidePanel';
-import LeftSidebar from './components/LeftSidebar';
-import LocationCarousel from './components/LocationCarousel';
-import type { NavView } from './components/LeftSidebar';
-import StatusBar from './components/StatusBar';
-import { pinReports as staticPinReports, type PinReport, type ThreatLevel, CATEGORY_COLORS, LOCATION_COORDS } from './data/locations';
-import type { PDFViewData } from './components/ChatView';
-import { useVoiceControl, type VoiceCommand } from './voice/useVoiceControl';
-import { useTTS } from './voice/useTTS';
-import VoiceControlPanel from './components/VoiceControlPanel';
-import VoiceTestInstructions from './components/VoiceTestInstructions';
-import ChatBox from './components/ChatBox';
-import { interpretVoiceCommand } from './data/ai';
+import TopBar from '@/components/TopBar';
+import SidePanel from '@/components/SidePanel';
+import LeftSidebar from '@/components/LeftSidebar';
+import LocationCarousel from '@/components/LocationCarousel';
+import type { NavView } from '@/components/LeftSidebar';
+import StatusBar from '@/components/StatusBar';
+import { pinReports as staticPinReports, type PinReport, type ThreatLevel, CATEGORY_COLORS, LOCATION_COORDS } from '@/data/locations';
+import type { PDFViewData } from '@/components/ChatView';
+import { useVoiceControl, type VoiceCommand } from '@/hooks/useVoiceControl';
+import { useTTS } from '@/hooks/useTTS';
+import VoiceControlPanel from '@/components/VoiceControlPanel';
+import VoiceTestInstructions from '@/components/VoiceTestInstructions';
+import ChatBox from '@/components/ChatBox';
+import { interpretVoiceCommand } from '@/data/ai';
 
 // Map bot classification categories → dashboard categories
 const CLASSIFY_TO_CATEGORY: Record<string, string> = {

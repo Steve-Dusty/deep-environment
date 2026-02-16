@@ -2,8 +2,8 @@
 // AI Service — OpenAI integration for graph queries and node analysis
 // ============================================================================
 
-import { GraphNode, GraphLink, GraphData, CATEGORY_LABELS } from './graphData';
-import { pinReports } from './locations';
+import { GraphNode, GraphLink, GraphData, CATEGORY_LABELS } from '@/data/graphData';
+import { pinReports } from '@/data/locations';
 
 const OPENAI_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY as string;
 const API_URL = 'https://api.openai.com/v1/chat/completions';

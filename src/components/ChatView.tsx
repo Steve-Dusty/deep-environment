@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Bot, Send, FileText, Loader2, Download, ExternalLink, X, ArrowLeft } from 'lucide-react';
-import { queryGlobalKnowledgeGraph, generateGlobalPDF } from '../data/globalAI';
+import { queryGlobalKnowledgeGraph, generateGlobalPDF } from '@/data/globalAI';
 
 export interface PDFViewData {
   url: string;

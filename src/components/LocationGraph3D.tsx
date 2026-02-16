@@ -16,7 +16,7 @@ import {
   type LocationGraph,
   PROBLEM_CATEGORY_COLORS,
   PROBLEM_CATEGORY_LABELS,
-} from '../data/locationGraphs';
+} from '@/data/locationGraphs';
 
 
 // ── Sprite text label ──────────────────────────────────────────────────────

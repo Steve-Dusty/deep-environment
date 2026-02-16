@@ -2,11 +2,11 @@
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { buildLocationGraph, fetchDynamicNodes, locationSummaries, PROBLEM_CATEGORY_COLORS, PROBLEM_CATEGORY_LABELS, type ProblemNode, type LocationGraph } from '../data/locationGraphs';
-import { THREAT_COLORS } from '../data/locations';
-import { queryLocationGraph, analyzeProblem, generatePlanToFix } from '../data/locationAI';
-import { getPinImage, getPinImages } from '../data/images';
-import { pinReports, type PinReport } from '../data/locations';
+import { buildLocationGraph, fetchDynamicNodes, locationSummaries, PROBLEM_CATEGORY_COLORS, PROBLEM_CATEGORY_LABELS, type ProblemNode, type LocationGraph } from '@/data/locationGraphs';
+import { THREAT_COLORS } from '@/data/locations';
+import { queryLocationGraph, analyzeProblem, generatePlanToFix } from '@/data/locationAI';
+import { getPinImage, getPinImages } from '@/data/images';
+import { pinReports, type PinReport } from '@/data/locations';
 
 // Fallback images per problem category — ensures every node always has a background
 const CATEGORY_FALLBACK_IMAGES: Record<string, string[]> = {

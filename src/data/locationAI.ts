@@ -3,7 +3,7 @@
 // Context-aware AI for location-specific problem graphs
 // ============================================================================
 
-import { type ProblemNode, type LocationGraph, PROBLEM_CATEGORY_LABELS, locationSummaries } from './locationGraphs';
+import { type ProblemNode, type LocationGraph, PROBLEM_CATEGORY_LABELS, locationSummaries } from '@/data/locationGraphs';
 
 const OPENAI_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY as string;
 const API_URL = 'https://api.openai.com/v1/chat/completions';

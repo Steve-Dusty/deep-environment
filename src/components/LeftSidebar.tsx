@@ -34,9 +34,9 @@ import {
   THREAT_LABELS,
   CATEGORY_COLORS,
   LOCATION_COORDS,
-} from '../data/locations';
-import { getPinImage } from '../data/images';
-import { generatePosterContent, type PosterCard } from '../data/globalAI';
+} from '@/data/locations';
+import { getPinImage } from '@/data/images';
+import { generatePosterContent, type PosterCard } from '@/data/globalAI';
 // GlobalChatbot moved to full-page ChatView
 
 export type NavView = 'feed' | 'odyssey' | 'slack' | 'chat' | 'posters' | null;

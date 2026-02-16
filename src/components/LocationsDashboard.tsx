@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { MapPin, ArrowRight, Eye } from 'lucide-react';
-import { locationSummaries, type LocationSummary } from '../data/locationGraphs';
-import { THREAT_COLORS, THREAT_LABELS, pinReports, type PinReport } from '../data/locations';
-import { getPinImage } from '../data/images';
+import { locationSummaries, type LocationSummary } from '@/data/locationGraphs';
+import { THREAT_COLORS, THREAT_LABELS, pinReports, type PinReport } from '@/data/locations';
+import { getPinImage } from '@/data/images';
 
 interface LocationsDashboardProps {
   onSelectLocation: (locationId: string) => void;

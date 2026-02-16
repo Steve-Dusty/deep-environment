@@ -2,14 +2,14 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import KnowledgeGraph3D, { GraphHandle } from './KnowledgeGraph3D';
-import { queryGraph, analyzeNode } from '../data/ai';
+import { queryGraph, analyzeNode } from '@/data/ai';
 import {
   GraphNode,
   GraphData,
   CATEGORY_COLORS,
   CATEGORY_LABELS,
   THREAT_COLORS,
-} from '../data/graphData';
+} from '@/data/graphData';
 
 interface KnowledgeGraphViewProps {
   onClose: () => void;

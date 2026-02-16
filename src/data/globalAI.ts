@@ -1,4 +1,4 @@
-import { locationSummaries, buildLocationGraph, PROBLEM_CATEGORY_LABELS } from './locationGraphs';
+import { locationSummaries, buildLocationGraph, PROBLEM_CATEGORY_LABELS } from '@/data/locationGraphs';
 
 const OPENAI_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY as string;
 const API_URL = 'https://api.openai.com/v1/chat/completions';

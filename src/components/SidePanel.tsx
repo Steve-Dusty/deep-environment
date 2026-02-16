@@ -26,8 +26,8 @@ import {
   THREAT_LABELS,
   CATEGORY_COLORS,
   pinReports,
-} from '../data/locations';
-import { getPinImages } from '../data/images';
+} from '@/data/locations';
+import { getPinImages } from '@/data/images';
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   Water: <Droplets size={14} />,

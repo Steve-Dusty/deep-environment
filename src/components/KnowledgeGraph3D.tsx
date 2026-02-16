@@ -21,7 +21,7 @@ import {
   buildInitialGraph,
   generateNewReport,
   generateNewThreat,
-} from '../data/graphData';
+} from '@/data/graphData';
 
 // ── Sprite text label ──────────────────────────────────────────────────────
 

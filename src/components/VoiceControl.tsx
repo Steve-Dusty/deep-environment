@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
-import { interpretVoiceCommand, AICommandResult } from '../data/ai';
+import { interpretVoiceCommand, AICommandResult } from '@/data/ai';
 
 interface VoiceControlProps {
   onCommand: (result: AICommandResult) => void;

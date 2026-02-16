@@ -2,8 +2,8 @@
 
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
-import { type PinReport, THREAT_COLORS, CATEGORY_COLORS } from '../data/locations';
-import { getPinImage } from '../data/images';
+import { type PinReport, THREAT_COLORS, CATEGORY_COLORS } from '@/data/locations';
+import { getPinImage } from '@/data/images';
 
 interface LocationCarouselProps {
   pins: PinReport[];

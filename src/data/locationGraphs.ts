@@ -3,7 +3,7 @@
 // Each location has its own problem graph with hierarchical tree structures
 // ============================================================================
 
-import { ThreatLevel, THREAT_COLORS } from './locations';
+import { ThreatLevel, THREAT_COLORS } from '@/data/locations';
 
 export interface ProblemNode {
   id: string;

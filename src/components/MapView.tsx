@@ -10,8 +10,8 @@ import {
   THREAT_COLORS,
   THREAT_LABELS,
   CATEGORY_COLORS,
-} from '../data/locations';
-import { getPinImage } from '../data/images';
+} from '@/data/locations';
+import { getPinImage } from '@/data/images';
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY || '';
 

@@ -6,7 +6,7 @@ import {
   type PinReport,
   THREAT_COLORS,
   CATEGORY_COLORS,
-} from '../data/locations';
+} from '@/data/locations';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // DECISION TREES — Telltale-style branching narrative per category
