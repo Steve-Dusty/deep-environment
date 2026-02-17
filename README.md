@@ -265,7 +265,8 @@ MIT License - see LICENSE file for details
 Built with 💚 by the Deep Environment team
 
 - **Ayaan** - Voice control & integration
-- **Team** - Full-stack development
+- **Steve** - Core developer
+- **Shry** - 3D force graphs and pdf generation
 
 ---
 
