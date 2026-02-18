@@ -245,19 +245,7 @@ Say **"Hey Deep"** followed by any command:
 - **Voice Commands**: See `VOICE-COMMANDS.md`
 - **Project Brief**: See `CLAUDE.md`
 - **CRS Specifications**: See `CRS.md`
-
----
-
-## 🤝 Contributing
-
-This is a hackathon project. For major changes, please open an issue first.
-
----
-
-## 📄 License
-
-MIT License - see LICENSE file for details
-
+  
 ---
 
 ## 👥 Team
@@ -277,15 +265,6 @@ Built with 💚 by the Deep Environment team
 - **Mapbox** for mapping technology
 - **Odyssey.ml** for narrative visualizations
 - **Vercel** for Next.js framework
-
----
-
-## 📞 Support
-
-For questions or issues:
-- Open a GitHub issue
-- Check documentation files in repo
-- Review API provider docs for key-related issues
 
 ---
 
