@@ -56,13 +56,19 @@ async function ddLog(
   level: 'info' | 'warn' | 'error',
   attributes: Record<string, unknown>,
 ) {
-  if (!DD_API_KEY) return;
+  const apiKey = process.env.DD_API_KEY || DD_API_KEY;
+  if (!apiKey) {
+    console.warn('[DD] No DD_API_KEY — skipping log');
+    return;
+  }
+  const ddSite = process.env.DD_SITE || DD_SITE;
+  const url = `https://http-intake.logs.${ddSite}/api/v2/logs`;
   try {
-    await fetch(`https://http-intake.logs.${DD_SITE}/api/v2/logs`, {
+    const res = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'DD-API-KEY': DD_API_KEY,
+        'DD-API-KEY': apiKey,
       },
       body: JSON.stringify([
         {
@@ -76,8 +82,13 @@ async function ddLog(
         },
       ]),
     });
-  } catch {
-    // swallow — fire-and-forget
+    if (!res.ok) {
+      console.error(`[DD] Log shipping failed: ${res.status} ${await res.text().catch(() => '')}`);
+    } else {
+      console.log(`[DD] Log shipped OK (${res.status})`);
+    }
+  } catch (err) {
+    console.error('[DD] Log shipping error:', err instanceof Error ? err.message : err);
   }
 }
 
@@ -87,14 +98,20 @@ async function ddMetric(
   tags: string[],
   type: 'gauge' | 'count' = 'gauge',
 ) {
-  if (!DD_API_KEY) return;
+  const apiKey = process.env.DD_API_KEY || DD_API_KEY;
+  if (!apiKey) {
+    console.warn('[DD] No DD_API_KEY — skipping metric');
+    return;
+  }
+  const ddSite = process.env.DD_SITE || DD_SITE;
   const now = Math.floor(Date.now() / 1000);
+  const url = `https://api.${ddSite}/api/v2/series`;
   try {
-    await fetch(`https://api.${DD_SITE}/api/v2/series`, {
+    const res = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'DD-API-KEY': DD_API_KEY,
+        'DD-API-KEY': apiKey,
       },
       body: JSON.stringify({
         series: [
@@ -107,8 +124,11 @@ async function ddMetric(
         ],
       }),
     });
-  } catch {
-    // swallow — fire-and-forget
+    if (!res.ok) {
+      console.error(`[DD] Metric ${metric} failed: ${res.status} ${await res.text().catch(() => '')}`);
+    }
+  } catch (err) {
+    console.error('[DD] Metric shipping error:', err instanceof Error ? err.message : err);
   }
 }
 
