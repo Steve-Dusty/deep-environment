@@ -47,20 +47,20 @@ export interface GraphData {
 // ── Colors ─────────────────────────────────────────────────────────────────
 
 export const CATEGORY_COLORS: Record<NodeCategory, string> = {
-  location: '#0ff5c4',
+  location: '#00d4ff',
   metric: '#3b82f6',
-  threat: '#ff3b4f',
+  threat: '#ff4d6a',
   agent: '#a78bfa',
-  report: '#f5a623',
+  report: '#ffaa00',
   correlation: '#06b6d4',
 };
 
 export const THREAT_COLORS: Record<ThreatLevel, string> = {
-  low: '#0ff5c4',
+  low: '#00d4ff',
   moderate: '#3b82f6',
-  elevated: '#f5a623',
-  high: '#ff6b35',
-  critical: '#ff3b4f',
+  elevated: '#ffaa00',
+  high: '#ff4d6a',
+  critical: '#ff4d6a',
 };
 
 export const CATEGORY_LABELS: Record<NodeCategory, string> = {
@@ -75,8 +75,8 @@ export const CATEGORY_LABELS: Record<NodeCategory, string> = {
 const metricColors: Record<string, string> = {
   air: '#a78bfa',
   water: '#06b6d4',
-  bio: '#22c55e',
-  soil: '#f5a623',
+  bio: '#00e68a',
+  soil: '#ffaa00',
 };
 
 // ── Build a clean, readable graph ──────────────────────────────────────────
@@ -169,13 +169,13 @@ export function buildInitialGraph(): GraphData {
   });
 
   // ─── Causal chains between threats (these make sense) ───
-  links.push({ source: 'thr-refinery', target: 'thr-fishkill', label: 'causes', color: '#ff3b4f33', strength: 0.2 });
-  links.push({ source: 'thr-drought', target: 'thr-invasive', label: 'amplifies', color: '#ff3b4f33', strength: 0.2 });
+  links.push({ source: 'thr-refinery', target: 'thr-fishkill', label: 'causes', color: '#ff4d6a33', strength: 0.2 });
+  links.push({ source: 'thr-drought', target: 'thr-invasive', label: 'amplifies', color: '#ff4d6a33', strength: 0.2 });
 
   // ─── Metric → Threat causal links ───
   links.push({ source: 'met-gulf-water', target: 'thr-fishkill', label: 'degrades', color: '#06b6d433', strength: 0.2 });
   links.push({ source: 'met-la-air', target: 'thr-smog', label: 'worsened by', color: '#a78bfa33', strength: 0.2 });
-  links.push({ source: 'met-ever-bio', target: 'thr-invasive', label: 'threatened by', color: '#22c55e33', strength: 0.2 });
+  links.push({ source: 'met-ever-bio', target: 'thr-invasive', label: 'threatened by', color: '#00e68a33', strength: 0.2 });
 
   // ─── Agents (just 2, clearly assigned) ───
   const agents = [

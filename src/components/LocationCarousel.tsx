@@ -78,10 +78,10 @@ export default function LocationCarousel({ pins, selectedId, onSelect }: Locatio
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 glass-panel px-3 py-1.5 flex items-center gap-2 rounded-full cursor-pointer hover:border-[var(--color-signal-teal-dim)] transition-colors"
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 glass-panel px-3 py-1.5 flex items-center gap-2 rounded-full cursor-pointer hover:border-[var(--color-accent-dim)] transition-colors"
         style={{ border: '1px solid var(--color-border)' }}
       >
-        <Search size={10} className="text-[var(--color-signal-teal)]" />
+        <Search size={10} className="text-[var(--color-accent)]" />
         <span className="text-[9px] tracking-[0.15em] text-[var(--color-text-secondary)] uppercase">
           Locations
         </span>
@@ -121,7 +121,7 @@ export default function LocationCarousel({ pins, selectedId, onSelect }: Locatio
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Location..."
-              className="w-full bg-[var(--color-deep)] border border-[var(--color-border-subtle)] rounded-md pl-6 pr-6 py-1 text-[9px] tracking-[0.04em] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-signal-teal-dim)] transition-colors"
+              className="w-full bg-[var(--color-deep)] border border-[var(--color-border-subtle)] rounded-md pl-6 pr-6 py-1 text-[9px] tracking-[0.04em] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent-dim)] transition-colors"
               style={{ fontFamily: 'var(--font-mono)' }}
             />
             {query ? (
@@ -161,7 +161,7 @@ export default function LocationCarousel({ pins, selectedId, onSelect }: Locatio
             {sorted.map((pin) => {
               const isSelected = pin.id === selectedId;
               const threatColor = THREAT_COLORS[pin.severity];
-              const catColor = CATEGORY_COLORS[pin.category] || '#8b8fa4';
+              const catColor = CATEGORY_COLORS[pin.category] || 'rgba(255,255,255,0.55)';
               const imgSrc = pin.imageUrl || getPinImage(pin.id);
 
               return (
@@ -231,9 +231,9 @@ export default function LocationCarousel({ pins, selectedId, onSelect }: Locatio
                     <div
                       className="absolute top-1 right-1.5 text-[5px] tracking-[0.15em] px-1 py-px rounded"
                       style={{
-                        background: 'rgba(15,245,196,0.15)',
-                        color: 'var(--color-signal-teal)',
-                        border: '1px solid rgba(15,245,196,0.3)',
+                        background: 'rgba(0,212,255,0.15)',
+                        color: 'var(--color-accent)',
+                        border: '1px solid rgba(0,212,255,0.3)',
                       }}
                     >
                       LIVE

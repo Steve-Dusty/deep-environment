@@ -85,12 +85,12 @@ function slackUploadToPinReport(upload: any, index: number): PinReport | null {
   };
 }
 
-const MapView = dynamic(() => import('./components/MapView'), {
+const MapView = dynamic(() => import('@/components/MapView'), {
   ssr: false,
   loading: () => (
     <div className="absolute inset-0 flex items-center justify-center bg-[var(--color-void)]">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-3 h-3 rounded-full bg-[var(--color-signal-teal)] data-live" />
+        <div className="w-3 h-3 rounded-full bg-[var(--color-accent)] data-live" />
         <span className="text-[10px] tracking-[0.3em] text-[var(--color-text-muted)]">
           INITIALIZING DEEP ENVIRONMENT
         </span>
@@ -99,12 +99,12 @@ const MapView = dynamic(() => import('./components/MapView'), {
   ),
 });
 
-const KnowledgeGraphView = dynamic(() => import('./components/KnowledgeGraphView'), {
+const KnowledgeGraphView = dynamic(() => import('@/components/KnowledgeGraphView'), {
   ssr: false,
   loading: () => (
     <div className="fixed inset-0 flex items-center justify-center bg-[var(--color-void)] z-50">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-3 h-3 rounded-full bg-[var(--color-signal-teal)] data-live" />
+        <div className="w-3 h-3 rounded-full bg-[var(--color-accent)] data-live" />
         <span className="text-[10px] tracking-[0.3em] text-[var(--color-text-muted)]">
           INITIALIZING KNOWLEDGE GRAPH
         </span>
@@ -113,12 +113,12 @@ const KnowledgeGraphView = dynamic(() => import('./components/KnowledgeGraphView
   ),
 });
 
-const LocationsDashboard = dynamic(() => import('./components/LocationsDashboard'), {
+const LocationsDashboard = dynamic(() => import('@/components/LocationsDashboard'), {
   ssr: false,
   loading: () => (
     <div className="fixed inset-0 flex items-center justify-center bg-[var(--color-void)] z-50">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-3 h-3 rounded-full bg-[var(--color-signal-teal)] data-live" />
+        <div className="w-3 h-3 rounded-full bg-[var(--color-accent)] data-live" />
         <span className="text-[10px] tracking-[0.3em] text-[var(--color-text-muted)]">
           LOADING LOCATIONS
         </span>
@@ -127,12 +127,12 @@ const LocationsDashboard = dynamic(() => import('./components/LocationsDashboard
   ),
 });
 
-const LocationDetailView = dynamic(() => import('./components/LocationDetailView'), {
+const LocationDetailView = dynamic(() => import('@/components/LocationDetailView'), {
   ssr: false,
   loading: () => (
     <div className="fixed inset-0 flex items-center justify-center bg-[var(--color-void)] z-50">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-3 h-3 rounded-full bg-[var(--color-signal-teal)] data-live" />
+        <div className="w-3 h-3 rounded-full bg-[var(--color-accent)] data-live" />
         <span className="text-[10px] tracking-[0.3em] text-[var(--color-text-muted)]">
           LOADING LOCATION GRAPH
         </span>
@@ -141,12 +141,12 @@ const LocationDetailView = dynamic(() => import('./components/LocationDetailView
   ),
 });
 
-const ChatView = dynamic(() => import('./components/ChatView'), {
+const ChatView = dynamic(() => import('@/components/ChatView'), {
   ssr: false,
   loading: () => (
     <div className="fixed inset-0 flex items-center justify-center bg-[var(--color-void)] z-50">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-3 h-3 rounded-full bg-[var(--color-signal-teal)] data-live" />
+        <div className="w-3 h-3 rounded-full bg-[var(--color-accent)] data-live" />
         <span className="text-[10px] tracking-[0.3em] text-[var(--color-text-muted)]">
           INITIALIZING AI ASSISTANT
         </span>
@@ -155,12 +155,12 @@ const ChatView = dynamic(() => import('./components/ChatView'), {
   ),
 });
 
-const PDFReportView = dynamic(() => import('./components/PDFReportView'), {
+const PDFReportView = dynamic(() => import('@/components/PDFReportView'), {
   ssr: false,
   loading: () => (
     <div className="fixed inset-0 flex items-center justify-center bg-[var(--color-void)] z-50">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-3 h-3 rounded-full bg-[var(--color-signal-teal)] data-live" />
+        <div className="w-3 h-3 rounded-full bg-[var(--color-accent)] data-live" />
         <span className="text-[10px] tracking-[0.3em] text-[var(--color-text-muted)]">
           LOADING PDF VIEWER
         </span>
@@ -169,12 +169,12 @@ const PDFReportView = dynamic(() => import('./components/PDFReportView'), {
   ),
 });
 
-const OdysseyView = dynamic(() => import('./components/OdysseyView'), {
+const OdysseyView = dynamic(() => import('@/components/OdysseyView'), {
   ssr: false,
   loading: () => (
     <div className="fixed inset-0 flex items-center justify-center bg-black z-[60]">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-3 h-3 rounded-full bg-[var(--color-signal-teal)] data-live" />
+        <div className="w-3 h-3 rounded-full bg-[var(--color-accent)] data-live" />
         <span className="text-[10px] tracking-[0.3em] text-[var(--color-text-muted)]">
           INITIALIZING ODYSSEY
         </span>

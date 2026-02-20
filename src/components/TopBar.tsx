@@ -63,34 +63,39 @@ export default function TopBar({ toggles, onToggle }: TopBarProps) {
         <div className="relative">
           <div
             className="w-2 h-2 rounded-full"
-            style={{ backgroundColor: '#0ff5c4' }}
+            style={{ backgroundColor: '#00d4ff' }}
           />
           <div
             className="absolute inset-0 w-2 h-2 rounded-full"
             style={{
-              backgroundColor: '#0ff5c4',
+              backgroundColor: '#00d4ff',
               animation: 'pulse-ring 2s ease-out infinite',
             }}
           />
         </div>
         <div className="flex items-baseline gap-2">
           <span
-            className="text-xs tracking-[0.3em] font-semibold"
-            style={{ fontFamily: 'var(--font-sans)', color: '#0ff5c4' }}
+            className="text-sm tracking-[0.25em] font-bold"
+            style={{ fontFamily: 'var(--font-sans)', color: '#00d4ff', textShadow: '0 0 20px rgba(0,212,255,0.3)' }}
           >
             DEEP
           </span>
           <span
-            className="text-xs tracking-[0.2em] font-medium"
+            className="text-sm tracking-[0.15em] font-semibold"
             style={{ fontFamily: 'var(--font-sans)', color: 'var(--color-text-primary)' }}
           >
             ENVIRONMENT
           </span>
         </div>
+        <div className="ml-3 flex items-center gap-1.5 pl-3 border-l border-[var(--color-border)]">
+          <span className="text-[8px] text-[var(--color-text-muted)] tracking-wider">
+            CIVIC INTELLIGENCE
+          </span>
+        </div>
         <div className="ml-2 flex items-center gap-1.5 pl-3 border-l border-[var(--color-border)]">
-          <Activity size={10} className="text-[var(--color-signal-teal)]" />
+          <Activity size={10} className="text-[var(--color-accent)]" />
           <span className="text-[9px] text-[var(--color-text-muted)] tracking-wider">
-            v2.4.1
+            LIVE
           </span>
         </div>
       </div>

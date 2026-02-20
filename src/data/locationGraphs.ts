@@ -49,16 +49,16 @@ export interface LocationSummary {
 }
 
 export const PROBLEM_CATEGORY_COLORS: Record<ProblemNode['category'], string> = {
-  pollution: '#ff3b4f',
-  deforestation: '#f5a623',
+  pollution: '#ff4d6a',
+  deforestation: '#ffaa00',
   runoff: '#06b6d4',
-  wildfire: '#ff6b35',
-  litter: '#8b8fa4',
+  wildfire: '#ffaa00',
+  litter: 'rgba(255,255,255,0.55)',
   erosion: '#a78bfa',
-  invasive: '#22c55e',
+  invasive: '#00e68a',
   drought: '#3b82f6',
-  contamination: '#ff3b4f',
-  other: '#555870',
+  contamination: '#ff4d6a',
+  other: 'rgba(255,255,255,0.4)',
 };
 
 export const PROBLEM_CATEGORY_LABELS: Record<ProblemNode['category'], string> = {

@@ -1,8 +1,5 @@
 import { locationSummaries, buildLocationGraph, PROBLEM_CATEGORY_LABELS } from '@/data/locationGraphs';
 
-const OPENAI_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY as string;
-const API_URL = 'https://api.openai.com/v1/chat/completions';
-
 // ── Fetch live Slack upload data ────────────────────────────────────────────
 
 async function fetchSlackUploadsContext(): Promise<string> {
@@ -68,42 +65,45 @@ export interface GlobalQueryResult {
 }
 
 const GENERATE_PDF_TOOL = {
-  type: 'function' as const,
-  function: {
-    name: 'generate_pdf_report',
-    description:
-      'Generate a PDF report for a specific monitoring location. Call this when the user asks for a report, PDF, document, export, or summary they can download or save.',
-    parameters: {
-      type: 'object',
-      properties: {
-        location_id: {
-          type: 'string',
-          description: 'The location ID to generate the report for.',
-          enum: locationSummaries.map((l) => l.id),
-        },
-        report_type: {
-          type: 'string',
-          enum: ['location-report', 'knowledge-graph'],
-          description:
-            'Type of report. Use "location-report" for general reports. Use "knowledge-graph" if the user specifically asks about graph structure or relationships.',
-        },
+  name: 'generate_pdf_report',
+  description:
+    'Generate a PDF report for a specific monitoring location. Call this when the user asks for a report, PDF, document, export, or summary they can download or save.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      location_id: {
+        type: 'string',
+        description: 'The location ID to generate the report for.',
+        enum: locationSummaries.map((l) => l.id),
       },
-      required: ['location_id', 'report_type'],
+      report_type: {
+        type: 'string',
+        enum: ['location-report', 'knowledge-graph'],
+        description:
+          'Type of report. Use "location-report" for general reports. Use "knowledge-graph" if the user specifically asks about graph structure or relationships.',
+      },
     },
+    required: ['location_id', 'report_type'],
+  },
+};
+
+const SYSTEM_HEALTH_TOOL = {
+  name: 'get_system_health',
+  description:
+    'Query Datadog observability data for real-time system performance metrics including LLM latency, error rates, token usage, TTS performance, and recent call history. Call this when the user asks about system health, performance, monitoring, or how the AI is performing.',
+  input_schema: {
+    type: 'object',
+    properties: {},
   },
 };
 
 export async function queryGlobalKnowledgeGraph(
   query: string,
 ): Promise<GlobalQueryResult> {
-  if (!OPENAI_KEY) {
-    return { answer: 'OpenAI API key not configured. Please set NEXT_PUBLIC_OPENAI_API_KEY.' };
-  }
-
   const allGraphsContext = serializeAllLocationGraphs();
   const slackContext = await fetchSlackUploadsContext();
 
-  const systemPrompt = `You are an advanced environmental monitoring AI assistant for the Deep Environment system.
+  const systemPrompt = `You are an advanced environmental monitoring AI assistant for the Deep Environment system, powered by MiniMax 2.1 on Amazon Bedrock.
 You have access to ALL knowledge graphs across ALL locations in the system, plus live field reports uploaded via Slack.
 
 ${allGraphsContext}
@@ -121,50 +121,45 @@ When a user asks about a specific place (e.g. "SFSU", "Golden Gate Park"), check
 
 You have a tool called generate_pdf_report. Use it whenever the user wants a report, PDF, document, export, or anything they'd want to download/save. Decide the best matching location based on context.
 
+You also have access to real-time system observability data via the get_system_health tool. Use it when users ask about system status, performance, monitoring, or how the AI is performing.
+
 Be helpful, concise, and technical. Use location names and problem IDs when relevant.`;
 
   try {
-    const res = await fetch(API_URL, {
+    const res = await fetch('/api/ai', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${OPENAI_KEY}`,
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: query },
-        ],
-        tools: [GENERATE_PDF_TOOL],
-        max_tokens: 800,
+        systemPrompt,
+        userMessage: query,
+        maxTokens: 800,
         temperature: 0.7,
+        tools: [GENERATE_PDF_TOOL, SYSTEM_HEALTH_TOOL],
+        action: 'global-query',
       }),
     });
 
     if (!res.ok) {
       const err = await res.text();
-      throw new Error(`OpenAI API error: ${res.status} ${err}`);
+      throw new Error(`Bedrock API error: ${res.status} ${err}`);
     }
 
     const data = await res.json();
-    const choice = data.choices[0];
-    const message = choice.message;
 
-    // Check if the model called the generate_pdf_report tool
-    if (message.tool_calls && message.tool_calls.length > 0) {
-      const toolCall = message.tool_calls.find(
-        (tc: { function: { name: string } }) => tc.function.name === 'generate_pdf_report',
+    // Check if the model called any tools
+    if (data.toolCalls && data.toolCalls.length > 0) {
+      // Handle generate_pdf_report
+      const pdfToolCall = data.toolCalls.find(
+        (tc: { name: string }) => tc.name === 'generate_pdf_report',
       );
 
-      if (toolCall) {
-        const args = JSON.parse(toolCall.function.arguments);
+      if (pdfToolCall) {
+        const args = pdfToolCall.arguments;
         const locationId = args.location_id;
         const reportType = args.report_type || 'location-report';
         const location = locationSummaries.find((l) => l.id === locationId);
 
-        // The model may also have content alongside the tool call
-        const textContent = message.content || `Generating a ${reportType.replace('-', ' ')} for ${location?.name || locationId}.`;
+        const textContent = data.content || `Generating a ${reportType.replace('-', ' ')} for ${location?.name || locationId}.`;
 
         return {
           answer: textContent,
@@ -175,10 +170,36 @@ Be helpful, concise, and technical. Use location names and problem IDs when rele
           },
         };
       }
+
+      // Handle get_system_health (Datadog MCP)
+      const healthToolCall = data.toolCalls.find(
+        (tc: { name: string }) => tc.name === 'get_system_health',
+      );
+
+      if (healthToolCall) {
+        try {
+          const healthRes = await fetch('/api/observability');
+          const healthData = await healthRes.json();
+          const stats = healthData.stats;
+          const recent = healthData.recentCalls?.slice(0, 5) || [];
+
+          const healthSummary = `📊 **System Health Report**
+• Total calls: ${stats.total} | Errors: ${stats.errors} (${(stats.errorRate * 100).toFixed(1)}%)
+• Avg latency: ${stats.avgLatency}ms | Total tokens: ${stats.totalTokens}
+• By type: ${Object.entries(stats.byType).map(([k, v]) => `${k}: ${v}`).join(', ')}
+• Models: Text=${healthData.models.text}, Speech=${healthData.models.speech}, Narration=${healthData.models.narration}
+${recent.length > 0 ? `• Recent: ${recent.map((r: any) => `[${r.type}] ${r.status} ${r.latencyMs}ms`).join(' | ')}` : '• No recent calls'}`;
+
+          const textPart = data.content ? `${data.content}\n\n${healthSummary}` : healthSummary;
+          return { answer: textPart };
+        } catch {
+          return { answer: data.content || 'System health data is currently unavailable.' };
+        }
+      }
     }
 
     // Normal text response
-    return { answer: message.content?.trim() || '' };
+    return { answer: data.content?.trim() || '' };
   } catch (e) {
     console.error('Global query failed:', e);
     return {
@@ -196,7 +217,7 @@ export interface PosterCard {
   accentColor: string;
 }
 
-const POSTER_ACCENTS = ['#06b6d4', '#22c55e', '#a78bfa', '#f59e0b', '#3b82f6'];
+const POSTER_ACCENTS = ['#00d4ff', '#00e68a', '#a78bfa', '#ffaa00', '#3b82f6'];
 
 export async function generatePosterContent(topic: string): Promise<PosterCard[]> {
   const res = await fetch('/api/generate-posters', {

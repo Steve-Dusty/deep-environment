@@ -46,7 +46,7 @@ export default function ChatBox({ onCommand }: ChatBoxProps) {
     <div className="glass-panel rounded p-3 w-[320px] flex flex-col gap-2">
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
-          <MessageSquare size={14} style={{ color: 'var(--color-signal-teal)' }} />
+          <MessageSquare size={14} style={{ color: 'var(--color-accent)' }} />
           <span className="text-[8px] tracking-[0.2em] text-[var(--color-text-muted)]">
             TEXT COMMANDS
           </span>
@@ -87,7 +87,7 @@ export default function ChatBox({ onCommand }: ChatBoxProps) {
           type="submit"
           disabled={!input.trim()}
           className="flex items-center justify-center w-6 h-6 rounded hover:opacity-70 transition-opacity disabled:opacity-30"
-          style={{ color: 'var(--color-signal-teal)' }}
+          style={{ color: 'var(--color-accent)' }}
         >
           <Send size={12} />
         </button>

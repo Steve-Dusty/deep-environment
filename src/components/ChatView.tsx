@@ -177,10 +177,10 @@ export default function ChatView({ onClose, onOpenPDFView }: ChatViewProps) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={S.sub}>
-            MODEL <span style={{ color: '#0ff5c4' }}>Gemini-2.0-flash</span>
+            MODEL <span style={{ color: '#00d4ff' }}>MiniMax 2.1</span>
           </span>
           <span style={S.sub}>
-            MESSAGES <span style={{ color: '#8b8fa4' }}>{messages.length}</span>
+            MESSAGES <span style={{ color: 'rgba(255,255,255,0.55)' }}>{messages.length}</span>
           </span>
         </div>
       </div>
@@ -198,7 +198,7 @@ export default function ChatView({ onClose, onOpenPDFView }: ChatViewProps) {
               }}
               className="cv-msg-in"
             >
-              {msg.role === 'ai' && <div style={S.aiAvatar}><Bot size={13} color="#08090c" /></div>}
+              {msg.role === 'ai' && <div style={S.aiAvatar}><Bot size={13} color="#0a0e1a" /></div>}
 
               <div style={{
                 ...S.bubble,
@@ -213,7 +213,7 @@ export default function ChatView({ onClose, onOpenPDFView }: ChatViewProps) {
                 <div style={S.bubbleText}>{msg.text}</div>
                 {msg.pdfData && (
                   <div style={S.pdfTag}>
-                    <FileText size={9} color="#0ff5c4" />
+                    <FileText size={9} color="#00d4ff" />
                     <span>{msg.pdfData.locationName} — {msg.pdfData.type.replace('-', ' ')}</span>
                   </div>
                 )}
@@ -226,21 +226,21 @@ export default function ChatView({ onClose, onOpenPDFView }: ChatViewProps) {
           {/* Loading */}
           {loading && !generatingPDF && (
             <div style={{ ...S.msgRow, justifyContent: 'flex-start' }} className="cv-msg-in">
-              <div style={S.aiAvatar}><Bot size={13} color="#08090c" /></div>
+              <div style={S.aiAvatar}><Bot size={13} color="#0a0e1a" /></div>
               <div style={{ ...S.bubble, ...S.aiBubble, display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                   {[0, 1, 2].map((i) => (
                     <div
                       key={i}
                       style={{
-                        width: 5, height: 5, borderRadius: '50%', background: '#0ff5c4',
+                        width: 5, height: 5, borderRadius: '50%', background: '#00d4ff',
                         animation: `cvPulse 1.4s ease-in-out ${i * 0.2}s infinite`,
-                        boxShadow: '0 0 6px rgba(15,245,196,0.5)',
+                        boxShadow: '0 0 6px rgba(0,212,255,0.5)',
                       }}
                     />
                   ))}
                 </div>
-                <span style={{ fontSize: 10, color: '#0ff5c4', letterSpacing: 2 }}>ANALYZING</span>
+                <span style={{ fontSize: 10, color: '#00d4ff', letterSpacing: 2 }}>ANALYZING</span>
               </div>
             </div>
           )}
@@ -248,36 +248,36 @@ export default function ChatView({ onClose, onOpenPDFView }: ChatViewProps) {
           {/* PDF Generating */}
           {generatingPDF && (
             <div style={{ ...S.msgRow, justifyContent: 'flex-start' }} className="cv-msg-in">
-              <div style={S.aiAvatar}><FileText size={13} color="#08090c" /></div>
+              <div style={S.aiAvatar}><FileText size={13} color="#0a0e1a" /></div>
               <div style={S.genCard}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
                   <div style={{ position: 'relative', width: 36, height: 36 }}>
                     <svg viewBox="0 0 36 36" style={{ position: 'absolute', inset: 0, animation: 'cvSpin 2s linear infinite' }}>
-                      <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(15,245,196,0.12)" strokeWidth="2.5" />
-                      <circle cx="18" cy="18" r="15" fill="none" stroke="#0ff5c4" strokeWidth="2.5"
+                      <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(0,212,255,0.12)" strokeWidth="2.5" />
+                      <circle cx="18" cy="18" r="15" fill="none" stroke="#00d4ff" strokeWidth="2.5"
                         strokeDasharray="94.2" strokeDashoffset={94.2 - (94.2 * Math.min(genProgress, 100)) / 100}
                         strokeLinecap="round" style={{ transition: 'stroke-dashoffset 0.3s ease' }}
                       />
                     </svg>
                     <div style={{
                       position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
-                      width: 8, height: 8, borderRadius: '50%', background: '#0ff5c4',
-                      boxShadow: '0 0 10px rgba(15,245,196,0.6)', animation: 'cvPulse 1.5s ease-in-out infinite',
+                      width: 8, height: 8, borderRadius: '50%', background: '#00d4ff',
+                      boxShadow: '0 0 10px rgba(0,212,255,0.6)', animation: 'cvPulse 1.5s ease-in-out infinite',
                     }} />
                   </div>
                   <div>
-                    <div style={{ fontSize: 10, color: '#0ff5c4', letterSpacing: 2.5, fontWeight: 600 }}>GENERATING PDF</div>
-                    <div style={{ fontSize: 9, color: '#555870', letterSpacing: 1.5, marginTop: 2 }}>
+                    <div style={{ fontSize: 10, color: '#00d4ff', letterSpacing: 2.5, fontWeight: 600 }}>GENERATING PDF</div>
+                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: 1.5, marginTop: 2 }}>
                       {genProgress < 30 ? 'Collecting data...' : genProgress < 60 ? 'Building document...' : genProgress < 90 ? 'Formatting report...' : 'Finalizing...'}
                     </div>
                   </div>
                 </div>
                 {/* Progress bar */}
-                <div style={{ height: 3, borderRadius: 2, background: 'rgba(15,245,196,0.08)', overflow: 'hidden' }}>
+                <div style={{ height: 3, borderRadius: 2, background: 'rgba(0,212,255,0.08)', overflow: 'hidden' }}>
                   <div style={{
                     height: '100%', width: `${Math.min(genProgress, 100)}%`, borderRadius: 2,
-                    background: 'linear-gradient(90deg, #0ff5c4, #06b6d4)',
-                    transition: 'width 0.3s ease', boxShadow: '0 0 10px rgba(15,245,196,0.4)',
+                    background: 'linear-gradient(90deg, #00d4ff, #06b6d4)',
+                    transition: 'width 0.3s ease', boxShadow: '0 0 10px rgba(0,212,255,0.4)',
                   }} />
                 </div>
                 {/* Phases */}
@@ -286,13 +286,13 @@ export default function ChatView({ onClose, onOpenPDFView }: ChatViewProps) {
                     <div key={ph} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                       <div style={{
                         width: 5, height: 5, borderRadius: '50%',
-                        background: genProgress >= (i + 1) * 25 ? '#0ff5c4' : '#252838',
-                        boxShadow: genProgress >= (i + 1) * 25 ? '0 0 5px rgba(15,245,196,0.5)' : 'none',
+                        background: genProgress >= (i + 1) * 25 ? '#00d4ff' : '#1e2a42',
+                        boxShadow: genProgress >= (i + 1) * 25 ? '0 0 5px rgba(0,212,255,0.5)' : 'none',
                         transition: 'all 0.3s',
                       }} />
                       <span style={{
                         fontSize: 7, letterSpacing: 1.5, fontWeight: 600,
-                        color: genProgress >= (i + 1) * 25 ? '#0ff5c4' : '#555870',
+                        color: genProgress >= (i + 1) * 25 ? '#00d4ff' : 'rgba(255,255,255,0.4)',
                         transition: 'color 0.3s',
                       }}>{ph}</span>
                     </div>
@@ -305,16 +305,16 @@ export default function ChatView({ onClose, onOpenPDFView }: ChatViewProps) {
           {/* PDF Ready */}
           {pdfReady && !generatingPDF && (
             <div style={{ ...S.msgRow, justifyContent: 'flex-start' }} className="cv-msg-in">
-              <div style={S.aiAvatar}><FileText size={13} color="#08090c" /></div>
+              <div style={S.aiAvatar}><FileText size={13} color="#0a0e1a" /></div>
               <div style={S.pdfReadyCard}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                   <div style={{
-                    width: 7, height: 7, borderRadius: '50%', background: '#0ff5c4',
-                    boxShadow: '0 0 8px rgba(15,245,196,0.5)',
+                    width: 7, height: 7, borderRadius: '50%', background: '#00d4ff',
+                    boxShadow: '0 0 8px rgba(0,212,255,0.5)',
                   }} />
-                  <span style={{ fontSize: 10, color: '#0ff5c4', letterSpacing: 2.5, fontWeight: 600 }}>PDF READY</span>
+                  <span style={{ fontSize: 10, color: '#00d4ff', letterSpacing: 2.5, fontWeight: 600 }}>PDF READY</span>
                 </div>
-                <div style={{ fontSize: 9, color: '#555870', letterSpacing: 1, marginBottom: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: 1, marginBottom: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {pdfReady.filename}
                 </div>
                 <div style={{ display: 'flex', gap: 6 }}>
@@ -374,15 +374,15 @@ export default function ChatView({ onClose, onOpenPDFView }: ChatViewProps) {
       {/* ── Status bar ── */}
       <div style={S.statusBar}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ color: '#0ff5c4' }}>●</span>
+          <span style={{ color: '#00d4ff' }}>●</span>
           <span>DEEP ENVIRONMENT AI ENGINE</span>
-          <span style={{ color: '#252838' }}>|</span>
-          <span>SESSION <span style={{ color: '#8b8fa4' }}>{fmt(elapsed)}</span></span>
+          <span style={{ color: '#1e2a42' }}>|</span>
+          <span>SESSION <span style={{ color: 'rgba(255,255,255,0.55)' }}>{fmt(elapsed)}</span></span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span>Gemini-2.0-flash · function calling · PDFKit</span>
-          <span style={{ color: '#252838' }}>|</span>
-          <span style={{ color: '#0ff5c4' }}>CONNECTED</span>
+          <span>MiniMax 2.1 · Bedrock · function calling · PDFKit</span>
+          <span style={{ color: '#1e2a42' }}>|</span>
+          <span style={{ color: '#00d4ff' }}>CONNECTED</span>
         </div>
       </div>
 
@@ -394,7 +394,7 @@ export default function ChatView({ onClose, onOpenPDFView }: ChatViewProps) {
         @keyframes cvSpin { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
         @keyframes cvMsgIn { 0%{opacity:0;transform:translateY(10px)} 100%{opacity:1;transform:translateY(0)} }
         .cv-msg-in { animation: cvMsgIn 0.3s cubic-bezier(0.16,1,0.3,1) both; }
-        @keyframes cvHeaderPulse { 0%,100%{opacity:.6;box-shadow:0 0 4px #0ff5c4} 50%{opacity:1;box-shadow:0 0 12px #0ff5c4} }
+        @keyframes cvHeaderPulse { 0%,100%{opacity:.6;box-shadow:0 0 4px #00d4ff} 50%{opacity:1;box-shadow:0 0 12px #00d4ff} }
       `}</style>
     </div>
   );
@@ -405,22 +405,22 @@ export default function ChatView({ onClose, onOpenPDFView }: ChatViewProps) {
 const glass = {
   background: 'linear-gradient(135deg, rgba(12,14,20,0.93), rgba(17,19,24,0.89))',
   backdropFilter: 'blur(20px) saturate(1.2)',
-  border: '1px solid #1a1d2a',
+  border: '1px solid #162035',
   boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03)',
 };
 
 const S: Record<string, React.CSSProperties> = {
   container: {
-    position: 'fixed', inset: 0, background: '#08090c',
+    position: 'fixed', inset: 0, background: '#0a0e1a',
     fontFamily: "'JetBrains Mono', 'SF Mono', 'Fira Code', monospace",
-    color: '#e4e6ef', overflow: 'hidden', zIndex: 50,
+    color: 'rgba(255,255,255,0.92)', overflow: 'hidden', zIndex: 50,
   },
   bgGrad: {
     position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none',
     background: `
-      radial-gradient(ellipse at 50% 0%, rgba(15,245,196,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 0%, rgba(0,212,255,0.04) 0%, transparent 50%),
       radial-gradient(ellipse at 80% 100%, rgba(6,182,212,0.03) 0%, transparent 40%),
-      linear-gradient(180deg, #08090c 0%, #0a0b10 50%, #08090c 100%)
+      linear-gradient(180deg, #0a0e1a 0%, #0d1120 50%, #0a0e1a 100%)
     `,
   },
   header: {
@@ -431,20 +431,20 @@ const S: Record<string, React.CSSProperties> = {
   },
   headerLeft: { display: 'flex', alignItems: 'center', gap: 10 },
   headerLabel: {
-    fontSize: 9, color: '#0ff5c4', letterSpacing: 2, fontWeight: 600,
-    background: 'rgba(15,245,196,0.08)', padding: '2px 8px', borderRadius: 3,
-    border: '1px solid rgba(15,245,196,0.2)',
+    fontSize: 9, color: '#00d4ff', letterSpacing: 2, fontWeight: 600,
+    background: 'rgba(0,212,255,0.08)', padding: '2px 8px', borderRadius: 3,
+    border: '1px solid rgba(0,212,255,0.2)',
   },
   dot: {
-    width: 7, height: 7, borderRadius: '50%', background: '#0ff5c4',
-    boxShadow: '0 0 8px #0ff5c4', animation: 'cvHeaderPulse 2s ease-in-out infinite',
+    width: 7, height: 7, borderRadius: '50%', background: '#00d4ff',
+    boxShadow: '0 0 8px #00d4ff', animation: 'cvHeaderPulse 2s ease-in-out infinite',
   },
-  title: { fontSize: 11, fontWeight: 600, letterSpacing: 3, color: '#e4e6ef' },
-  sub: { fontSize: 9, color: '#555870', letterSpacing: 1 },
+  title: { fontSize: 11, fontWeight: 600, letterSpacing: 3, color: 'rgba(255,255,255,0.92)' },
+  sub: { fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: 1 },
   btn: {
-    padding: '5px 10px', background: 'rgba(15,245,196,0.1)',
-    border: '1px solid rgba(15,245,196,0.3)', borderRadius: 4,
-    color: '#0ff5c4', fontSize: 8, fontWeight: 600, cursor: 'pointer',
+    padding: '5px 10px', background: 'rgba(0,212,255,0.1)',
+    border: '1px solid rgba(0,212,255,0.3)', borderRadius: 4,
+    color: '#00d4ff', fontSize: 8, fontWeight: 600, cursor: 'pointer',
     fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1.5,
     transition: 'all 0.2s ease',
   },
@@ -466,70 +466,70 @@ const S: Record<string, React.CSSProperties> = {
   },
   aiAvatar: {
     width: 28, height: 28, borderRadius: '50%', flexShrink: 0, marginTop: 2,
-    background: 'linear-gradient(135deg, #0ff5c4, #06b6d4)',
+    background: 'linear-gradient(135deg, #00d4ff, #06b6d4)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
   },
   userAvatar: {
     width: 28, height: 28, borderRadius: '50%', flexShrink: 0, marginTop: 2,
-    background: 'rgba(15,245,196,0.1)', border: '1px solid rgba(15,245,196,0.25)',
+    background: 'rgba(0,212,255,0.1)', border: '1px solid rgba(0,212,255,0.25)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontSize: 10, fontWeight: 700, color: '#0ff5c4',
+    fontSize: 10, fontWeight: 700, color: '#00d4ff',
   },
   bubble: {
     maxWidth: '75%', borderRadius: 8, padding: '10px 14px',
   },
   userBubble: {
-    background: 'rgba(15,245,196,0.06)', border: '1px solid rgba(15,245,196,0.18)',
+    background: 'rgba(0,212,255,0.06)', border: '1px solid rgba(0,212,255,0.18)',
   },
   aiBubble: {
-    background: 'rgba(255,255,255,0.025)', border: '1px solid #1a1d2a',
+    background: 'rgba(255,255,255,0.025)', border: '1px solid #162035',
   },
   bubbleMeta: {
-    fontSize: 7, fontWeight: 600, letterSpacing: 2, color: '#555870', marginBottom: 5,
+    fontSize: 7, fontWeight: 600, letterSpacing: 2, color: 'rgba(255,255,255,0.4)', marginBottom: 5,
   },
   bubbleText: {
-    fontSize: 11, lineHeight: 1.7, color: '#c4c6d0', whiteSpace: 'pre-wrap' as const,
+    fontSize: 11, lineHeight: 1.7, color: 'rgba(255,255,255,0.72)', whiteSpace: 'pre-wrap' as const,
   },
   pdfTag: {
-    marginTop: 8, paddingTop: 6, borderTop: '1px solid #1a1d2a',
+    marginTop: 8, paddingTop: 6, borderTop: '1px solid #162035',
     display: 'flex', alignItems: 'center', gap: 6,
-    fontSize: 8, color: '#555870', letterSpacing: 1,
+    fontSize: 8, color: 'rgba(255,255,255,0.4)', letterSpacing: 1,
   },
 
   /* PDF generating card */
   genCard: {
     maxWidth: '75%', borderRadius: 8, padding: '14px 16px',
-    background: 'linear-gradient(135deg, rgba(15,245,196,0.06), rgba(6,182,212,0.03))',
-    border: '1px solid rgba(15,245,196,0.18)',
+    background: 'linear-gradient(135deg, rgba(0,212,255,0.06), rgba(6,182,212,0.03))',
+    border: '1px solid rgba(0,212,255,0.18)',
     minWidth: 280,
   },
 
   /* PDF ready card */
   pdfReadyCard: {
     maxWidth: '75%', borderRadius: 8, padding: '14px 16px',
-    background: 'linear-gradient(135deg, rgba(15,245,196,0.07), rgba(6,182,212,0.04))',
-    border: '1px solid rgba(15,245,196,0.22)',
+    background: 'linear-gradient(135deg, rgba(0,212,255,0.07), rgba(6,182,212,0.04))',
+    border: '1px solid rgba(0,212,255,0.22)',
     minWidth: 280,
   },
   pdfBtn: {
     display: 'flex', alignItems: 'center', gap: 6,
     padding: '6px 12px', borderRadius: 4, fontSize: 9, fontWeight: 600, letterSpacing: 1.5,
-    background: 'linear-gradient(135deg, rgba(15,245,196,0.18), rgba(6,182,212,0.12))',
-    border: '1px solid rgba(15,245,196,0.4)', color: '#0ff5c4',
+    background: 'linear-gradient(135deg, rgba(0,212,255,0.18), rgba(6,182,212,0.12))',
+    border: '1px solid rgba(0,212,255,0.4)', color: '#00d4ff',
     cursor: 'pointer', fontFamily: "'JetBrains Mono', monospace",
     transition: 'all 0.2s',
   },
   pdfBtnSecondary: {
     display: 'flex', alignItems: 'center', gap: 4,
     padding: '6px 10px', borderRadius: 4, fontSize: 8, fontWeight: 600, letterSpacing: 1.5,
-    background: 'rgba(255,255,255,0.03)', border: '1px solid #252838', color: '#8b8fa4',
+    background: 'rgba(255,255,255,0.03)', border: '1px solid #1e2a42', color: 'rgba(255,255,255,0.55)',
     cursor: 'pointer', fontFamily: "'JetBrains Mono', monospace",
     transition: 'all 0.2s',
   },
   pdfBtnDismiss: {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     width: 28, height: 28, borderRadius: 4,
-    background: 'rgba(255,255,255,0.03)', border: '1px solid #252838', color: '#555870',
+    background: 'rgba(255,255,255,0.03)', border: '1px solid #1e2a42', color: 'rgba(255,255,255,0.4)',
     cursor: 'pointer', transition: 'all 0.2s',
   },
 
@@ -537,7 +537,7 @@ const S: Record<string, React.CSSProperties> = {
   inputBar: {
     position: 'fixed', left: 0, right: 0, bottom: 28,
     zIndex: 100, padding: '0 20px 8px',
-    background: 'linear-gradient(180deg, transparent 0%, #08090c 20%)',
+    background: 'linear-gradient(180deg, transparent 0%, #0a0e1a 20%)',
   },
   inputInner: {
     maxWidth: 700, margin: '0 auto',
@@ -545,8 +545,8 @@ const S: Record<string, React.CSSProperties> = {
   },
   textarea: {
     flex: 1, padding: '10px 14px',
-    background: 'rgba(255,255,255,0.03)', border: '1px solid #1a1d2a',
-    borderRadius: 6, color: '#e4e6ef', fontSize: 11,
+    background: 'rgba(255,255,255,0.03)', border: '1px solid #162035',
+    borderRadius: 6, color: 'rgba(255,255,255,0.92)', fontSize: 11,
     fontFamily: "'JetBrains Mono', monospace",
     resize: 'none' as const, outline: 'none',
     minHeight: 40, maxHeight: 100,
@@ -554,9 +554,9 @@ const S: Record<string, React.CSSProperties> = {
   },
   sendBtn: {
     width: 40, height: 40, borderRadius: 6, border: 'none',
-    background: 'linear-gradient(135deg, #0ff5c4, #06b6d4)',
+    background: 'linear-gradient(135deg, #00d4ff, #06b6d4)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    color: '#08090c', flexShrink: 0,
+    color: '#0a0e1a', flexShrink: 0,
     transition: 'all 0.2s',
   },
   inputHint: {
@@ -569,7 +569,7 @@ const S: Record<string, React.CSSProperties> = {
     position: 'fixed', bottom: 0, left: 0, right: 0, height: 28,
     ...glass, borderRadius: 0, borderLeft: 'none', borderRight: 'none', borderBottom: 'none',
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    padding: '0 14px', zIndex: 100, fontSize: 9, color: '#555870',
+    padding: '0 14px', zIndex: 100, fontSize: 9, color: 'rgba(255,255,255,0.4)',
   },
   scanline: {
     position: 'fixed', inset: 0, zIndex: 9999, pointerEvents: 'none' as const,

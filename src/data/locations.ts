@@ -45,11 +45,11 @@ export const LOCATION_COORDS: Record<string, [number, number]> = {
 };
 
 export const THREAT_COLORS: Record<ThreatLevel, string> = {
-  low: '#0ff5c4',
+  low: '#00d4ff',
   moderate: '#3b82f6',
-  elevated: '#f5a623',
-  high: '#ff6b35',
-  critical: '#ff3b4f',
+  elevated: '#ffaa00',
+  high: '#ff4d6a',
+  critical: '#ff4d6a',
 };
 
 export const THREAT_LABELS: Record<ThreatLevel, string> = {
@@ -63,8 +63,8 @@ export const THREAT_LABELS: Record<ThreatLevel, string> = {
 export const CATEGORY_COLORS: Record<string, string> = {
   Water: '#06b6d4',
   Air: '#a78bfa',
-  Soil: '#f5a623',
-  Bio: '#22c55e',
+  Soil: '#ffaa00',
+  Bio: '#00e68a',
   Climate: '#3b82f6',
 };
 
@@ -607,7 +607,7 @@ export function getPinReportsGeoJSON(pins?: PinReport[]) {
         severity: pin.severity,
         category: pin.category,
         color: THREAT_COLORS[pin.severity],
-        categoryColor: CATEGORY_COLORS[pin.category] || '#8b8fa4',
+        categoryColor: CATEGORY_COLORS[pin.category] || 'rgba(255,255,255,0.55)',
         title: pin.title,
         user: pin.user,
         timestamp: pin.timestamp,

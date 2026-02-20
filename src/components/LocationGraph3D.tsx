@@ -81,7 +81,7 @@ function convertToGraphData(graph: LocationGraph): { nodes: GNode[]; links: GLin
       source: l.source,
       target: l.target,
       label: l.label,
-      color: l.type === 'causes' ? '#ff3b4f' : l.type === 'amplifies' ? '#ff6b35' : l.type === 'correlates' ? '#3b82f6' : '#0ff5c4',
+      color: l.type === 'causes' ? '#ff4d6a' : l.type === 'amplifies' ? '#ffaa00' : l.type === 'correlates' ? '#3b82f6' : '#00d4ff',
       strength: l.strength,
       particles: l.type === 'causes' ? 3 : l.type === 'amplifies' ? 2 : 1,
     }));
@@ -337,7 +337,7 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, Props>(
 
     // ── Link accessors ─────────────────────────────────────────────────
 
-    const linkColor = useCallback((link: GLink) => highlightLinks.has(link) ? '#0ff5c4' : 'rgba(255,255,255,0.15)', [highlightLinks]);
+    const linkColor = useCallback((link: GLink) => highlightLinks.has(link) ? '#00d4ff' : 'rgba(255,255,255,0.15)', [highlightLinks]);
     const linkWidth = useCallback((link: GLink) => highlightLinks.has(link) ? 0.8 : 0.15, [highlightLinks]);
     const linkParticles = useCallback((link: GLink) => highlightLinks.has(link) ? 3 : (link.particles || 0), [highlightLinks]);
 
@@ -357,7 +357,7 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, Props>(
         linkDirectionalParticles={linkParticles}
         linkDirectionalParticleWidth={0.8}
         linkDirectionalParticleSpeed={0.004}
-        linkDirectionalParticleColor={() => '#0ff5c4'}
+        linkDirectionalParticleColor={() => '#00d4ff'}
         d3AlphaDecay={0.025}
         d3VelocityDecay={0.35}
         warmupTicks={60}
@@ -368,7 +368,7 @@ const LocationGraph3D = forwardRef<LocationGraphHandle, Props>(
         enableNodeDrag={false}
         enableNavigationControls={true}
         controlType="trackball"
-        backgroundColor="#06070a"
+        backgroundColor="#0a0e1a"
       />
     );
   },

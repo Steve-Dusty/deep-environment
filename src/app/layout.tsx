@@ -3,8 +3,8 @@ import "./globals.css";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 export const metadata: Metadata = {
-  title: "Deep Environment — Environmental Intelligence Platform",
-  description: "Real-time environmental threat monitoring and multi-agent analysis",
+  title: "Deep Environment — Civic Intelligence Platform",
+  description: "Crowdsourced environmental intelligence powered by MiniMax 2.1 on Amazon Bedrock",
 };
 
 export default function RootLayout({

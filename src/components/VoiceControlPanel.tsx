@@ -36,7 +36,7 @@ export default function VoiceControlPanel({
 
   const stateConfig: Record<VoiceState, { color: string; label: string; icon: any }> = {
     idle: { color: 'var(--color-text-muted)', label: 'READY', icon: MicOff },
-    listening: { color: 'var(--color-signal-teal)', label: 'LISTENING', icon: Mic },
+    listening: { color: 'var(--color-accent)', label: 'LISTENING', icon: Mic },
     processing: { color: 'var(--color-signal-amber)', label: 'PROCESSING', icon: Loader2 },
     speaking: { color: 'var(--color-signal-blue)', label: 'RESPONDING', icon: CheckCircle },
   };
@@ -116,7 +116,7 @@ export default function VoiceControlPanel({
                   borderLeft: `2px solid ${
                     log.type === 'error' ? 'var(--color-signal-red)' :
                     log.type === 'response' ? 'var(--color-signal-blue)' :
-                    log.type === 'action' ? 'var(--color-signal-teal)' :
+                    log.type === 'action' ? 'var(--color-accent)' :
                     log.type === 'command' ? 'var(--color-signal-amber)' :
                     'var(--color-border)'
                   }`,
@@ -153,7 +153,7 @@ export default function VoiceControlPanel({
                 <span className="text-[8px] tracking-[0.2em]" style={{ color }}>
                   {label}
                 </span>
-                <span className="text-[6px] text-[var(--color-signal-teal)]">
+                <span className="text-[6px] text-[var(--color-accent)]">
                   ● CONTINUOUS MODE
                 </span>
               </div>
@@ -187,7 +187,7 @@ export default function VoiceControlPanel({
                   COMMAND:
                 </div>
                 <div
-                  className="text-[9px] text-[var(--color-signal-teal)] px-2 py-1 rounded"
+                  className="text-[9px] text-[var(--color-accent)] px-2 py-1 rounded"
                   style={{ backgroundColor: 'var(--color-void)' }}
                 >
                   {transcript}

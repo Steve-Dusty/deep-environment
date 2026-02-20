@@ -24,14 +24,14 @@ export default function StatusBar({
       {/* Left: System Status */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-1.5">
-          <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-signal-teal)] data-live" />
+          <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] data-live" />
           <span className="text-[9px] text-[var(--color-text-muted)] tracking-wider">
             SYSTEM NOMINAL
           </span>
         </div>
 
         <div className="flex items-center gap-1.5">
-          <Bot size={9} className="text-[var(--color-signal-teal-dim)]" />
+          <Bot size={9} className="text-[var(--color-accent-dim)]" />
           <span className="text-[9px] text-[var(--color-text-secondary)]">
             {agentsOnline}
           </span>
@@ -55,7 +55,7 @@ export default function StatusBar({
         </div>
 
         <div className="flex items-center gap-1.5">
-          <Signal size={9} className="text-[var(--color-signal-teal-dim)]" />
+          <Signal size={9} className="text-[var(--color-accent-dim)]" />
           <span className="text-[8px] text-[var(--color-text-muted)]">
             SYNC 2.4s
           </span>
@@ -91,8 +91,11 @@ export default function StatusBar({
         <span className="text-[8px] text-[var(--color-text-muted)] tracking-wider">
           MAPBOX GL
         </span>
+        <span className="text-[8px] text-[var(--color-accent)] tracking-wider font-medium">
+          MINIMAX 2.1
+        </span>
         <span className="text-[8px] text-[var(--color-text-muted)] tracking-wider">
-          GEMINI 2.0
+          BEDROCK
         </span>
       </div>
     </div>

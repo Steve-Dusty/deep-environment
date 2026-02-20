@@ -1,34 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-void: #08090c;
-  --color-abyss: #0c0e14;
-  --color-deep: #111318;
-  --color-surface: #181a22;
-  --color-raised: #1e2030;
-  --color-border: #252838;
-  --color-border-subtle: #1a1d2a;
-  --color-text-primary: #e4e6ef;
-  --color-text-secondary: #8b8fa4;
-  --color-text-muted: #555870;
-  --color-signal-teal: #0ff5c4;
-  --color-signal-teal-dim: #0aa882;
-  --color-signal-teal-glow: rgba(15, 245, 196, 0.15);
-  --color-signal-amber: #f5a623;
-  --color-signal-amber-dim: #b8791a;
-  --color-signal-amber-glow: rgba(245, 166, 35, 0.15);
-  --color-signal-red: #ff3b4f;
-  --color-signal-red-dim: #b82a39;
-  --color-signal-red-glow: rgba(255, 59, 79, 0.15);
+  --color-void: #0a0e1a;
+  --color-abyss: #0d1120;
+  --color-deep: #111828;
+  --color-surface: #151c2e;
+  --color-raised: #1a2338;
+  --color-border: #1e2a42;
+  --color-border-subtle: #162035;
+  --color-text-primary: rgba(255, 255, 255, 0.92);
+  --color-text-secondary: rgba(255, 255, 255, 0.55);
+  --color-text-muted: rgba(255, 255, 255, 0.4);
+  --color-accent: #00d4ff;
+  --color-accent-deep: #0088cc;
+  --color-accent-glow: rgba(0, 212, 255, 0.15);
+  --color-accent-dim: #0099bb;
+  --color-signal-amber: #ffaa00;
+  --color-signal-amber-dim: #b87a00;
+  --color-signal-amber-glow: rgba(255, 170, 0, 0.15);
+  --color-signal-red: #ff4d6a;
+  --color-signal-red-dim: #b82a45;
+  --color-signal-red-glow: rgba(255, 77, 106, 0.15);
   --color-signal-blue: #3b82f6;
   --color-signal-blue-dim: #2563b0;
-  --color-signal-green: #22c55e;
+  --color-signal-green: #00e68a;
   --color-eco-water: #06b6d4;
   --color-eco-forest: #16a34a;
   --color-eco-air: #a78bfa;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
-  --font-sans: 'Instrument Sans', system-ui, sans-serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
 }
 
 * {
@@ -43,7 +44,7 @@ html, body {
   overflow: hidden;
   background: var(--color-void);
   color: var(--color-text-primary);
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -54,31 +55,35 @@ html, body {
 }
 
 .mapboxgl-ctrl-group {
-  background: var(--color-surface) !important;
-  border: 1px solid var(--color-border) !important;
-  border-radius: 4px !important;
+  background: rgba(15, 20, 35, 0.85) !important;
+  backdrop-filter: blur(12px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(1.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
 }
 
 .mapboxgl-ctrl-group button {
-  border-color: var(--color-border) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
 }
 
 .mapboxgl-ctrl-group button:hover {
-  background-color: var(--color-raised) !important;
+  background-color: rgba(0, 212, 255, 0.1) !important;
 }
 
 .mapboxgl-ctrl-group button span {
-  filter: invert(0.8) !important;
+  filter: invert(0.85) !important;
 }
 
 .mapboxgl-ctrl-scale {
-  background: var(--color-surface) !important;
-  border-color: var(--color-signal-teal-dim) !important;
+  background: rgba(15, 20, 35, 0.85) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: var(--color-accent-dim) !important;
   color: var(--color-text-secondary) !important;
   font-family: var(--font-mono) !important;
   font-size: 9px !important;
   padding: 1px 6px !important;
+  border-radius: 4px !important;
 }
 
 .mapboxgl-ctrl-attrib {
@@ -101,28 +106,28 @@ html, body {
     0deg,
     transparent,
     transparent 2px,
-    rgba(0, 0, 0, 0.03) 2px,
-    rgba(0, 0, 0, 0.03) 4px
+    rgba(0, 0, 0, 0.02) 2px,
+    rgba(0, 0, 0, 0.02) 4px
   );
   mix-blend-mode: multiply;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-deep);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 2px;
+  background: rgba(0, 212, 255, 0.3);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
+  background: rgba(0, 212, 255, 0.5);
 }
 
 /* Marker pulse animation */
@@ -179,6 +184,11 @@ html, body {
   50% { opacity: 0.8; }
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
 .marker-container {
   cursor: pointer;
   position: relative;
@@ -211,26 +221,18 @@ html, body {
 
 /* Glassmorphic panel styles */
 .glass-panel {
-  background: linear-gradient(
-    135deg,
-    rgba(12, 14, 20, 0.92),
-    rgba(17, 19, 24, 0.88)
-  );
-  backdrop-filter: blur(20px) saturate(1.2);
-  -webkit-backdrop-filter: blur(20px) saturate(1.2);
-  border: 1px solid var(--color-border-subtle);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  background: rgba(15, 20, 35, 0.75);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .glass-panel-hover:hover {
-  border-color: var(--color-border);
-  background: linear-gradient(
-    135deg,
-    rgba(14, 16, 24, 0.95),
-    rgba(20, 22, 30, 0.92)
-  );
+  border-color: rgba(0, 212, 255, 0.2);
+  background: rgba(18, 24, 40, 0.8);
 }
 
 /* Toggle button styles */
@@ -254,10 +256,10 @@ html, body {
 }
 
 .toggle-btn-active {
-  background: rgba(15, 245, 196, 0.08) !important;
-  border-color: var(--color-signal-teal-dim) !important;
-  color: var(--color-signal-teal) !important;
-  box-shadow: 0 0 12px rgba(15, 245, 196, 0.1);
+  background: rgba(0, 212, 255, 0.1) !important;
+  border-color: rgba(0, 212, 255, 0.3) !important;
+  color: var(--color-accent) !important;
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.15);
 }
 
 /* Connection line animation */
@@ -276,6 +278,13 @@ html, body {
   animation: fade-in-up 0.4s ease-out forwards;
 }
 
+/* Loading skeleton shimmer */
+.skeleton-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0.02) 25%, rgba(0,212,255,0.06) 50%, rgba(255,255,255,0.02) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
 /* Left sidebar additions */
 @keyframes scan-sweep {
   0%   { transform: translateY(-100%); }
@@ -288,7 +297,7 @@ html, body {
 }
 
 .scan-sweep-bg {
-  background: linear-gradient(180deg, transparent 0%, rgba(15, 245, 196, 0.07) 40%, rgba(15, 245, 196, 0.12) 50%, rgba(15, 245, 196, 0.07) 60%, transparent 100%);
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 212, 255, 0.07) 40%, rgba(0, 212, 255, 0.12) 50%, rgba(0, 212, 255, 0.07) 60%, transparent 100%);
   animation: scan-sweep 3s ease-in-out infinite;
 }
 
@@ -331,17 +340,18 @@ html, body {
 
 /* Pin image popup */
 .pin-popup .mapboxgl-popup-content {
-  background: #0a0e14 !important;
+  background: rgba(15, 20, 35, 0.95) !important;
+  backdrop-filter: blur(12px) !important;
   padding: 0 !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
-  border-radius: 6px !important;
-  border: none !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   overflow: hidden;
 }
 
 .pin-popup .mapboxgl-popup-tip {
-  border-top-color: #0a0e14 !important;
-  border-bottom-color: #0a0e14 !important;
+  border-top-color: rgba(15, 20, 35, 0.95) !important;
+  border-bottom-color: rgba(15, 20, 35, 0.95) !important;
 }
 
 .pin-popup .mapboxgl-popup-close-button {
@@ -357,8 +367,8 @@ html, body {
 }
 
 .upload-popup .mapboxgl-popup-tip {
-  border-top-color: rgba(12, 14, 20, 0.96) !important;
-  border-bottom-color: rgba(12, 14, 20, 0.96) !important;
+  border-top-color: rgba(15, 20, 35, 0.96) !important;
+  border-bottom-color: rgba(15, 20, 35, 0.96) !important;
 }
 
 .threat-bar::after {
@@ -370,4 +380,27 @@ html, body {
   width: 40px;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
   animation: sweep 3s ease-in-out infinite;
+}
+
+/* Modal / popup entrance */
+@keyframes modal-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-enter {
+  animation: modal-enter 0.25s ease-out forwards;
+}
+
+/* Backdrop filter fallback for unsupported browsers */
+@supports not (backdrop-filter: blur(16px)) {
+  .glass-panel {
+    background: rgba(10, 14, 26, 0.95);
+  }
 }

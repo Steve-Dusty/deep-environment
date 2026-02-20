@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['pdfkit'],
+  serverExternalPackages: ['pdfkit', 'dd-trace'],
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {

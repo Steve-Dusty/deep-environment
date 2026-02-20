@@ -546,10 +546,10 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
   const negativeCount = choicesMade.filter((c) => c.type === 'negative').length;
   const finaleVerdict =
     positiveCount > negativeCount
-      ? { text: 'ENVIRONMENT RESTORED', color: '#0ff5c4', sub: `This is what ${pin.neighborhood} could look like with action.` }
+      ? { text: 'ENVIRONMENT RESTORED', color: '#00d4ff', sub: `This is what ${pin.neighborhood} could look like with action.` }
       : negativeCount > positiveCount
-        ? { text: 'DEGRADATION CONTINUES', color: '#ff3b4f', sub: 'Without intervention, the environment keeps declining.' }
-        : { text: 'PARTIAL RECOVERY', color: '#f5a623', sub: 'Some improvement, but more action is needed.' };
+        ? { text: 'DEGRADATION CONTINUES', color: '#ff4d6a', sub: 'Without intervention, the environment keeps declining.' }
+        : { text: 'PARTIAL RECOVERY', color: '#ffaa00', sub: 'Some improvement, but more action is needed.' };
 
   // AI-generated finale narration
   useEffect(() => {
@@ -582,10 +582,10 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
               <div key={i} style={{
                 color: line.startsWith('TARGET') || line.startsWith('THREAT') || line.startsWith('SEVERITY') ? threatColor
                   : line.startsWith('MODE') ? '#a78bfa'
-                  : line.startsWith('CONFIDENCE') ? '#0ff5c4'
-                  : line.startsWith('━') ? '#252838'
-                  : line.includes('✓') ? '#0ff5c4'
-                  : '#8b8fa4',
+                  : line.startsWith('CONFIDENCE') ? '#00d4ff'
+                  : line.startsWith('━') ? '#1e2a42'
+                  : line.includes('✓') ? '#00d4ff'
+                  : 'rgba(255,255,255,0.55)',
                 fontWeight: line.startsWith('ODYSSEY') ? 600 : 400,
                 fontSize: line.startsWith('ODYSSEY') ? 14 : 11,
                 letterSpacing: line.startsWith('ODYSSEY') ? 4 : 1,
@@ -593,7 +593,7 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
               }}>{line || '\u00A0'}</div>
             ))}
             {bootLineIndex >= bootLines.length && (
-              <div style={{ color: '#0ff5c4', animation: 'ody-blink 1s infinite' }}>▸ Connecting... ●</div>
+              <div style={{ color: '#00d4ff', animation: 'ody-blink 1s infinite' }}>▸ Connecting... ●</div>
             )}
           </div>
           <div style={S.scanlineAnim} />
@@ -605,10 +605,10 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
         <div style={S.overlay}>
           <div style={{ textAlign: 'center' }}>
             <div style={S.spinner}><div style={S.spinnerInner} /></div>
-            <div style={{ fontSize: 10, letterSpacing: 3, color: '#0ff5c4', marginTop: 24 }}>
+            <div style={{ fontSize: 10, letterSpacing: 3, color: '#00d4ff', marginTop: 24 }}>
               {statusText.toUpperCase()}
             </div>
-            <div style={{ fontSize: 9, color: '#555870', marginTop: 8 }}>
+            <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', marginTop: 8 }}>
               {pin.city} — {pin.title}
             </div>
           </div>
@@ -619,11 +619,11 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
       {phase === 'error' && (
         <div style={S.overlay}>
           <div style={{ textAlign: 'center', maxWidth: 420 }}>
-            <div style={{ fontSize: 13, letterSpacing: 3, color: '#ff3b4f', marginBottom: 12 }}>CONNECTION FAILED</div>
-            <div style={{ fontSize: 10, color: '#8b8fa4', marginBottom: 24, lineHeight: 1.6 }}>{statusText}</div>
+            <div style={{ fontSize: 13, letterSpacing: 3, color: '#ff4d6a', marginBottom: 12 }}>CONNECTION FAILED</div>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginBottom: 24, lineHeight: 1.6 }}>{statusText}</div>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
               <button onClick={() => { setPhase('boot'); setBootLineIndex(0); }} style={S.retryBtn}>RETRY</button>
-              <button onClick={onClose} style={{ ...S.retryBtn, borderColor: '#ff3b4f40', color: '#ff3b4f' }}>EXIT</button>
+              <button onClick={onClose} style={{ ...S.retryBtn, borderColor: '#ff4d6a40', color: '#ff4d6a' }}>EXIT</button>
             </div>
           </div>
         </div>
@@ -639,7 +639,7 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
           <div style={{ ...S.topBar, opacity: hudVisible ? 1 : 0, transition: 'opacity 0.8s ease' }}>
             <button onClick={onClose} style={S.exitBtn}>✕</button>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#0ff5c4', boxShadow: '0 0 8px #0ff5c4' }} />
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#00d4ff', boxShadow: '0 0 8px #00d4ff' }} />
               <span style={{ fontSize: 10, letterSpacing: 2, fontWeight: 600 }}>ODYSSEY</span>
               {usingFieldPhoto && (
                 <span style={{ fontSize: 7, letterSpacing: 1.5, padding: '2px 6px', borderRadius: 3, color: '#a78bfa', background: 'rgba(167,139,250,0.15)', border: '1px solid rgba(167,139,250,0.3)', fontWeight: 600 }}>
@@ -653,9 +653,9 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
                 style={{
                   ...S.exitBtn,
                   width: 'auto', padding: '0 8px',
-                  background: voiceEnabled ? 'rgba(15,245,196,0.12)' : 'rgba(255,255,255,0.05)',
-                  borderColor: voiceEnabled ? 'rgba(15,245,196,0.3)' : 'rgba(255,255,255,0.1)',
-                  color: voiceEnabled ? '#0ff5c4' : '#555870',
+                  background: voiceEnabled ? 'rgba(0,212,255,0.12)' : 'rgba(255,255,255,0.05)',
+                  borderColor: voiceEnabled ? 'rgba(0,212,255,0.3)' : 'rgba(255,255,255,0.1)',
+                  color: voiceEnabled ? '#00d4ff' : 'rgba(255,255,255,0.4)',
                   fontSize: 8, letterSpacing: 1.5, fontWeight: 600,
                   display: 'flex', alignItems: 'center', gap: 5,
                 }}
@@ -664,7 +664,7 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
                 {voiceEnabled ? (isSpeaking ? '◉' : '♫') : '♫̶'}
                 <span>{voiceEnabled ? 'VOICE ON' : 'VOICE OFF'}</span>
               </button>
-              <span style={{ fontSize: 9, color: '#8b8fa4' }}>{pin.city}</span>
+              <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.55)' }}>{pin.city}</span>
               <span style={{ fontSize: 8, letterSpacing: 1, padding: '2px 6px', borderRadius: 3, color: threatColor, background: `${threatColor}15`, border: `1px solid ${threatColor}30` }}>
                 {pin.severity.toUpperCase()}
               </span>
@@ -676,9 +676,9 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
             {decisions.map((_, i) => (
               <div key={i} style={{
                 width: 24, height: 3, borderRadius: 2,
-                background: i < decisionIndex ? (choicesMade[i]?.type === 'positive' ? '#0ff5c4' : choicesMade[i]?.type === 'negative' ? '#ff3b4f' : '#f5a623')
-                  : i === decisionIndex ? '#e4e6ef'
-                  : '#252838',
+                background: i < decisionIndex ? (choicesMade[i]?.type === 'positive' ? '#00d4ff' : choicesMade[i]?.type === 'negative' ? '#ff4d6a' : '#ffaa00')
+                  : i === decisionIndex ? 'rgba(255,255,255,0.92)'
+                  : '#1e2a42',
                 transition: 'background 0.5s ease',
               }} />
             ))}
@@ -704,7 +704,7 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
           {storyPhase === 'choosing' && currentDecision && (
             <div style={S.choicesContainer}>
               {currentDecision.choices.map((choice, i) => {
-                const cColor = choice.type === 'positive' ? '#0ff5c4' : choice.type === 'negative' ? '#ff3b4f' : '#f5a623';
+                const cColor = choice.type === 'positive' ? '#00d4ff' : choice.type === 'negative' ? '#ff4d6a' : '#ffaa00';
                 return (
                   <button
                     key={i}
@@ -726,15 +726,15 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
                         {choice.type === 'positive' ? '▲' : choice.type === 'negative' ? '▼' : '◆'}
                       </span>
                       <div style={{ textAlign: 'left' }}>
-                        <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: 2, color: '#e4e6ef' }}>
+                        <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: 2, color: 'rgba(255,255,255,0.92)' }}>
                           {choice.label}
                         </div>
-                        <div style={{ fontSize: 9, color: '#8b8fa4', marginTop: 2 }}>
+                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>
                           {choice.sub}
                         </div>
                       </div>
                     </div>
-                    <span style={{ fontSize: 9, color: '#555870', letterSpacing: 1 }}>{i + 1}</span>
+                    <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: 1 }}>{i + 1}</span>
                   </button>
                 );
               })}
@@ -745,10 +745,10 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
           {storyPhase === 'responding' && (
             <div style={S.consequenceContainer}>
               <div style={S.consequenceFlash} />
-              <div style={{ fontSize: 9, letterSpacing: 4, color: '#555870', marginBottom: 8 }}>
+              <div style={{ fontSize: 9, letterSpacing: 4, color: 'rgba(255,255,255,0.4)', marginBottom: 8 }}>
                 VISUALIZING TRANSFORMATION
               </div>
-              <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: 2, color: '#e4e6ef' }}>
+              <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: 2, color: 'rgba(255,255,255,0.92)' }}>
                 {consequenceText}
               </div>
             </div>
@@ -757,13 +757,13 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
           {/* ── FINALE ── */}
           {storyPhase === 'finale' && (
             <div style={S.finaleContainer}>
-              <div style={{ fontSize: 9, letterSpacing: 4, color: '#555870', marginBottom: 16 }}>
+              <div style={{ fontSize: 9, letterSpacing: 4, color: 'rgba(255,255,255,0.4)', marginBottom: 16 }}>
                 {pin.city.toUpperCase()} — {pin.title.toUpperCase()}
               </div>
               <div style={{ fontSize: 28, fontWeight: 700, letterSpacing: 4, color: finaleVerdict.color, marginBottom: 12, textShadow: `0 0 40px ${finaleVerdict.color}40` }}>
                 {finaleVerdict.text}
               </div>
-              <div style={{ fontSize: 11, color: '#8b8fa4', marginBottom: 32 }}>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', marginBottom: 32 }}>
                 {finaleVerdict.sub}
               </div>
               {/* Choices recap */}
@@ -771,9 +771,9 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
                 {choicesMade.map((c, i) => (
                   <span key={i} style={{
                     fontSize: 8, letterSpacing: 1.5, padding: '4px 10px', borderRadius: 3,
-                    color: c.type === 'positive' ? '#0ff5c4' : c.type === 'negative' ? '#ff3b4f' : '#f5a623',
-                    background: c.type === 'positive' ? 'rgba(15,245,196,0.1)' : c.type === 'negative' ? 'rgba(255,59,79,0.1)' : 'rgba(245,166,35,0.1)',
-                    border: `1px solid ${c.type === 'positive' ? 'rgba(15,245,196,0.2)' : c.type === 'negative' ? 'rgba(255,59,79,0.2)' : 'rgba(245,166,35,0.2)'}`,
+                    color: c.type === 'positive' ? '#00d4ff' : c.type === 'negative' ? '#ff4d6a' : '#ffaa00',
+                    background: c.type === 'positive' ? 'rgba(0,212,255,0.1)' : c.type === 'negative' ? 'rgba(255,77,106,0.1)' : 'rgba(255,170,0,0.1)',
+                    border: `1px solid ${c.type === 'positive' ? 'rgba(0,212,255,0.2)' : c.type === 'negative' ? 'rgba(255,77,106,0.2)' : 'rgba(255,170,0,0.2)'}`,
                   }}>
                     {c.label}
                   </span>
@@ -805,8 +805,8 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
                 <div style={S.promptBar}>
                   <div style={S.promptHeader}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#0ff5c4', boxShadow: '0 0 6px #0ff5c4' }} />
-                      <span style={{ fontSize: 8, letterSpacing: 2, color: '#0ff5c4', fontWeight: 600 }}>TRANSFORM PROMPT</span>
+                      <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#00d4ff', boxShadow: '0 0 6px #00d4ff' }} />
+                      <span style={{ fontSize: 8, letterSpacing: 2, color: '#00d4ff', fontWeight: 600 }}>TRANSFORM PROMPT</span>
                     </div>
                     <button onClick={() => setPromptOpen(false)} style={S.promptClose}>ESC</button>
                   </div>
@@ -839,8 +839,8 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
                           onClick={() => { setPromptInput(h); promptInputRef.current?.focus(); }}
                           style={S.promptHistoryItem}
                         >
-                          <span style={{ fontSize: 7, color: '#555870', marginRight: 4 }}>↩</span>
-                          <span style={{ fontSize: 8, color: '#8b8fa4', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h}</span>
+                          <span style={{ fontSize: 7, color: 'rgba(255,255,255,0.4)', marginRight: 4 }}>↩</span>
+                          <span style={{ fontSize: 8, color: 'rgba(255,255,255,0.55)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h}</span>
                         </button>
                       ))}
                     </div>
@@ -866,7 +866,7 @@ export default function OdysseyView({ pin, imageUrl, onClose }: OdysseyViewProps
         @keyframes ody-fade-in { 0%{opacity:0;transform:translateY(4px)} 100%{opacity:1;transform:translateY(0)} }
         @keyframes ody-spin { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
         @keyframes ody-scandown { 0%{top:-2px} 100%{top:100%} }
-        @keyframes ody-pulse-ring { 0%{box-shadow:0 0 0 0 rgba(15,245,196,.4)} 70%{box-shadow:0 0 0 20px rgba(15,245,196,0)} 100%{box-shadow:0 0 0 0 rgba(15,245,196,0)} }
+        @keyframes ody-pulse-ring { 0%{box-shadow:0 0 0 0 rgba(0,212,255,.4)} 70%{box-shadow:0 0 0 20px rgba(0,212,255,0)} 100%{box-shadow:0 0 0 0 rgba(0,212,255,0)} }
         @keyframes ody-flash { 0%{opacity:0.3} 100%{opacity:0} }
         @keyframes ody-slide-up { 0%{opacity:0;transform:translateY(30px)} 100%{opacity:1;transform:translateY(0)} }
         @keyframes ody-narrative-in { 0%{opacity:0;transform:translateY(10px)} 100%{opacity:1;transform:translateY(0)} }
@@ -883,7 +883,7 @@ const S: Record<string, React.CSSProperties> = {
   container: {
     position: 'fixed', inset: 0, background: '#000',
     fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
-    color: '#e4e6ef', overflow: 'hidden', zIndex: 60,
+    color: 'rgba(255,255,255,0.92)', overflow: 'hidden', zIndex: 60,
   },
   video: {
     position: 'absolute', inset: 0, width: '100%', height: '100%',
@@ -892,30 +892,30 @@ const S: Record<string, React.CSSProperties> = {
 
   // Overlays (boot, connecting, error)
   overlay: {
-    position: 'absolute', inset: 0, background: '#08090c',
+    position: 'absolute', inset: 0, background: '#0a0e1a',
     display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100,
   },
   bootTerminal: { lineHeight: 2, maxWidth: 500 },
   scanlineAnim: {
     position: 'absolute', left: 0, right: 0, height: 2,
-    background: 'rgba(15,245,196,0.15)', zIndex: 101,
+    background: 'rgba(0,212,255,0.15)', zIndex: 101,
     animation: 'ody-scandown 2.5s linear infinite',
   },
   spinner: {
     width: 80, height: 80, borderRadius: '50%',
-    border: '2px solid rgba(15,245,196,0.2)',
+    border: '2px solid rgba(0,212,255,0.2)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     animation: 'ody-pulse-ring 2s ease infinite', margin: '0 auto',
   },
   spinnerInner: {
     width: 50, height: 50, borderRadius: '50%',
-    border: '2px solid transparent', borderTopColor: '#0ff5c4',
+    border: '2px solid transparent', borderTopColor: '#00d4ff',
     animation: 'ody-spin 1s linear infinite',
   },
   retryBtn: {
-    padding: '8px 20px', background: 'rgba(15,245,196,0.1)',
-    border: '1px solid rgba(15,245,196,0.3)', borderRadius: 4,
-    color: '#0ff5c4', fontSize: 9, fontWeight: 600, cursor: 'pointer',
+    padding: '8px 20px', background: 'rgba(0,212,255,0.1)',
+    border: '1px solid rgba(0,212,255,0.3)', borderRadius: 4,
+    color: '#00d4ff', fontSize: 9, fontWeight: 600, cursor: 'pointer',
     fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1.5,
   },
 
@@ -932,8 +932,8 @@ const S: Record<string, React.CSSProperties> = {
   },
   exitBtn: {
     width: 28, height: 28, borderRadius: 4,
-    background: 'rgba(255,59,79,0.15)', border: '1px solid rgba(255,59,79,0.3)',
-    color: '#ff3b4f', fontSize: 10, cursor: 'pointer', display: 'flex',
+    background: 'rgba(255,77,106,0.15)', border: '1px solid rgba(255,77,106,0.3)',
+    color: '#ff4d6a', fontSize: 10, cursor: 'pointer', display: 'flex',
     alignItems: 'center', justifyContent: 'center',
     fontFamily: "'JetBrains Mono', monospace",
   },
@@ -949,7 +949,7 @@ const S: Record<string, React.CSSProperties> = {
     animation: 'ody-narrative-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both',
   },
   narrativeText: {
-    fontSize: 18, fontWeight: 400, lineHeight: 1.6, color: '#e4e6ef',
+    fontSize: 18, fontWeight: 400, lineHeight: 1.6, color: 'rgba(255,255,255,0.92)',
     textShadow: '0 2px 20px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.5)',
     fontFamily: "'Instrument Sans', 'Inter', sans-serif",
   },
@@ -958,7 +958,7 @@ const S: Record<string, React.CSSProperties> = {
     borderRadius: 1, marginTop: 16, overflow: 'hidden',
   },
   timerFill: {
-    height: '100%', background: '#0ff5c4', borderRadius: 1,
+    height: '100%', background: '#00d4ff', borderRadius: 1,
     transition: 'width 0.1s linear',
   },
 
@@ -1000,8 +1000,8 @@ const S: Record<string, React.CSSProperties> = {
   },
   finaleBtn: {
     padding: '12px 32px', borderRadius: 6,
-    background: 'rgba(15,245,196,0.1)', border: '1px solid rgba(15,245,196,0.3)',
-    color: '#0ff5c4', fontSize: 10, fontWeight: 600, letterSpacing: 2,
+    background: 'rgba(0,212,255,0.1)', border: '1px solid rgba(0,212,255,0.3)',
+    color: '#00d4ff', fontSize: 10, fontWeight: 600, letterSpacing: 2,
     cursor: 'pointer', fontFamily: "'JetBrains Mono', monospace",
     transition: 'all 0.2s ease',
   },
@@ -1017,8 +1017,8 @@ const S: Record<string, React.CSSProperties> = {
     display: 'flex', alignItems: 'center', gap: 6,
     padding: '8px 14px', borderRadius: 6,
     background: 'rgba(8,9,12,0.7)', backdropFilter: 'blur(20px)',
-    border: '1px solid rgba(15,245,196,0.25)',
-    color: '#0ff5c4', cursor: 'pointer',
+    border: '1px solid rgba(0,212,255,0.25)',
+    color: '#00d4ff', cursor: 'pointer',
     fontFamily: "'JetBrains Mono', monospace",
     transition: 'all 0.2s ease',
   } as React.CSSProperties,
@@ -1026,7 +1026,7 @@ const S: Record<string, React.CSSProperties> = {
     position: 'fixed', bottom: 16, right: 16, zIndex: 200,
     width: 420, borderRadius: 8,
     background: 'rgba(8,9,12,0.85)', backdropFilter: 'blur(24px)',
-    border: '1px solid rgba(15,245,196,0.2)',
+    border: '1px solid rgba(0,212,255,0.2)',
     overflow: 'hidden',
     animation: 'ody-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) both',
   } as React.CSSProperties,
@@ -1038,7 +1038,7 @@ const S: Record<string, React.CSSProperties> = {
   promptClose: {
     fontSize: 7, letterSpacing: 1.5, padding: '3px 8px', borderRadius: 3,
     background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-    color: '#8b8fa4', cursor: 'pointer',
+    color: 'rgba(255,255,255,0.55)', cursor: 'pointer',
     fontFamily: "'JetBrains Mono', monospace",
   } as React.CSSProperties,
   promptInputRow: {
@@ -1049,13 +1049,13 @@ const S: Record<string, React.CSSProperties> = {
     flex: 1, padding: '8px 12px', borderRadius: 4,
     background: 'rgba(255,255,255,0.04)',
     border: '1px solid rgba(255,255,255,0.08)',
-    color: '#e4e6ef', fontSize: 11, outline: 'none',
+    color: 'rgba(255,255,255,0.92)', fontSize: 11, outline: 'none',
     fontFamily: "'JetBrains Mono', monospace",
   } as React.CSSProperties,
   promptSendBtn: {
     width: 32, height: 32, borderRadius: 4, flexShrink: 0,
-    background: 'rgba(15,245,196,0.12)', border: '1px solid rgba(15,245,196,0.3)',
-    color: '#0ff5c4', fontSize: 14, cursor: 'pointer',
+    background: 'rgba(0,212,255,0.12)', border: '1px solid rgba(0,212,255,0.3)',
+    color: '#00d4ff', fontSize: 14, cursor: 'pointer',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     fontFamily: "'JetBrains Mono', monospace",
     transition: 'all 0.15s ease',

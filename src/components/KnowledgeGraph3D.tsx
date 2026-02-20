@@ -239,8 +239,8 @@ const KnowledgeGraph3D = forwardRef<GraphHandle, KnowledgeGraph3DProps>(
       }
 
       const scene = fg.scene();
-      scene.fog = new THREE.FogExp2(0x08090c, 0.0008);
-      scene.background = new THREE.Color(0x08090c);
+      scene.fog = new THREE.FogExp2(0x0a0e1a, 0.0008);
+      scene.background = new THREE.Color(0x0a0e1a);
       scene.add(new THREE.AmbientLight(0x444466, 1.0));
 
       const teal = new THREE.PointLight(0x0ff5c4, 1.2, 600);
@@ -373,7 +373,7 @@ const KnowledgeGraph3D = forwardRef<GraphHandle, KnowledgeGraph3DProps>(
     // ── Link accessors ─────────────────────────────────────────────────
 
     const linkColor = useCallback(
-      (link: GraphLink) => (highlightLinks.has(link) ? '#0ff5c4' : link.color || '#1a1d2a'),
+      (link: GraphLink) => (highlightLinks.has(link) ? '#00d4ff' : link.color || '#162035'),
       [highlightLinks],
     );
 
@@ -405,7 +405,7 @@ const KnowledgeGraph3D = forwardRef<GraphHandle, KnowledgeGraph3DProps>(
         linkDirectionalParticles={linkParticles}
         linkDirectionalParticleWidth={1.5}
         linkDirectionalParticleSpeed={0.005}
-        linkDirectionalParticleColor={() => '#0ff5c4'}
+        linkDirectionalParticleColor={() => '#00d4ff'}
         d3AlphaDecay={0.025}
         d3VelocityDecay={0.35}
         warmupTicks={60}
@@ -416,7 +416,7 @@ const KnowledgeGraph3D = forwardRef<GraphHandle, KnowledgeGraph3DProps>(
         enableNodeDrag={false}
         enableNavigationControls={true}
         controlType="trackball"
-        backgroundColor="#08090c"
+        backgroundColor="#0a0e1a"
       />
     );
   },

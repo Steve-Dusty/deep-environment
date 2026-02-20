@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { logPosterCall } from '@/lib/datadog';
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY as string;
 const GEMINI_URL =
@@ -12,6 +13,8 @@ const POSTER_STYLES = [
 ];
 
 export async function POST(req: Request) {
+  const startTime = Date.now();
+
   if (!GOOGLE_API_KEY) {
     return NextResponse.json({ error: 'GOOGLE_API_KEY not configured' }, { status: 500 });
   }
@@ -66,6 +69,8 @@ export async function POST(req: Request) {
 
   const results = await Promise.all(promises);
   const posters = results.filter(Boolean);
+
+  logPosterCall({ topic, model: 'gemini-3-pro-image-preview', count: posters.length, latencyMs: Date.now() - startTime, status: 'success' });
 
   return NextResponse.json({ posters });
 }

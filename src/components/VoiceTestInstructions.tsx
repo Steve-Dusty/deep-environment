@@ -104,8 +104,8 @@ export default function VoiceTestInstructions() {
                     </div>
                   </div>
                   <div className="flex items-start gap-1 ml-6">
-                    <CheckCircle size={8} style={{ color: 'var(--color-signal-teal)', marginTop: '2px' }} />
-                    <div className="text-[7px] italic text-[var(--color-signal-teal)]">
+                    <CheckCircle size={8} style={{ color: 'var(--color-accent)', marginTop: '2px' }} />
+                    <div className="text-[7px] italic text-[var(--color-accent)]">
                       {test.expected}
                     </div>
                   </div>
@@ -141,7 +141,7 @@ export default function VoiceTestInstructions() {
               <div className="flex items-center gap-1">
                 <div
                   className="w-2 h-2 rounded-full"
-                  style={{ backgroundColor: 'var(--color-signal-teal)' }}
+                  style={{ backgroundColor: 'var(--color-accent)' }}
                 />
                 <span className="text-[7px] text-[var(--color-text-secondary)]">Listening</span>
               </div>

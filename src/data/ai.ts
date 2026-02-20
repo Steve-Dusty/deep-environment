@@ -1,35 +1,27 @@
 // ============================================================================
-// AI Service — OpenAI integration for graph queries and node analysis
+// AI Service — MiniMax 2.1 on Amazon Bedrock for graph queries and node analysis
 // ============================================================================
 
 import { GraphNode, GraphLink, GraphData, CATEGORY_LABELS } from '@/data/graphData';
 import { pinReports } from '@/data/locations';
-
-const OPENAI_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY as string;
-const API_URL = 'https://api.openai.com/v1/chat/completions';
 
 async function chatCompletion(
   systemPrompt: string,
   userMessage: string,
   maxTokens = 500,
 ): Promise<string> {
-  console.log('🔑 OpenAI Key present:', !!OPENAI_KEY);
-  console.log('📤 Sending request to OpenAI...');
+  console.log('🔑 Using MiniMax 2.1 on Amazon Bedrock');
+  console.log('📤 Sending request to Bedrock...');
 
-  const res = await fetch(API_URL, {
+  const res = await fetch('/api/ai', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${OPENAI_KEY}`,
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userMessage },
-      ],
-      max_tokens: maxTokens,
+      systemPrompt,
+      userMessage,
+      maxTokens,
       temperature: 0.3,
+      action: 'graph-query',
     }),
   });
 
@@ -37,27 +29,27 @@ async function chatCompletion(
 
   if (!res.ok) {
     const err = await res.text();
-    console.error('❌ OpenAI API error:', res.status, err);
-    throw new Error(`OpenAI API error: ${res.status} ${err}`);
+    console.error('❌ Bedrock API error:', res.status, err);
+    throw new Error(`Bedrock API error: ${res.status} ${err}`);
   }
 
   const data = await res.json();
-  console.log('✅ OpenAI response received');
-  return data.choices[0]?.message?.content?.trim() || '';
+  console.log('✅ Bedrock response received (model:', data.model, 'latency:', data.latencyMs + 'ms)');
+  return data.content?.trim() || '';
 }
 
 // ── Quick Test Function ─────────────────────────────────────────────────────
 
-export async function testOpenAIConnection(): Promise<string> {
+export async function testBedrockConnection(): Promise<string> {
   try {
     const response = await chatCompletion(
       'You are a helpful assistant. Answer in one short sentence.',
       'What is a banana?',
       50
     );
-    return `✅ OpenAI API working! Response: "${response}"`;
+    return `✅ Bedrock API working! Response: "${response}"`;
   } catch (error) {
-    return `❌ OpenAI API failed: ${error instanceof Error ? error.message : String(error)}`;
+    return `❌ Bedrock API failed: ${error instanceof Error ? error.message : String(error)}`;
   }
 }
 
@@ -195,7 +187,7 @@ export interface AICommandResult {
 export async function interpretVoiceCommand(
   userSpeech: string,
 ): Promise<AICommandResult> {
-  const locationsList = pinReports.map(p => 
+  const locationsList = pinReports.map(p =>
     `- ${p.id}: ${p.neighborhood} (${p.city}, ${p.state}) - ${p.title} [${p.category}, ${p.severity}]`
   ).join('\n');
 
@@ -247,42 +239,6 @@ Special:
 • "stop" - Stop voice control (emergency)
 • "unknown" - When you can't interpret the command
 
-═══ INTERPRETATION RULES ═══
-
-1. Location Matching (Smart & Flexible):
-   - Match partial names: "Florida" → Everglades-Degradation
-   - Match colloquial: "oil spill" → Deepwater-Horizon
-   - Match keywords: "coral" → Great-Barrier-Reef, "wildfire" → Camp-Fire-CA
-   - Match regions: "Gulf" → Deepwater-Horizon, "Pacific" → Pacific-Garbage-Patch
-
-2. Action Mapping (Natural Language → Program Action):
-   - "show/view/display/open [map/graph/odyssey/feed]" → view-[target]
-   - "turn on/enable/activate/show [overlay name]" → enable (target: satellite/terrain/weather/heatmap/globe)
-   - "turn off/disable/hide [overlay name]" → disable (target: satellite/terrain/weather/heatmap/globe)
-   - "go to/navigate/take me to [location]" → navigate (target: location-id)
-   - "filter/show only [category/severity]" → filter-category or filter-severity
-   - "zoom in/closer" → zoom-in
-   - "zoom out/further" → zoom-out
-   - "next/previous location" → next-pin / prev-pin
-   - "tell me about/describe [location]" → describe-location
-
-3. Casual & Vague Language Handling:
-   - "what's happening" / "what's going on" → describe current or navigate if location mentioned
-   - "show me more" / "tell me more" → depends on context (default: view-feed)
-   - "the graph thing" / "that graph" → view-graph
-   - "satellite stuff" / "satellite view" → enable (target: satellite)
-   - "map view" / "go back to map" → view-map
-   - "the immersive thing" / "3D view" → view-odyssey
-   - "zoom in a bit" / "get closer" → zoom-in
-   - "what can you do" / "help me" → help
-   - Common variations are OK: "gimme", "lemme see", "pull up", "bring up", etc.
-
-4. Confidence Scoring:
-   - 90-100: Exact match or very clear intent
-   - 70-89: Good match with minor ambiguity
-   - 50-69: Reasonable guess, some ambiguity
-   - Below 50: Very uncertain, might need clarification
-
 ═══ RESPONSE FORMAT ═══
 ALWAYS respond with ONLY valid JSON (no markdown, no explanation):
 
@@ -292,53 +248,6 @@ ALWAYS respond with ONLY valid JSON (no markdown, no explanation):
   "confidence": 85,
   "reasoning": "Brief explanation of interpretation"
 }
-
-═══ EXAMPLES ═══
-
-User: "I want to see what's happening in the Amazon"
-{"action": "navigate", "target": "Amazon-Deforestation", "confidence": 90, "reasoning": "User wants to navigate to Amazon location"}
-
-User: "show me the oil spill"
-{"action": "navigate", "target": "Deepwater-Horizon", "confidence": 95, "reasoning": "Oil spill refers to Deepwater Horizon"}
-
-User: "take me to Miami"
-{"action": "navigate", "target": "miami", "confidence": 95, "reasoning": "User wants to navigate to Miami location"}
-
-User: "let me see the graph"
-{"action": "view-graph", "confidence": 100, "reasoning": "User wants to view knowledge graph"}
-
-User: "turn on the satellite stuff"
-{"action": "enable", "target": "satellite", "confidence": 95, "reasoning": "User wants to enable satellite overlay"}
-
-User: "show me the terrain"
-{"action": "enable", "target": "terrain", "confidence": 95, "reasoning": "User wants to enable terrain view"}
-
-User: "enable weather data"
-{"action": "enable", "target": "weather", "confidence": 100, "reasoning": "User wants to enable weather/precipitation"}
-
-User: "turn off the heat map"
-{"action": "disable", "target": "heatmap", "confidence": 95, "reasoning": "User wants to disable heatmap"}
-
-User: "filter to just water problems"
-{"action": "filter-category", "target": "Water", "confidence": 90, "reasoning": "User wants to filter by water category"}
-
-User: "what's going on in Florida"
-{"action": "navigate", "target": "Everglades-Degradation", "confidence": 85, "reasoning": "Florida location is Everglades"}
-
-User: "I want to see the graph thing"
-{"action": "view-graph", "confidence": 90, "reasoning": "User wants knowledge graph view"}
-
-User: "show me critical threats"
-{"action": "list-high", "confidence": 85, "reasoning": "User wants list of high-severity threats"}
-
-User: "next location please"
-{"action": "next-pin", "confidence": 100, "reasoning": "Clear navigation command"}
-
-User: "turn everything off"
-{"action": "disable-all", "confidence": 95, "reasoning": "User wants to disable all overlays"}
-
-User: "what's the coral reef situation"
-{"action": "navigate", "target": "Great-Barrier-Reef", "confidence": 90, "reasoning": "Coral reef refers to Great Barrier Reef"}
 
 Now interpret the user's command:`;
 

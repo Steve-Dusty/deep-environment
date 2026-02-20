@@ -47,7 +47,7 @@ export default function MapView({
   const createPinMarker = useCallback(
     (pin: PinReport) => {
       const color = THREAT_COLORS[pin.severity];
-      const catColor = CATEGORY_COLORS[pin.category] || '#8b8fa4';
+      const catColor = CATEGORY_COLORS[pin.category] || 'rgba(255,255,255,0.55)';
       const isCritical = pin.severity === 'critical' || pin.severity === 'high';
       const isSlack = pin.source === 'slack';
 
@@ -89,7 +89,7 @@ export default function MapView({
         const label = document.createElement('div');
         label.style.cssText = `position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:4px;white-space:nowrap;pointer-events:none;text-align:center;`;
         label.innerHTML = `
-          <div style="font-size:7px;letter-spacing:0.12em;color:rgba(228,230,239,0.6);font-family:'JetBrains Mono',monospace;text-shadow:0 1px 6px rgba(0,0,0,0.95),0 0 20px rgba(0,0,0,0.8);font-weight:500;">${pin.city.toUpperCase()}</div>
+          <div style="font-size:7px;letter-spacing:0.12em;color:rgba(255,255,255,0.55);font-family:'JetBrains Mono',monospace;text-shadow:0 1px 6px rgba(0,0,0,0.95),0 0 20px rgba(0,0,0,0.8);font-weight:500;">${pin.city.toUpperCase()}</div>
           <div style="font-size:6px;letter-spacing:0.08em;color:${color}90;font-family:'JetBrains Mono',monospace;text-shadow:0 1px 4px rgba(0,0,0,0.9);margin-top:1px;">${isSlack ? 'FIELD REPORT' : pin.category.toUpperCase()}</div>
         `;
 
@@ -116,19 +116,19 @@ export default function MapView({
           const threatLabel = THREAT_LABELS[pin.severity];
 
           const html = `
-            <div style="font-family:'JetBrains Mono','SF Mono',monospace;background:#0a0e14;border:1px solid ${threatColor}30;border-radius:6px;overflow:hidden;width:240px;">
+            <div style="font-family:'JetBrains Mono','SF Mono',monospace;background:#0a0e1a;border:1px solid ${threatColor}30;border-radius:6px;overflow:hidden;width:240px;">
               ${img ? `<div style="position:relative;width:100%;height:140px;overflow:hidden;">
                 <img src="${img}" alt="${pin.title}" style="width:100%;height:100%;object-fit:cover;" />
                 <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(10,14,20,0.7),transparent 60%);"></div>
                 <div style="position:absolute;top:6px;right:6px;font-size:7px;letter-spacing:1.5px;padding:2px 6px;border-radius:3px;color:${threatColor};background:rgba(0,0,0,0.7);border:1px solid ${threatColor}40;font-weight:600;">${threatLabel}</div>
               </div>` : ''}
               <div style="padding:8px 10px;">
-                <div style="font-size:10px;font-weight:600;color:#e4e6ef;margin-bottom:3px;line-height:1.3;">${pin.title}</div>
-                <div style="font-size:8px;color:#8b8fa4;margin-bottom:4px;">${pin.neighborhood}, ${pin.city}</div>
-                <div style="font-size:7px;color:#555870;display:flex;align-items:center;gap:6px;">
+                <div style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.92);margin-bottom:3px;line-height:1.3;">${pin.title}</div>
+                <div style="font-size:8px;color:rgba(255,255,255,0.55);margin-bottom:4px;">${pin.neighborhood}, ${pin.city}</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:6px;">
                   <span>@${pin.user}</span>
                   <span>${pin.timestamp}</span>
-                  <span style="margin-left:auto;color:${CATEGORY_COLORS[pin.category] || '#8b8fa4'}">${pin.category.toUpperCase()}</span>
+                  <span style="margin-left:auto;color:${CATEGORY_COLORS[pin.category] || 'rgba(255,255,255,0.55)'}">${pin.category.toUpperCase()}</span>
                 </div>
               </div>
             </div>
@@ -212,13 +212,13 @@ export default function MapView({
     map.on('zoom', () => onZoomChange(map.getZoom()));
 
     map.on('style.load', () => {
-      // Fog
+      // Fog — dark base with blue undertone
       map.setFog({
-        color: 'rgba(10, 12, 18, 1)',
-        'high-color': 'rgba(15, 50, 80, 1)',
-        'horizon-blend': 0.06,
-        'space-color': 'rgba(3, 4, 8, 1)',
-        'star-intensity': 0.5,
+        color: 'rgba(10, 14, 26, 1)',
+        'high-color': 'rgba(0, 40, 80, 1)',
+        'horizon-blend': 0.08,
+        'space-color': 'rgba(5, 8, 18, 1)',
+        'star-intensity': 0.6,
       });
 
       // 3D Lighting
@@ -249,7 +249,7 @@ export default function MapView({
       if (!map.getLayer('sky')) {
         map.addLayer({
           id: 'sky', type: 'sky',
-          paint: { 'sky-type': 'atmosphere', 'sky-atmosphere-sun': [0, 85], 'sky-atmosphere-sun-intensity': 3, 'sky-atmosphere-halo-color': 'rgba(15,245,196,0.12)', 'sky-atmosphere-color': 'rgba(10,25,45,0.9)', 'sky-opacity': ['interpolate', ['exponential', 0.1], ['zoom'], 5, 0, 22, 1] },
+          paint: { 'sky-type': 'atmosphere', 'sky-atmosphere-sun': [0, 85], 'sky-atmosphere-sun-intensity': 3, 'sky-atmosphere-halo-color': 'rgba(0,212,255,0.12)', 'sky-atmosphere-color': 'rgba(10,25,45,0.9)', 'sky-opacity': ['interpolate', ['exponential', 0.1], ['zoom'], 5, 0, 22, 1] },
         });
       }
 
@@ -277,10 +277,10 @@ export default function MapView({
         map.addSource('connections', { type: 'geojson', data: getConnectionLines() });
       }
       if (!map.getLayer('connection-lines-glow')) {
-        map.addLayer({ id: 'connection-lines-glow', type: 'line', source: 'connections', paint: { 'line-color': 'rgba(15,245,196,0.06)', 'line-width': 6, 'line-blur': 4 }, layout: { 'line-cap': 'round', 'line-join': 'round' } });
+        map.addLayer({ id: 'connection-lines-glow', type: 'line', source: 'connections', paint: { 'line-color': 'rgba(0,212,255,0.06)', 'line-width': 6, 'line-blur': 4 }, layout: { 'line-cap': 'round', 'line-join': 'round' } });
       }
       if (!map.getLayer('connection-lines')) {
-        map.addLayer({ id: 'connection-lines', type: 'line', source: 'connections', paint: { 'line-color': 'rgba(15,245,196,0.25)', 'line-width': 1.2, 'line-dasharray': [2, 3] }, layout: { 'line-cap': 'round', 'line-join': 'round' } });
+        map.addLayer({ id: 'connection-lines', type: 'line', source: 'connections', paint: { 'line-color': 'rgba(0,212,255,0.25)', 'line-width': 1.2, 'line-dasharray': [2, 3] }, layout: { 'line-cap': 'round', 'line-join': 'round' } });
       }
 
       // Heatmap (triangulated from user-submitted pin reports)
@@ -293,7 +293,7 @@ export default function MapView({
           paint: {
             'heatmap-weight': ['get', 'intensity'],
             'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 1, 5, 2.5, 10, 4],
-            'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(0,0,0,0)', 0.1, 'rgba(15,245,196,0.08)', 0.2, 'rgba(15,245,196,0.2)', 0.35, 'rgba(59,130,246,0.35)', 0.5, 'rgba(245,166,35,0.45)', 0.65, 'rgba(255,107,53,0.55)', 0.8, 'rgba(255,59,79,0.65)', 1, 'rgba(255,59,79,0.8)'],
+            'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(0,0,0,0)', 0.1, 'rgba(0,212,255,0.08)', 0.2, 'rgba(0,212,255,0.2)', 0.35, 'rgba(59,130,246,0.35)', 0.5, 'rgba(255,170,0,0.45)', 0.65, 'rgba(255,77,106,0.55)', 0.8, 'rgba(255,77,106,0.65)', 1, 'rgba(255,77,106,0.8)'],
             'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 20, 3, 40, 6, 65, 10, 85],
             'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.9, 6, 0.65, 10, 0.35],
           },

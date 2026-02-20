@@ -63,14 +63,14 @@ export default function PDFReportView({
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={S.sub}>
-            GENERATED <span style={{ color: '#8b8fa4' }}>{ts}</span>
+            GENERATED <span style={{ color: 'rgba(255,255,255,0.55)' }}>{ts}</span>
           </span>
           <button
             onClick={onDownload}
             style={{
               ...S.btn,
-              background: 'rgba(15,245,196,0.12)',
-              borderColor: 'rgba(15,245,196,0.35)',
+              background: 'rgba(0,212,255,0.12)',
+              borderColor: 'rgba(0,212,255,0.35)',
               display: 'flex',
               alignItems: 'center',
               gap: 5,
@@ -89,7 +89,7 @@ export default function PDFReportView({
           {/* Left pane header */}
           <div style={S.paneHeader}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Bot size={10} style={{ color: '#0ff5c4' }} />
+              <Bot size={10} style={{ color: '#00d4ff' }} />
               <span style={S.paneTitle}>QUERY TRANSCRIPT</span>
             </div>
             <span style={S.paneCount}>{messages.length} MESSAGES</span>
@@ -107,7 +107,7 @@ export default function PDFReportView({
                 }}
                 className="pdf-msg-fadein"
               >
-                {msg.role === 'ai' && <div style={S.aiAvatar}><Bot size={10} color="#08090c" /></div>}
+                {msg.role === 'ai' && <div style={S.aiAvatar}><Bot size={10} color="#0a0e1a" /></div>}
                 <div
                   style={{
                     ...S.msgBubble,
@@ -127,7 +127,7 @@ export default function PDFReportView({
             <div style={S.genNotice} className="pdf-msg-fadein">
               <div style={S.genNoticeLine} />
               <div style={S.genNoticeContent}>
-                <FileText size={10} style={{ color: '#0ff5c4' }} />
+                <FileText size={10} style={{ color: '#00d4ff' }} />
                 <span>PDF GENERATED SUCCESSFULLY</span>
               </div>
               <div style={S.genNoticeLine} />
@@ -137,11 +137,11 @@ export default function PDFReportView({
           {/* Left pane footer */}
           <div style={S.paneFooter}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Shield size={8} style={{ color: '#555870' }} />
+              <Shield size={8} style={{ color: 'rgba(255,255,255,0.4)' }} />
               <span>AI-GENERATED REPORT</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Clock size={8} style={{ color: '#555870' }} />
+              <Clock size={8} style={{ color: 'rgba(255,255,255,0.4)' }} />
               <span>{fmt(elapsed)}</span>
             </div>
           </div>
@@ -159,7 +159,7 @@ export default function PDFReportView({
           {/* Right pane header */}
           <div style={S.paneHeader}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <FileText size={10} style={{ color: '#0ff5c4' }} />
+              <FileText size={10} style={{ color: '#00d4ff' }} />
               <span style={S.paneTitle}>DOCUMENT VIEWER</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -167,7 +167,7 @@ export default function PDFReportView({
                 style={{
                   fontSize: 7,
                   letterSpacing: 1.5,
-                  color: '#8b8fa4',
+                  color: 'rgba(255,255,255,0.55)',
                   maxWidth: 160,
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -195,7 +195,7 @@ export default function PDFReportView({
                   style={{
                     fontSize: 9,
                     letterSpacing: 2.5,
-                    color: '#555870',
+                    color: 'rgba(255,255,255,0.4)',
                     marginTop: 12,
                   }}
                 >
@@ -217,10 +217,10 @@ export default function PDFReportView({
           {/* Right pane footer */}
           <div style={S.paneFooter}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Layers size={8} style={{ color: '#555870' }} />
+              <Layers size={8} style={{ color: 'rgba(255,255,255,0.4)' }} />
               <span>PDFKit · DEEP ENVIRONMENT</span>
             </div>
-            <span style={{ color: iframeLoaded ? '#0ff5c4' : '#555870' }}>
+            <span style={{ color: iframeLoaded ? '#00d4ff' : 'rgba(255,255,255,0.4)' }}>
               {iframeLoaded ? '● LOADED' : '○ LOADING'}
             </span>
           </div>
@@ -230,17 +230,17 @@ export default function PDFReportView({
       {/* ── Status bar ── */}
       <div style={S.statusBar}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ color: '#0ff5c4' }}>●</span>
+          <span style={{ color: '#00d4ff' }}>●</span>
           <span>PDF REPORT ENGINE</span>
-          <span style={{ color: '#252838' }}>|</span>
+          <span style={{ color: '#1e2a42' }}>|</span>
           <span>
-            SESSION <span style={{ color: '#8b8fa4' }}>{fmt(elapsed)}</span>
+            SESSION <span style={{ color: 'rgba(255,255,255,0.55)' }}>{fmt(elapsed)}</span>
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span>PDFKit · Gemini · Gemini-2.0-flash</span>
-          <span style={{ color: '#252838' }}>|</span>
-          <span style={{ color: '#0ff5c4' }}>COMPLETE</span>
+          <span>PDFKit · MiniMax 2.1 · Bedrock</span>
+          <span style={{ color: '#1e2a42' }}>|</span>
+          <span style={{ color: '#00d4ff' }}>COMPLETE</span>
         </div>
       </div>
 
@@ -263,8 +263,8 @@ export default function PDFReportView({
           animation: pdfSpin 1.5s linear infinite;
         }
         @keyframes pdfPulse {
-          0%, 100% { opacity: 0.5; box-shadow: 0 0 4px #0ff5c4; }
-          50% { opacity: 1; box-shadow: 0 0 14px #0ff5c4; }
+          0%, 100% { opacity: 0.5; box-shadow: 0 0 4px #00d4ff; }
+          50% { opacity: 1; box-shadow: 0 0 14px #00d4ff; }
         }
       `}</style>
     </div>
@@ -276,7 +276,7 @@ export default function PDFReportView({
 const glass = {
   background: 'linear-gradient(135deg, rgba(12,14,20,0.95), rgba(17,19,24,0.92))',
   backdropFilter: 'blur(20px) saturate(1.2)',
-  border: '1px solid #1a1d2a',
+  border: '1px solid #162035',
   boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03)',
 };
 
@@ -284,9 +284,9 @@ const S: Record<string, React.CSSProperties> = {
   container: {
     position: 'fixed',
     inset: 0,
-    background: '#08090c',
+    background: '#0a0e1a',
     fontFamily: "'JetBrains Mono', 'SF Mono', 'Fira Code', monospace",
-    color: '#e4e6ef',
+    color: 'rgba(255,255,255,0.92)',
     overflow: 'hidden',
     zIndex: 50,
   },
@@ -310,30 +310,30 @@ const S: Record<string, React.CSSProperties> = {
   headerLeft: { display: 'flex', alignItems: 'center', gap: 10 },
   headerLabel: {
     fontSize: 9,
-    color: '#0ff5c4',
+    color: '#00d4ff',
     letterSpacing: 2,
     fontWeight: 600,
-    background: 'rgba(15,245,196,0.08)',
+    background: 'rgba(0,212,255,0.08)',
     padding: '2px 8px',
     borderRadius: 3,
-    border: '1px solid rgba(15,245,196,0.2)',
+    border: '1px solid rgba(0,212,255,0.2)',
   },
   dot: {
     width: 7,
     height: 7,
     borderRadius: '50%',
-    background: '#0ff5c4',
-    boxShadow: '0 0 8px #0ff5c4',
+    background: '#00d4ff',
+    boxShadow: '0 0 8px #00d4ff',
     animation: 'pdfPulse 2s ease-in-out infinite',
   },
-  title: { fontSize: 11, fontWeight: 600, letterSpacing: 3, color: '#e4e6ef' },
-  sub: { fontSize: 9, color: '#555870', letterSpacing: 1 },
+  title: { fontSize: 11, fontWeight: 600, letterSpacing: 3, color: 'rgba(255,255,255,0.92)' },
+  sub: { fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: 1 },
   btn: {
     padding: '5px 10px',
-    background: 'rgba(15,245,196,0.1)',
-    border: '1px solid rgba(15,245,196,0.3)',
+    background: 'rgba(0,212,255,0.1)',
+    border: '1px solid rgba(0,212,255,0.3)',
     borderRadius: 4,
-    color: '#0ff5c4',
+    color: '#00d4ff',
     fontSize: 8,
     fontWeight: 600,
     cursor: 'pointer',
@@ -345,10 +345,10 @@ const S: Record<string, React.CSSProperties> = {
   },
   btnSmall: {
     padding: '3px 7px',
-    background: 'rgba(15,245,196,0.08)',
-    border: '1px solid rgba(15,245,196,0.25)',
+    background: 'rgba(0,212,255,0.08)',
+    border: '1px solid rgba(0,212,255,0.25)',
     borderRadius: 3,
-    color: '#0ff5c4',
+    color: '#00d4ff',
     fontSize: 7,
     fontWeight: 600,
     cursor: 'pointer',
@@ -369,14 +369,14 @@ const S: Record<string, React.CSSProperties> = {
     width: '50%',
     display: 'flex',
     flexDirection: 'column',
-    borderRight: '1px solid #1a1d2a',
-    background: 'linear-gradient(180deg, #0a0b10 0%, #08090c 100%)',
+    borderRight: '1px solid #162035',
+    background: 'linear-gradient(180deg, #0d1120 0%, #0a0e1a 100%)',
   },
   rightPane: {
     width: '50%',
     display: 'flex',
     flexDirection: 'column',
-    background: '#08090c',
+    background: '#0a0e1a',
   },
   paneHeader: {
     height: 36,
@@ -384,7 +384,7 @@ const S: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '0 14px',
-    borderBottom: '1px solid #1a1d2a',
+    borderBottom: '1px solid #162035',
     background: 'rgba(12,14,20,0.8)',
     flexShrink: 0,
   },
@@ -392,12 +392,12 @@ const S: Record<string, React.CSSProperties> = {
     fontSize: 8,
     fontWeight: 600,
     letterSpacing: 2.5,
-    color: '#e4e6ef',
+    color: 'rgba(255,255,255,0.92)',
   },
   paneCount: {
     fontSize: 7,
     letterSpacing: 1.5,
-    color: '#555870',
+    color: 'rgba(255,255,255,0.4)',
   },
   paneFooter: {
     height: 28,
@@ -405,11 +405,11 @@ const S: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '0 14px',
-    borderTop: '1px solid #1a1d2a',
+    borderTop: '1px solid #162035',
     background: 'rgba(12,14,20,0.8)',
     fontSize: 7,
     letterSpacing: 1.5,
-    color: '#555870',
+    color: 'rgba(255,255,255,0.4)',
     flexShrink: 0,
   },
   messagesArea: {
@@ -429,7 +429,7 @@ const S: Record<string, React.CSSProperties> = {
     width: 22,
     height: 22,
     borderRadius: '50%',
-    background: 'linear-gradient(135deg, #0ff5c4, #06b6d4)',
+    background: 'linear-gradient(135deg, #00d4ff, #06b6d4)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -440,7 +440,7 @@ const S: Record<string, React.CSSProperties> = {
     width: 22,
     height: 22,
     borderRadius: '50%',
-    background: 'rgba(15,245,196,0.12)',
+    background: 'rgba(0,212,255,0.12)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -448,7 +448,7 @@ const S: Record<string, React.CSSProperties> = {
     marginTop: 2,
     fontSize: 8,
     fontWeight: 700,
-    color: '#0ff5c4',
+    color: '#00d4ff',
   },
   msgBubble: {
     maxWidth: '80%',
@@ -456,24 +456,24 @@ const S: Record<string, React.CSSProperties> = {
     padding: '8px 10px',
   },
   userBubble: {
-    background: 'rgba(15,245,196,0.08)',
-    border: '1px solid rgba(15,245,196,0.2)',
+    background: 'rgba(0,212,255,0.08)',
+    border: '1px solid rgba(0,212,255,0.2)',
   },
   aiBubble: {
     background: 'rgba(255,255,255,0.025)',
-    border: '1px solid #1a1d2a',
+    border: '1px solid #162035',
   },
   msgMeta: {
     fontSize: 6,
     fontWeight: 600,
     letterSpacing: 2,
-    color: '#555870',
+    color: 'rgba(255,255,255,0.4)',
     marginBottom: 4,
   },
   msgText: {
     fontSize: 10,
     lineHeight: 1.65,
-    color: '#c4c6d0',
+    color: 'rgba(255,255,255,0.72)',
     whiteSpace: 'pre-wrap' as const,
   },
   genNotice: {
@@ -486,7 +486,7 @@ const S: Record<string, React.CSSProperties> = {
   genNoticeLine: {
     flex: 1,
     height: 1,
-    background: 'linear-gradient(90deg, transparent, rgba(15,245,196,0.2), transparent)',
+    background: 'linear-gradient(90deg, transparent, rgba(0,212,255,0.2), transparent)',
   },
   genNoticeContent: {
     display: 'flex',
@@ -494,7 +494,7 @@ const S: Record<string, React.CSSProperties> = {
     gap: 6,
     fontSize: 7,
     letterSpacing: 2.5,
-    color: '#0ff5c4',
+    color: '#00d4ff',
     fontWeight: 600,
     whiteSpace: 'nowrap' as const,
   },
@@ -516,8 +516,8 @@ const S: Record<string, React.CSSProperties> = {
     width: 28,
     height: 28,
     borderRadius: '50%',
-    border: '2px solid #1a1d2a',
-    borderTopColor: '#0ff5c4',
+    border: '2px solid #162035',
+    borderTopColor: '#00d4ff',
   },
   iframe: {
     width: '100%',
@@ -542,7 +542,7 @@ const S: Record<string, React.CSSProperties> = {
     padding: '0 14px',
     zIndex: 100,
     fontSize: 9,
-    color: '#555870',
+    color: 'rgba(255,255,255,0.4)',
   },
   scanline: {
     position: 'fixed',
@@ -565,14 +565,14 @@ const S: Record<string, React.CSSProperties> = {
   dividerLine: {
     flex: 1,
     width: 1,
-    background: 'linear-gradient(180deg, transparent, #1a1d2a 30%, #1a1d2a 70%, transparent)',
+    background: 'linear-gradient(180deg, transparent, #162035 30%, #162035 70%, transparent)',
   },
   dividerDot: {
     width: 5,
     height: 5,
     borderRadius: '50%',
-    background: '#1a1d2a',
-    border: '1px solid #252838',
+    background: '#162035',
+    border: '1px solid #1e2a42',
     flexShrink: 0,
   },
 };

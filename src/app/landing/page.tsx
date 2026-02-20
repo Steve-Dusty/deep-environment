@@ -38,11 +38,11 @@ const AGENT_MESSAGES = [
 ];
 
 const SEVERITY_COLORS: Record<string, string> = {
-  low: '#0ff5c4',
+  low: '#00d4ff',
   moderate: '#3b82f6',
-  elevated: '#f5a623',
-  high: '#ff6b35',
-  critical: '#ff3b4f',
+  elevated: '#ffaa00',
+  high: '#ff4d6a',
+  critical: '#ff4d6a',
 };
 
 const FEATURES = [
@@ -104,7 +104,7 @@ function ParticleField() {
     }
 
     const particles: Particle[] = [];
-    const COLORS = ['#0ff5c4', '#3b82f6', '#f5a623', '#a78bfa', '#22c55e'];
+    const COLORS = ['#00d4ff', '#3b82f6', '#ffaa00', '#a78bfa', '#00e68a'];
 
     function resize() {
       w = canvas!.width = window.innerWidth;
@@ -237,7 +237,7 @@ function KnowledgeGraphCanvas({ active }: { active: boolean }) {
       vx: number; vy: number; vz: number;
     }
 
-    const COLORS = ['#0ff5c4', '#3b82f6', '#f5a623', '#a78bfa', '#22c55e', '#ff3b4f', '#06b6d4'];
+    const COLORS = ['#00d4ff', '#3b82f6', '#ffaa00', '#a78bfa', '#00e68a', '#ff4d6a', '#06b6d4'];
     const LABELS = ['Water', 'PM2.5', 'Temp', 'O₂', 'pH', 'Bio', 'CO₂', 'NOx', 'Coral', 'Flow', 'Wind', 'Soil'];
 
     const nodes: GNode[] = LABELS.map((label, i) => ({
@@ -338,7 +338,7 @@ function KnowledgeGraphCanvas({ active }: { active: boolean }) {
 
         // Label
         ctx!.font = '9px monospace';
-        ctx!.fillStyle = '#e4e6ef';
+        ctx!.fillStyle = 'rgba(255,255,255,0.92)';
         ctx!.globalAlpha = 0.6;
         ctx!.textAlign = 'center';
         ctx!.fillText(n.label, n.px, n.py - n.r - 6);
@@ -373,16 +373,16 @@ function CorrelationCanvas({ active }: { active: boolean }) {
 
     // City nodes positioned roughly on a US map layout
     const cities = [
-      { name: 'SF', x: 60, y: 140, color: '#f5a623' },
-      { name: 'LA', x: 80, y: 200, color: '#ff3b4f' },
+      { name: 'SF', x: 60, y: 140, color: '#ffaa00' },
+      { name: 'LA', x: 80, y: 200, color: '#ff4d6a' },
       { name: 'SEA', x: 70, y: 70, color: '#3b82f6' },
-      { name: 'PDX', x: 65, y: 95, color: '#f5a623' },
+      { name: 'PDX', x: 65, y: 95, color: '#ffaa00' },
       { name: 'DEN', x: 200, y: 150, color: '#3b82f6' },
-      { name: 'HOU', x: 260, y: 250, color: '#ff3b4f' },
-      { name: 'CHI', x: 320, y: 110, color: '#f5a623' },
-      { name: 'ATL', x: 360, y: 210, color: '#ff6b35' },
-      { name: 'MIA', x: 410, y: 280, color: '#ff3b4f' },
-      { name: 'NYC', x: 440, y: 100, color: '#ff6b35' },
+      { name: 'HOU', x: 260, y: 250, color: '#ff4d6a' },
+      { name: 'CHI', x: 320, y: 110, color: '#ffaa00' },
+      { name: 'ATL', x: 360, y: 210, color: '#ff4d6a' },
+      { name: 'MIA', x: 410, y: 280, color: '#ff4d6a' },
+      { name: 'NYC', x: 440, y: 100, color: '#ff4d6a' },
     ];
 
     const links = [
@@ -459,7 +459,7 @@ function CorrelationCanvas({ active }: { active: boolean }) {
 
         // Label
         ctx!.font = '9px monospace';
-        ctx!.fillStyle = '#e4e6ef';
+        ctx!.fillStyle = 'rgba(255,255,255,0.92)';
         ctx!.globalAlpha = 0.7;
         ctx!.textAlign = 'center';
         ctx!.fillText(c.name, c.x, c.y - 12);
@@ -517,8 +517,8 @@ function AgentFeed({ active }: { active: boolean }) {
             key={m.id}
             className="flex gap-3 py-2 px-3 rounded border transition-all duration-500"
             style={{
-              background: i === 0 ? 'rgba(15, 245, 196, 0.04)' : 'rgba(24, 26, 34, 0.6)',
-              borderColor: i === 0 ? 'rgba(15, 245, 196, 0.15)' : 'rgba(37, 40, 56, 0.5)',
+              background: i === 0 ? 'rgba(0, 212, 255, 0.04)' : 'rgba(24, 26, 34, 0.6)',
+              borderColor: i === 0 ? 'rgba(0, 212, 255, 0.15)' : 'rgba(37, 40, 56, 0.5)',
               opacity: i === 0 ? 1 : 1 - i * 0.1,
               transform: `translateY(${i === 0 ? 0 : 0}px)`,
               animation: i === 0 ? 'slideIn 0.4s ease-out' : undefined,
@@ -528,20 +528,20 @@ function AgentFeed({ active }: { active: boolean }) {
               <div
                 className="w-2 h-2 rounded-full mt-1.5"
                 style={{
-                  background: '#0ff5c4',
-                  boxShadow: i === 0 ? '0 0 8px rgba(15, 245, 196, 0.5)' : 'none',
+                  background: '#00d4ff',
+                  boxShadow: i === 0 ? '0 0 8px rgba(0, 212, 255, 0.5)' : 'none',
                   animation: i === 0 ? 'pulse 1.5s ease-in-out infinite' : undefined,
                 }}
               />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
-                <span style={{ color: '#0ff5c4', fontSize: 10, fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>
+                <span style={{ color: '#00d4ff', fontSize: 10, fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>
                   {m.agent}
                 </span>
-                <span style={{ color: '#555870', fontSize: 9 }}>{m.time}</span>
+                <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: 9 }}>{m.time}</span>
               </div>
-              <p style={{ color: '#8b8fa4', fontSize: 11, fontFamily: 'var(--font-mono)', lineHeight: 1.4, margin: 0 }}>
+              <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11, fontFamily: 'var(--font-mono)', lineHeight: 1.4, margin: 0 }}>
                 {m.msg}
               </p>
             </div>
@@ -550,7 +550,7 @@ function AgentFeed({ active }: { active: boolean }) {
       </div>
       {/* Fade out at bottom */}
       <div className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none" style={{
-        background: 'linear-gradient(transparent, #08090c)',
+        background: 'linear-gradient(transparent, #0a0e1a)',
       }} />
     </div>
   );
@@ -642,14 +642,14 @@ function OdysseyVisual({ active }: { active: boolean }) {
       const scanY = (time * 30) % h;
       const scanG = ctx!.createLinearGradient(0, scanY - 20, 0, scanY + 20);
       scanG.addColorStop(0, 'transparent');
-      scanG.addColorStop(0.5, 'rgba(15, 245, 196, 0.15)');
+      scanG.addColorStop(0.5, 'rgba(0, 212, 255, 0.15)');
       scanG.addColorStop(1, 'transparent');
       ctx!.fillStyle = scanG;
       ctx!.globalAlpha = 1;
       ctx!.fillRect(0, scanY - 20, w, 40);
 
       // Grid overlay
-      ctx!.strokeStyle = 'rgba(15, 245, 196, 0.05)';
+      ctx!.strokeStyle = 'rgba(0, 212, 255, 0.05)';
       ctx!.lineWidth = 0.5;
       ctx!.globalAlpha = 1;
       for (let x = 0; x < w; x += cellW * 4) {
@@ -667,7 +667,7 @@ function OdysseyVisual({ active }: { active: boolean }) {
 
       // HUD elements
       ctx!.font = '9px monospace';
-      ctx!.fillStyle = '#0ff5c4';
+      ctx!.fillStyle = '#00d4ff';
       ctx!.globalAlpha = 0.6;
       ctx!.textAlign = 'left';
       ctx!.fillText('ODYSSEY.ML // WORLD MODEL v3.2', 12, 20);
@@ -742,7 +742,7 @@ function ThreatTicker() {
             <span style={{ color: SEVERITY_COLORS[t.severity], fontSize: 10, fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', whiteSpace: 'nowrap' }}>
               {t.location.toUpperCase()}
             </span>
-            <span style={{ color: '#8b8fa4', fontSize: 10, fontFamily: 'var(--font-mono)', whiteSpace: 'nowrap' }}>
+            <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: 10, fontFamily: 'var(--font-mono)', whiteSpace: 'nowrap' }}>
               {t.threat}
             </span>
           </div>
@@ -788,7 +788,7 @@ export default function LandingPage() {
   const locationsRef = useInView(0.2);
 
   return (
-    <div className="relative w-full min-h-screen overflow-x-hidden overflow-y-auto" style={{ background: '#08090c' }}>
+    <div className="relative w-full min-h-screen overflow-x-hidden overflow-y-auto" style={{ background: '#0a0e1a' }}>
       <style dangerouslySetInnerHTML={{ __html: `
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
 
@@ -832,8 +832,8 @@ export default function LandingPage() {
         }
 
         @keyframes borderGlow {
-          0%, 100% { border-color: rgba(15, 245, 196, 0.1); }
-          50% { border-color: rgba(15, 245, 196, 0.3); }
+          0%, 100% { border-color: rgba(0, 212, 255, 0.1); }
+          50% { border-color: rgba(0, 212, 255, 0.3); }
         }
 
         @keyframes gradientShift {
@@ -896,24 +896,24 @@ export default function LandingPage() {
           {/* Logo mark */}
           <div className="relative w-8 h-8">
             <svg viewBox="0 0 32 32" fill="none" className="w-8 h-8">
-              <circle cx="16" cy="16" r="14" stroke="#0ff5c4" strokeWidth="1" opacity="0.3" />
-              <circle cx="16" cy="16" r="8" stroke="#0ff5c4" strokeWidth="1.5" opacity="0.6" />
-              <circle cx="16" cy="16" r="3" fill="#0ff5c4" opacity="0.9" />
-              <line x1="16" y1="2" x2="16" y2="8" stroke="#0ff5c4" strokeWidth="1" opacity="0.4" />
-              <line x1="16" y1="24" x2="16" y2="30" stroke="#0ff5c4" strokeWidth="1" opacity="0.4" />
-              <line x1="2" y1="16" x2="8" y2="16" stroke="#0ff5c4" strokeWidth="1" opacity="0.4" />
-              <line x1="24" y1="16" x2="30" y2="16" stroke="#0ff5c4" strokeWidth="1" opacity="0.4" />
+              <circle cx="16" cy="16" r="14" stroke="#00d4ff" strokeWidth="1" opacity="0.3" />
+              <circle cx="16" cy="16" r="8" stroke="#00d4ff" strokeWidth="1.5" opacity="0.6" />
+              <circle cx="16" cy="16" r="3" fill="#00d4ff" opacity="0.9" />
+              <line x1="16" y1="2" x2="16" y2="8" stroke="#00d4ff" strokeWidth="1" opacity="0.4" />
+              <line x1="16" y1="24" x2="16" y2="30" stroke="#00d4ff" strokeWidth="1" opacity="0.4" />
+              <line x1="2" y1="16" x2="8" y2="16" stroke="#00d4ff" strokeWidth="1" opacity="0.4" />
+              <line x1="24" y1="16" x2="30" y2="16" stroke="#00d4ff" strokeWidth="1" opacity="0.4" />
             </svg>
             <div className="absolute inset-0 rounded-full" style={{
-              background: 'radial-gradient(circle, rgba(15, 245, 196, 0.15) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(0, 212, 255, 0.15) 0%, transparent 70%)',
               animation: 'pulse 3s ease-in-out infinite',
             }} />
           </div>
           <div>
-            <span className="font-display text-sm font-semibold tracking-wide" style={{ color: '#e4e6ef' }}>
+            <span className="font-display text-sm font-semibold tracking-wide" style={{ color: 'rgba(255,255,255,0.92)' }}>
               DEEP
             </span>
-            <span className="font-display text-sm font-light tracking-wide" style={{ color: '#0ff5c4' }}>
+            <span className="font-display text-sm font-light tracking-wide" style={{ color: '#00d4ff' }}>
               {' '}ENVIRONMENT
             </span>
           </div>
@@ -925,9 +925,9 @@ export default function LandingPage() {
               key={item}
               href="#"
               className="font-mono text-xs tracking-widest uppercase transition-colors duration-200"
-              style={{ color: '#555870' }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#e4e6ef')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#555870')}
+              style={{ color: 'rgba(255, 255, 255, 0.4)' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.92)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255, 255, 255, 0.4)')}
             >
               {item}
             </a>
@@ -938,18 +938,18 @@ export default function LandingPage() {
           href="/"
           className="font-mono text-xs tracking-widest uppercase px-5 py-2 rounded transition-all duration-300"
           style={{
-            border: '1px solid rgba(15, 245, 196, 0.3)',
-            color: '#0ff5c4',
-            background: 'rgba(15, 245, 196, 0.05)',
+            border: '1px solid rgba(0, 212, 255, 0.3)',
+            color: '#00d4ff',
+            background: 'rgba(0, 212, 255, 0.05)',
           }}
           onMouseEnter={e => {
-            e.currentTarget.style.background = 'rgba(15, 245, 196, 0.15)';
-            e.currentTarget.style.borderColor = 'rgba(15, 245, 196, 0.6)';
-            e.currentTarget.style.boxShadow = '0 0 20px rgba(15, 245, 196, 0.15)';
+            e.currentTarget.style.background = 'rgba(0, 212, 255, 0.15)';
+            e.currentTarget.style.borderColor = 'rgba(0, 212, 255, 0.6)';
+            e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.15)';
           }}
           onMouseLeave={e => {
-            e.currentTarget.style.background = 'rgba(15, 245, 196, 0.05)';
-            e.currentTarget.style.borderColor = 'rgba(15, 245, 196, 0.3)';
+            e.currentTarget.style.background = 'rgba(0, 212, 255, 0.05)';
+            e.currentTarget.style.borderColor = 'rgba(0, 212, 255, 0.3)';
             e.currentTarget.style.boxShadow = 'none';
           }}
         >
@@ -964,7 +964,7 @@ export default function LandingPage() {
       >
         {/* Radial glow behind hero */}
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] pointer-events-none" style={{
-          background: 'radial-gradient(ellipse at center, rgba(15, 245, 196, 0.06) 0%, rgba(59, 130, 246, 0.03) 40%, transparent 70%)',
+          background: 'radial-gradient(ellipse at center, rgba(0, 212, 255, 0.06) 0%, rgba(59, 130, 246, 0.03) 40%, transparent 70%)',
         }} />
 
         <div className={`flex flex-col items-center text-center max-w-4xl ${heroRef.inView ? 'opacity-100' : 'opacity-0'}`}>
@@ -972,13 +972,13 @@ export default function LandingPage() {
           <div
             className={`flex items-center gap-2 px-4 py-1.5 rounded-full mb-8 ${heroRef.inView ? 'reveal-up' : ''}`}
             style={{
-              border: '1px solid rgba(15, 245, 196, 0.15)',
-              background: 'rgba(15, 245, 196, 0.03)',
+              border: '1px solid rgba(0, 212, 255, 0.15)',
+              background: 'rgba(0, 212, 255, 0.03)',
               opacity: heroRef.inView ? undefined : 0,
             }}
           >
-            <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#0ff5c4', boxShadow: '0 0 8px rgba(15, 245, 196, 0.5)', animation: 'pulse 2s ease-in-out infinite' }} />
-            <span className="font-mono text-[10px] tracking-[0.2em] uppercase" style={{ color: '#0ff5c4' }}>
+            <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#00d4ff', boxShadow: '0 0 8px rgba(0, 212, 255, 0.5)', animation: 'pulse 2s ease-in-out infinite' }} />
+            <span className="font-mono text-[10px] tracking-[0.2em] uppercase" style={{ color: '#00d4ff' }}>
               47 agents monitoring 18 zones globally
             </span>
           </div>
@@ -988,7 +988,7 @@ export default function LandingPage() {
             className={`font-display font-extralight leading-[0.95] mb-6 ${heroRef.inView ? 'reveal-up delay-200' : ''}`}
             style={{
               fontSize: 'clamp(2.5rem, 7vw, 5.5rem)',
-              color: '#e4e6ef',
+              color: 'rgba(255,255,255,0.92)',
               opacity: heroRef.inView ? undefined : 0,
               letterSpacing: '-0.02em',
             }}
@@ -996,7 +996,7 @@ export default function LandingPage() {
             See the planet&apos;s
             <br />
             <span style={{
-              background: 'linear-gradient(135deg, #0ff5c4 0%, #3b82f6 50%, #a78bfa 100%)',
+              background: 'linear-gradient(135deg, #00d4ff 0%, #3b82f6 50%, #a78bfa 100%)',
               backgroundSize: '200% 200%',
               animation: 'gradientShift 6s ease infinite',
               WebkitBackgroundClip: 'text',
@@ -1011,7 +1011,7 @@ export default function LandingPage() {
           <p
             className={`font-mono text-sm leading-relaxed max-w-2xl mb-10 ${heroRef.inView ? 'reveal-up delay-300' : ''}`}
             style={{
-              color: '#8b8fa4',
+              color: 'rgba(255,255,255,0.55)',
               opacity: heroRef.inView ? undefined : 0,
             }}
           >
@@ -1026,16 +1026,16 @@ export default function LandingPage() {
               href="/"
               className="font-mono text-xs tracking-[0.15em] uppercase px-8 py-3.5 rounded transition-all duration-300 relative overflow-hidden group"
               style={{
-                background: 'linear-gradient(135deg, rgba(15, 245, 196, 0.15) 0%, rgba(15, 245, 196, 0.08) 100%)',
-                border: '1px solid rgba(15, 245, 196, 0.4)',
-                color: '#0ff5c4',
+                background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(0, 212, 255, 0.08) 100%)',
+                border: '1px solid rgba(0, 212, 255, 0.4)',
+                color: '#00d4ff',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(15, 245, 196, 0.25) 0%, rgba(15, 245, 196, 0.15) 100%)';
-                e.currentTarget.style.boxShadow = '0 0 30px rgba(15, 245, 196, 0.2), inset 0 1px 0 rgba(15, 245, 196, 0.2)';
+                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(0, 212, 255, 0.25) 0%, rgba(0, 212, 255, 0.15) 100%)';
+                e.currentTarget.style.boxShadow = '0 0 30px rgba(0, 212, 255, 0.2), inset 0 1px 0 rgba(0, 212, 255, 0.2)';
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(15, 245, 196, 0.15) 0%, rgba(15, 245, 196, 0.08) 100%)';
+                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(0, 212, 255, 0.08) 100%)';
                 e.currentTarget.style.boxShadow = 'none';
               }}
             >
@@ -1046,16 +1046,16 @@ export default function LandingPage() {
               className="font-mono text-xs tracking-[0.15em] uppercase px-8 py-3.5 rounded transition-all duration-200"
               style={{
                 border: '1px solid rgba(37, 40, 56, 0.8)',
-                color: '#8b8fa4',
+                color: 'rgba(255,255,255,0.55)',
                 background: 'rgba(24, 26, 34, 0.3)',
               }}
               onMouseEnter={e => {
                 e.currentTarget.style.borderColor = 'rgba(139, 143, 164, 0.3)';
-                e.currentTarget.style.color = '#e4e6ef';
+                e.currentTarget.style.color = 'rgba(255,255,255,0.92)';
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.borderColor = 'rgba(37, 40, 56, 0.8)';
-                e.currentTarget.style.color = '#8b8fa4';
+                e.currentTarget.style.color = 'rgba(255,255,255,0.55)';
               }}
             >
               How it works
@@ -1064,8 +1064,8 @@ export default function LandingPage() {
 
           {/* Scroll indicator */}
           <div className={`mt-16 flex flex-col items-center gap-2 ${heroRef.inView ? 'reveal-up delay-600' : ''}`} style={{ opacity: heroRef.inView ? undefined : 0 }}>
-            <div className="w-px h-8" style={{ background: 'linear-gradient(180deg, rgba(15, 245, 196, 0.4) 0%, transparent 100%)' }} />
-            <span className="font-mono text-[9px] tracking-[0.3em] uppercase" style={{ color: '#555870' }}>Scroll</span>
+            <div className="w-px h-8" style={{ background: 'linear-gradient(180deg, rgba(0, 212, 255, 0.4) 0%, transparent 100%)' }} />
+            <span className="font-mono text-[9px] tracking-[0.3em] uppercase" style={{ color: 'rgba(255, 255, 255, 0.4)' }}>Scroll</span>
           </div>
         </div>
       </section>
@@ -1090,7 +1090,7 @@ export default function LandingPage() {
                 opacity: statsRef.inView ? undefined : 0,
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = 'rgba(15, 245, 196, 0.2)';
+                e.currentTarget.style.borderColor = 'rgba(0, 212, 255, 0.2)';
                 e.currentTarget.style.background = 'rgba(17, 19, 24, 0.8)';
               }}
               onMouseLeave={e => {
@@ -1098,10 +1098,10 @@ export default function LandingPage() {
                 e.currentTarget.style.background = 'rgba(17, 19, 24, 0.6)';
               }}
             >
-              <div className="font-display text-3xl md:text-4xl font-light mb-1" style={{ color: '#0ff5c4' }}>
+              <div className="font-display text-3xl md:text-4xl font-light mb-1" style={{ color: '#00d4ff' }}>
                 {stat.value}<span className="text-lg">{stat.suffix}</span>
               </div>
-              <div className="font-mono text-[10px] tracking-[0.2em] uppercase" style={{ color: '#555870' }}>
+              <div className="font-mono text-[10px] tracking-[0.2em] uppercase" style={{ color: 'rgba(255, 255, 255, 0.4)' }}>
                 {stat.label}
               </div>
             </div>
@@ -1118,10 +1118,10 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           {/* Section header */}
           <div className={`text-center mb-16 ${featuresRef.inView ? 'reveal-up' : ''}`} style={{ opacity: featuresRef.inView ? undefined : 0 }}>
-            <span className="font-mono text-[10px] tracking-[0.3em] uppercase block mb-3" style={{ color: '#0ff5c4' }}>
+            <span className="font-mono text-[10px] tracking-[0.3em] uppercase block mb-3" style={{ color: '#00d4ff' }}>
               Core Technology
             </span>
-            <h2 className="font-display text-3xl md:text-4xl font-extralight" style={{ color: '#e4e6ef', letterSpacing: '-0.01em' }}>
+            <h2 className="font-display text-3xl md:text-4xl font-extralight" style={{ color: 'rgba(255,255,255,0.92)', letterSpacing: '-0.01em' }}>
               Intelligence architecture
             </h2>
           </div>
@@ -1136,30 +1136,30 @@ export default function LandingPage() {
                   onClick={() => setActiveFeature(i)}
                   className={`text-left p-5 rounded-lg transition-all duration-300 ${featuresRef.inView ? 'reveal-left' : ''}`}
                   style={{
-                    background: activeFeature === i ? 'rgba(15, 245, 196, 0.04)' : 'rgba(17, 19, 24, 0.3)',
-                    border: `1px solid ${activeFeature === i ? 'rgba(15, 245, 196, 0.15)' : 'rgba(37, 40, 56, 0.3)'}`,
+                    background: activeFeature === i ? 'rgba(0, 212, 255, 0.04)' : 'rgba(17, 19, 24, 0.3)',
+                    border: `1px solid ${activeFeature === i ? 'rgba(0, 212, 255, 0.15)' : 'rgba(37, 40, 56, 0.3)'}`,
                     animationDelay: `${i * 100 + 200}ms`,
                     opacity: featuresRef.inView ? undefined : 0,
                   }}
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-1.5 h-1.5 rounded-full transition-all duration-300" style={{
-                      background: activeFeature === i ? '#0ff5c4' : '#555870',
-                      boxShadow: activeFeature === i ? '0 0 8px rgba(15, 245, 196, 0.5)' : 'none',
+                      background: activeFeature === i ? '#00d4ff' : 'rgba(255, 255, 255, 0.4)',
+                      boxShadow: activeFeature === i ? '0 0 8px rgba(0, 212, 255, 0.5)' : 'none',
                     }} />
                     <span className="font-mono text-[9px] tracking-[0.2em] uppercase" style={{
-                      color: activeFeature === i ? '#0ff5c4' : '#555870',
+                      color: activeFeature === i ? '#00d4ff' : 'rgba(255, 255, 255, 0.4)',
                     }}>
                       {f.tag}
                     </span>
                   </div>
                   <h3 className="font-display text-lg font-light mb-1 transition-colors duration-300" style={{
-                    color: activeFeature === i ? '#e4e6ef' : '#8b8fa4',
+                    color: activeFeature === i ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.55)',
                   }}>
                     {f.title}
                   </h3>
                   {activeFeature === i && (
-                    <p className="font-mono text-xs leading-relaxed mt-2" style={{ color: '#8b8fa4' }}>
+                    <p className="font-mono text-xs leading-relaxed mt-2" style={{ color: 'rgba(255,255,255,0.55)' }}>
                       {f.desc}
                     </p>
                   )}
@@ -1183,10 +1183,10 @@ export default function LandingPage() {
                   background: 'rgba(17, 19, 24, 0.8)',
                   borderBottom: '1px solid rgba(37, 40, 56, 0.3)',
                 }}>
-                  <div className="w-2 h-2 rounded-full" style={{ background: '#ff3b4f', opacity: 0.6 }} />
-                  <div className="w-2 h-2 rounded-full" style={{ background: '#f5a623', opacity: 0.6 }} />
-                  <div className="w-2 h-2 rounded-full" style={{ background: '#22c55e', opacity: 0.6 }} />
-                  <span className="font-mono text-[9px] tracking-[0.15em] ml-2" style={{ color: '#555870' }}>
+                  <div className="w-2 h-2 rounded-full" style={{ background: '#ff4d6a', opacity: 0.6 }} />
+                  <div className="w-2 h-2 rounded-full" style={{ background: '#ffaa00', opacity: 0.6 }} />
+                  <div className="w-2 h-2 rounded-full" style={{ background: '#00e68a', opacity: 0.6 }} />
+                  <span className="font-mono text-[9px] tracking-[0.15em] ml-2" style={{ color: 'rgba(255, 255, 255, 0.4)' }}>
                     {FEATURES[activeFeature].tag}
                   </span>
                 </div>
@@ -1206,7 +1206,7 @@ export default function LandingPage() {
             <span className="font-mono text-[10px] tracking-[0.3em] uppercase block mb-3" style={{ color: '#3b82f6' }}>
               Pipeline
             </span>
-            <h2 className="font-display text-3xl md:text-4xl font-extralight" style={{ color: '#e4e6ef' }}>
+            <h2 className="font-display text-3xl md:text-4xl font-extralight" style={{ color: 'rgba(255,255,255,0.92)' }}>
               From photo to prediction
             </h2>
           </div>
@@ -1214,7 +1214,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
             {/* Connection line */}
             <div className="hidden md:block absolute top-12 left-[12.5%] right-[12.5%] h-px" style={{
-              background: 'linear-gradient(90deg, rgba(15, 245, 196, 0.3), rgba(59, 130, 246, 0.3), rgba(167, 139, 250, 0.3), rgba(245, 166, 35, 0.3))',
+              background: 'linear-gradient(90deg, rgba(0, 212, 255, 0.3), rgba(59, 130, 246, 0.3), rgba(167, 139, 250, 0.3), rgba(245, 166, 35, 0.3))',
             }} />
 
             {[
@@ -1222,7 +1222,7 @@ export default function LandingPage() {
                 step: '01',
                 title: 'Capture',
                 desc: 'Users snap photos of environmental concerns and upload via Slack. Location, time, and context are automatically tagged.',
-                color: '#0ff5c4',
+                color: '#00d4ff',
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
                     <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -1264,7 +1264,7 @@ export default function LandingPage() {
                 step: '04',
                 title: 'Predict',
                 desc: 'Odyssey.ml generates immersive world models. See what environmental futures look like — and what interventions can change them.',
-                color: '#f5a623',
+                color: '#ffaa00',
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
                     <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
@@ -1277,7 +1277,7 @@ export default function LandingPage() {
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center mb-4 relative z-10"
                   style={{
-                    background: `rgba(${s.color === '#0ff5c4' ? '15,245,196' : s.color === '#3b82f6' ? '59,130,246' : s.color === '#a78bfa' ? '167,139,250' : '245,166,35'}, 0.1)`,
+                    background: `rgba(${s.color === '#00d4ff' ? '0,212,255' : s.color === '#3b82f6' ? '59,130,246' : s.color === '#a78bfa' ? '167,139,250' : '245,166,35'}, 0.1)`,
                     border: `1px solid ${s.color}40`,
                     color: s.color,
                   }}
@@ -1287,10 +1287,10 @@ export default function LandingPage() {
                 <span className="font-mono text-[9px] tracking-[0.2em] uppercase mb-1" style={{ color: s.color }}>
                   Step {s.step}
                 </span>
-                <h3 className="font-display text-lg font-light mb-2" style={{ color: '#e4e6ef' }}>
+                <h3 className="font-display text-lg font-light mb-2" style={{ color: 'rgba(255,255,255,0.92)' }}>
                   {s.title}
                 </h3>
-                <p className="font-mono text-[11px] leading-relaxed" style={{ color: '#8b8fa4' }}>
+                <p className="font-mono text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
                   {s.desc}
                 </p>
               </div>
@@ -1306,10 +1306,10 @@ export default function LandingPage() {
       >
         <div className="max-w-5xl mx-auto">
           <div className={`text-center mb-12 ${locationsRef.inView ? 'reveal-up' : ''}`} style={{ opacity: locationsRef.inView ? undefined : 0 }}>
-            <span className="font-mono text-[10px] tracking-[0.3em] uppercase block mb-3" style={{ color: '#f5a623' }}>
+            <span className="font-mono text-[10px] tracking-[0.3em] uppercase block mb-3" style={{ color: '#ffaa00' }}>
               Live Monitoring
             </span>
-            <h2 className="font-display text-3xl md:text-4xl font-extralight" style={{ color: '#e4e6ef' }}>
+            <h2 className="font-display text-3xl md:text-4xl font-extralight" style={{ color: 'rgba(255,255,255,0.92)' }}>
               Active threat zones
             </h2>
           </div>
@@ -1341,11 +1341,11 @@ export default function LandingPage() {
                     {loc.severity}
                   </span>
                 </div>
-                <h4 className="font-display text-sm font-medium mb-1" style={{ color: '#e4e6ef' }}>
+                <h4 className="font-display text-sm font-medium mb-1" style={{ color: 'rgba(255,255,255,0.92)' }}>
                   {loc.name}
                 </h4>
                 <div className="flex items-center gap-1">
-                  <span className="font-mono text-[10px]" style={{ color: '#555870' }}>
+                  <span className="font-mono text-[10px]" style={{ color: 'rgba(255, 255, 255, 0.4)' }}>
                     {loc.threats} active threats
                   </span>
                 </div>
@@ -1373,32 +1373,32 @@ export default function LandingPage() {
       >
         {/* Glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] pointer-events-none" style={{
-          background: 'radial-gradient(ellipse at center, rgba(15, 245, 196, 0.05) 0%, transparent 60%)',
+          background: 'radial-gradient(ellipse at center, rgba(0, 212, 255, 0.05) 0%, transparent 60%)',
         }} />
 
         <div className={`text-center max-w-2xl mx-auto ${ctaRef.inView ? 'reveal-up' : ''}`} style={{ opacity: ctaRef.inView ? undefined : 0 }}>
-          <h2 className="font-display text-3xl md:text-5xl font-extralight mb-6" style={{ color: '#e4e6ef', letterSpacing: '-0.01em' }}>
+          <h2 className="font-display text-3xl md:text-5xl font-extralight mb-6" style={{ color: 'rgba(255,255,255,0.92)', letterSpacing: '-0.01em' }}>
             The environment can&apos;t wait.
             <br />
-            <span style={{ color: '#0ff5c4', fontWeight: 300 }}>Neither should we.</span>
+            <span style={{ color: '#00d4ff', fontWeight: 300 }}>Neither should we.</span>
           </h2>
-          <p className="font-mono text-sm mb-10" style={{ color: '#8b8fa4' }}>
+          <p className="font-mono text-sm mb-10" style={{ color: 'rgba(255,255,255,0.55)' }}>
             Every photo uploaded makes the model smarter. Every correlation discovered makes predictions more accurate.
           </p>
           <a
             href="/"
             className="inline-block font-mono text-xs tracking-[0.15em] uppercase px-10 py-4 rounded transition-all duration-300"
             style={{
-              background: 'linear-gradient(135deg, rgba(15, 245, 196, 0.2) 0%, rgba(15, 245, 196, 0.08) 100%)',
-              border: '1px solid rgba(15, 245, 196, 0.4)',
-              color: '#0ff5c4',
+              background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(0, 212, 255, 0.08) 100%)',
+              border: '1px solid rgba(0, 212, 255, 0.4)',
+              color: '#00d4ff',
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(15, 245, 196, 0.3) 0%, rgba(15, 245, 196, 0.15) 100%)';
-              e.currentTarget.style.boxShadow = '0 0 40px rgba(15, 245, 196, 0.2)';
+              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(0, 212, 255, 0.3) 0%, rgba(0, 212, 255, 0.15) 100%)';
+              e.currentTarget.style.boxShadow = '0 0 40px rgba(0, 212, 255, 0.2)';
             }}
             onMouseLeave={e => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(15, 245, 196, 0.2) 0%, rgba(15, 245, 196, 0.08) 100%)';
+              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(0, 212, 255, 0.08) 100%)';
               e.currentTarget.style.boxShadow = 'none';
             }}
           >
@@ -1414,8 +1414,8 @@ export default function LandingPage() {
       }}>
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#0ff5c4', boxShadow: '0 0 6px rgba(15, 245, 196, 0.5)', animation: 'pulse 3s ease-in-out infinite' }} />
-            <span className="font-display text-xs tracking-wide" style={{ color: '#555870' }}>
+            <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#00d4ff', boxShadow: '0 0 6px rgba(0, 212, 255, 0.5)', animation: 'pulse 3s ease-in-out infinite' }} />
+            <span className="font-display text-xs tracking-wide" style={{ color: 'rgba(255, 255, 255, 0.4)' }}>
               DEEP ENVIRONMENT
             </span>
           </div>
@@ -1425,15 +1425,15 @@ export default function LandingPage() {
                 key={link}
                 href="#"
                 className="font-mono text-[10px] tracking-[0.15em] uppercase transition-colors duration-200"
-                style={{ color: '#555870' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#8b8fa4')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#555870')}
+                style={{ color: 'rgba(255, 255, 255, 0.4)' }}
+                onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.55)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255, 255, 255, 0.4)')}
               >
                 {link}
               </a>
             ))}
           </div>
-          <span className="font-mono text-[9px] tracking-[0.1em]" style={{ color: '#252838' }}>
+          <span className="font-mono text-[9px] tracking-[0.1em]" style={{ color: '#1e2a42' }}>
             SF HACKS 2026
           </span>
         </div>

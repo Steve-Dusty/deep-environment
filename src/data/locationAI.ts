@@ -1,37 +1,30 @@
 // ============================================================================
-// Location-Aware AI Service
+// Location-Aware AI Service — MiniMax 2.1 on Amazon Bedrock
 // Context-aware AI for location-specific problem graphs
 // ============================================================================
 
 import { type ProblemNode, type LocationGraph, PROBLEM_CATEGORY_LABELS, locationSummaries } from '@/data/locationGraphs';
 
-const OPENAI_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY as string;
-const API_URL = 'https://api.openai.com/v1/chat/completions';
-
 async function chatCompletion(systemPrompt: string, userMessage: string, maxTokens = 500): Promise<string> {
-  if (!OPENAI_KEY) return 'OpenAI API key not configured. Set NEXT_PUBLIC_OPENAI_API_KEY.';
-
-  const res = await fetch(API_URL, {
+  const res = await fetch('/api/ai', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${OPENAI_KEY}` },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userMessage },
-      ],
-      max_tokens: maxTokens,
+      systemPrompt,
+      userMessage,
+      maxTokens,
       temperature: 0.7,
+      action: 'location-query',
     }),
   });
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`OpenAI API error: ${res.status} ${err}`);
+    throw new Error(`Bedrock API error: ${res.status} ${err}`);
   }
 
   const data = await res.json();
-  return data.choices[0]?.message?.content?.trim() || '';
+  return data.content?.trim() || '';
 }
 
 function serializeLocationGraph(locationId: string, graphData: LocationGraph): string {
@@ -65,7 +58,7 @@ export async function queryLocationGraph(
   const graphContext = serializeLocationGraph(locationId, graphData);
   const location = locationSummaries.find((l) => l.id === locationId);
 
-  const systemPrompt = `You are an environmental monitoring AI for Deep Environment.
+  const systemPrompt = `You are an environmental monitoring AI for Deep Environment, powered by MiniMax 2.1 on Amazon Bedrock.
 You are analyzing problems at ${location?.name || locationId}.
 
 ${graphContext}
@@ -105,7 +98,7 @@ export async function analyzeProblem(
       return `${l.label} → ${other?.name || otherId}`;
     });
 
-  const systemPrompt = `You are an environmental monitoring AI analyst for Deep Environment.
+  const systemPrompt = `You are an environmental monitoring AI analyst for Deep Environment, powered by MiniMax 2.1 on Amazon Bedrock.
 Analyzing a problem at ${location?.name || locationId}.
 
 ${graphContext}`;
@@ -145,7 +138,7 @@ export async function generatePlanToFix(
   const graphContext = serializeLocationGraph(locationId, graphData);
   const location = locationSummaries.find((l) => l.id === locationId);
 
-  const systemPrompt = `You are an environmental remediation AI planner for Deep Environment.
+  const systemPrompt = `You are an environmental remediation AI planner for Deep Environment, powered by MiniMax 2.1 on Amazon Bedrock.
 Creating a plan to fix a problem at ${location?.name || locationId}.
 
 ${graphContext}`;

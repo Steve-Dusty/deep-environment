@@ -109,7 +109,7 @@ export default function SidePanel({ pins, selectedId, onSelect }: SidePanelProps
           <div className="px-3 py-2.5 border-b border-[var(--color-border-subtle)]">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
-                <MapPin size={10} className="text-[var(--color-signal-teal)]" />
+                <MapPin size={10} className="text-[var(--color-accent)]" />
                 <span className="text-[10px] tracking-[0.15em] font-semibold" style={{ fontFamily: 'var(--font-sans)' }}>
                   ACTIVE LOCATIONS
                 </span>
@@ -135,7 +135,7 @@ export default function SidePanel({ pins, selectedId, onSelect }: SidePanelProps
               <div className="mx-3 mt-3">
                 <div
                   className="relative w-full h-40 rounded overflow-hidden bg-[var(--color-abyss)]"
-                  style={{ border: `1px solid ${CATEGORY_COLORS[selected.category] || '#8b8fa4'}25` }}
+                  style={{ border: `1px solid ${CATEGORY_COLORS[selected.category] || 'rgba(255,255,255,0.55)'}25` }}
                 >
                   {images.length > 0 ? (
                     <>
@@ -151,13 +151,13 @@ export default function SidePanel({ pins, selectedId, onSelect }: SidePanelProps
                   ) : (
                     <>
                       <div className="absolute inset-0" style={{
-                        background: `linear-gradient(135deg, ${CATEGORY_COLORS[selected.category] || '#8b8fa4'}18, ${CATEGORY_COLORS[selected.category] || '#8b8fa4'}06)`,
+                        background: `linear-gradient(135deg, ${CATEGORY_COLORS[selected.category] || 'rgba(255,255,255,0.55)'}18, ${CATEGORY_COLORS[selected.category] || 'rgba(255,255,255,0.55)'}06)`,
                       }} />
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
-                        <div style={{ color: CATEGORY_COLORS[selected.category] || '#8b8fa4' }}>
+                        <div style={{ color: CATEGORY_COLORS[selected.category] || 'rgba(255,255,255,0.55)' }}>
                           {CATEGORY_ICONS[selected.category] || <Camera size={14} />}
                         </div>
-                        <span className="text-[9px] tracking-[0.15em] font-semibold" style={{ color: CATEGORY_COLORS[selected.category] || '#8b8fa4' }}>
+                        <span className="text-[9px] tracking-[0.15em] font-semibold" style={{ color: CATEGORY_COLORS[selected.category] || 'rgba(255,255,255,0.55)' }}>
                           FIELD CAPTURE
                         </span>
                       </div>
@@ -177,7 +177,7 @@ export default function SidePanel({ pins, selectedId, onSelect }: SidePanelProps
                   </div>
                   {/* Corner brackets */}
                   {['top-2 left-2 border-t border-l', 'top-2 right-2 border-t border-r', 'bottom-2 left-2 border-b border-l', 'bottom-2 right-2 border-b border-r'].map((cls) => (
-                    <div key={cls} className={`absolute w-3 h-3 ${cls}`} style={{ borderColor: `${CATEGORY_COLORS[selected.category] || '#8b8fa4'}40` }} />
+                    <div key={cls} className={`absolute w-3 h-3 ${cls}`} style={{ borderColor: `${CATEGORY_COLORS[selected.category] || 'rgba(255,255,255,0.55)'}40` }} />
                   ))}
                 </div>
 
@@ -190,7 +190,7 @@ export default function SidePanel({ pins, selectedId, onSelect }: SidePanelProps
                         onClick={() => setActiveImageIdx(i)}
                         className={`shrink-0 w-12 h-8 rounded overflow-hidden cursor-pointer transition-all ${
                           i === activeImageIdx
-                            ? 'ring-1 ring-[var(--color-signal-teal)] opacity-100'
+                            ? 'ring-1 ring-[var(--color-accent)] opacity-100'
                             : 'opacity-50 hover:opacity-80'
                         }`}
                       >
@@ -224,11 +224,11 @@ export default function SidePanel({ pins, selectedId, onSelect }: SidePanelProps
               {/* AI Analysis */}
               <div className="px-3 pb-3 border-t border-[var(--color-border-subtle)] pt-2.5">
                 <div className="flex items-center gap-1.5 mb-2">
-                  <Shield size={9} className="text-[var(--color-signal-teal)]" />
+                  <Shield size={9} className="text-[var(--color-accent)]" />
                   <span className="text-[9px] tracking-[0.12em] font-semibold" style={{ fontFamily: 'var(--font-sans)' }}>
                     AI ANALYSIS
                   </span>
-                  <span className="text-[8px] text-[var(--color-signal-teal)] ml-auto tabular-nums">
+                  <span className="text-[8px] text-[var(--color-accent)] ml-auto tabular-nums">
                     {selected.confidence}% CONF
                   </span>
                 </div>
@@ -238,7 +238,7 @@ export default function SidePanel({ pins, selectedId, onSelect }: SidePanelProps
                 <div className="space-y-1.5">
                   {selected.analysisDetails.map((detail, i) => (
                     <div key={i} className="flex items-start gap-1.5">
-                      <div className="w-1 h-1 rounded-full bg-[var(--color-signal-teal-dim)] mt-1 shrink-0" />
+                      <div className="w-1 h-1 rounded-full bg-[var(--color-accent-dim)] mt-1 shrink-0" />
                       <span className="text-[8px] text-[var(--color-text-muted)] leading-relaxed">{detail}</span>
                     </div>
                   ))}
@@ -277,7 +277,7 @@ export default function SidePanel({ pins, selectedId, onSelect }: SidePanelProps
               {correlatedPins.length > 0 && (
                 <div className="px-3 pb-3 border-t border-[var(--color-border-subtle)] pt-2.5">
                   <div className="flex items-center gap-1.5 mb-2">
-                    <Link size={9} className="text-[var(--color-signal-teal-dim)]" />
+                    <Link size={9} className="text-[var(--color-accent-dim)]" />
                     <span className="text-[9px] tracking-[0.12em] font-semibold" style={{ fontFamily: 'var(--font-sans)' }}>
                       CORRELATED REPORTS
                     </span>
@@ -304,7 +304,7 @@ export default function SidePanel({ pins, selectedId, onSelect }: SidePanelProps
               {/* Footer */}
               <div className="px-3 py-2.5 border-t border-[var(--color-border-subtle)] flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
-                  <Bot size={9} className="text-[var(--color-signal-teal-dim)]" />
+                  <Bot size={9} className="text-[var(--color-accent-dim)]" />
                   <span className="text-[8px] text-[var(--color-text-muted)] tracking-wider">{selected.agentsActive} AGENTS</span>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -322,7 +322,7 @@ export default function SidePanel({ pins, selectedId, onSelect }: SidePanelProps
             <div className="flex-1 overflow-y-auto">
               {pins.map((pin) => {
                 const color = THREAT_COLORS[pin.severity];
-                const catColor = CATEGORY_COLORS[pin.category] || '#8b8fa4';
+                const catColor = CATEGORY_COLORS[pin.category] || 'rgba(255,255,255,0.55)';
                 return (
                   <button
                     key={pin.id}

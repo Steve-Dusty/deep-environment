@@ -15,7 +15,7 @@ interface VoiceIndicatorProps {
 export default function VoiceIndicator({ state, enabled, onToggle, transcript, fullTranscript }: VoiceIndicatorProps) {
   const stateConfig: Record<VoiceState, { color: string; label: string }> = {
     idle: { color: 'var(--color-text-muted)', label: 'VOICE' },
-    listening: { color: 'var(--color-signal-teal)', label: 'LISTENING' },
+    listening: { color: 'var(--color-accent)', label: 'LISTENING' },
     processing: { color: 'var(--color-signal-amber)', label: 'PROCESSING' },
     speaking: { color: 'var(--color-signal-blue)', label: 'SPEAKING' },
   };
@@ -28,7 +28,7 @@ export default function VoiceIndicator({ state, enabled, onToggle, transcript, f
       {enabled && (
         <div
           className="glass-panel rounded px-3 py-2 max-w-[300px]"
-          style={{ borderColor: 'var(--color-signal-teal)' }}
+          style={{ borderColor: 'var(--color-accent)' }}
         >
           <div className="text-[8px] tracking-wider text-[var(--color-text-muted)] mb-1">
             HEARING: (Mic Active)

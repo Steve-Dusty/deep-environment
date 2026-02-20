@@ -118,8 +118,8 @@ function getPhotoStyle(pin: PinReport): React.CSSProperties {
   const palettes: Record<string, [string, string, string, string]> = {
     Water:   ['#041824', '#0a3a4a', '#064e5c', '#06b6d4'],
     Air:     ['#140d28', '#2a1a46', '#3d2a6e', '#a78bfa'],
-    Soil:    ['#1a1005', '#30200a', '#4a3015', '#f5a623'],
-    Bio:     ['#061408', '#0e2810', '#143a1a', '#22c55e'],
+    Soil:    ['#1a1005', '#30200a', '#4a3015', '#ffaa00'],
+    Bio:     ['#061408', '#0e2810', '#143a1a', '#00e68a'],
     Climate: ['#0a1228', '#152040', '#1e3058', '#3b82f6'],
   };
   const c = palettes[pin.category] || palettes.Water;
@@ -277,19 +277,19 @@ export default function LeftSidebar({
                 onClick={() => onViewChange(active ? null : item.id)}
                 className={`relative w-9 h-9 rounded flex items-center justify-center cursor-pointer transition-all duration-200 ${
                   active
-                    ? 'bg-[rgba(15,245,196,0.1)] text-[var(--color-signal-teal)]'
+                    ? 'bg-[rgba(0,212,255,0.1)] text-[var(--color-accent)]'
                     : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[rgba(255,255,255,0.03)]'
                 }`}
                 title={item.label}
               >
                 {item.icon}
                 {item.badge != null && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-3.5 rounded-full bg-[var(--color-signal-teal)] text-[7px] font-bold text-[var(--color-void)] flex items-center justify-center px-0.5">
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-3.5 rounded-full bg-[var(--color-accent)] text-[7px] font-bold text-[var(--color-void)] flex items-center justify-center px-0.5">
                     {item.badge}
                   </span>
                 )}
                 {active && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-px w-[3px] h-4 rounded-r bg-[var(--color-signal-teal)]" />
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-px w-[3px] h-4 rounded-r bg-[var(--color-accent)]" />
                 )}
               </button>
             );
@@ -300,7 +300,7 @@ export default function LeftSidebar({
           {/* AI Chatbot — opens full page */}
           <button
             onClick={() => onShowChat?.()}
-            className="relative w-9 h-9 rounded flex items-center justify-center cursor-pointer transition-all duration-200 text-[var(--color-text-muted)] hover:text-[var(--color-signal-teal)] hover:bg-[rgba(15,245,196,0.08)]"
+            className="relative w-9 h-9 rounded flex items-center justify-center cursor-pointer transition-all duration-200 text-[var(--color-text-muted)] hover:text-[var(--color-accent)] hover:bg-[rgba(0,212,255,0.08)]"
             title="AI Assistant"
           >
             <Bot size={18} />
@@ -317,7 +317,7 @@ export default function LeftSidebar({
           {/* Knowledge Graph */}
           <button
             onClick={onShowGraph}
-            className="w-9 h-9 rounded flex items-center justify-center text-[var(--color-signal-teal)] hover:bg-[rgba(15,245,196,0.1)] cursor-pointer transition-all"
+            className="w-9 h-9 rounded flex items-center justify-center text-[var(--color-accent)] hover:bg-[rgba(0,212,255,0.1)] cursor-pointer transition-all"
             title="Knowledge Graph"
           >
             <Network size={18} />
@@ -334,7 +334,7 @@ export default function LeftSidebar({
                 <div className="px-3 py-2.5 border-b border-[var(--color-border-subtle)]">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-1.5">
-                      <Camera size={10} className="text-[var(--color-signal-teal)]" />
+                      <Camera size={10} className="text-[var(--color-accent)]" />
                       <span
                         className="text-[10px] tracking-[0.15em] font-semibold"
                         style={{ fontFamily: 'var(--font-sans)' }}
@@ -355,7 +355,7 @@ export default function LeftSidebar({
                         onClick={() => setCategoryFilter(cat)}
                         className={`text-[8px] tracking-wider px-2 py-1 rounded-full whitespace-nowrap cursor-pointer transition-all ${
                           categoryFilter === cat
-                            ? 'text-[var(--color-signal-teal)] bg-[rgba(15,245,196,0.1)] border border-[rgba(15,245,196,0.2)]'
+                            ? 'text-[var(--color-accent)] bg-[rgba(0,212,255,0.1)] border border-[rgba(0,212,255,0.2)]'
                             : 'text-[var(--color-text-muted)] border border-[var(--color-border-subtle)] hover:border-[var(--color-border)] hover:text-[var(--color-text-secondary)]'
                         }`}
                       >
@@ -367,14 +367,14 @@ export default function LeftSidebar({
                   {/* severity chips */}
                   <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide mt-1">
                     {(['all', 'critical', 'high', 'elevated', 'moderate', 'low'] as const).map((sev) => {
-                      const sevColor = sev === 'all' ? 'var(--color-signal-teal)' : THREAT_COLORS[sev as ThreatLevel] || 'var(--color-text-muted)';
+                      const sevColor = sev === 'all' ? 'var(--color-accent)' : THREAT_COLORS[sev as ThreatLevel] || 'var(--color-text-muted)';
                       return (
                         <button
                           key={sev}
                           onClick={() => setSeverityFilter(sev)}
                           className={`text-[8px] tracking-wider px-2 py-1 rounded-full whitespace-nowrap cursor-pointer transition-all ${
                             severityFilter === sev
-                              ? 'bg-[rgba(15,245,196,0.1)] border'
+                              ? 'bg-[rgba(0,212,255,0.1)] border'
                               : 'text-[var(--color-text-muted)] border border-[var(--color-border-subtle)] hover:border-[var(--color-border)] hover:text-[var(--color-text-secondary)]'
                           }`}
                           style={severityFilter === sev ? { color: sevColor, borderColor: `${sevColor}33` } : undefined}
@@ -390,7 +390,7 @@ export default function LeftSidebar({
                 <div className="flex-1 overflow-y-auto">
                   {filteredPins.map((pin) => {
                     const selected = pin.id === selectedId;
-                    const catColor = CATEGORY_COLORS[pin.category] || '#8b8fa4';
+                    const catColor = CATEGORY_COLORS[pin.category] || 'rgba(255,255,255,0.55)';
                     const threatColor = THREAT_COLORS[pin.severity];
 
                     return (
@@ -398,7 +398,7 @@ export default function LeftSidebar({
                         key={pin.id}
                         onClick={() => onSelect(pin.id)}
                         className={`w-full text-left p-2.5 border-b border-[var(--color-border-subtle)] transition-all cursor-pointer group ${
-                          selected ? 'bg-[rgba(15,245,196,0.04)]' : 'hover:bg-[rgba(255,255,255,0.02)]'
+                          selected ? 'bg-[rgba(0,212,255,0.04)]' : 'hover:bg-[rgba(255,255,255,0.02)]'
                         }`}
                       >
                         {/* photo area */}
@@ -464,11 +464,11 @@ export default function LeftSidebar({
                           {selected && (
                             <div
                               className="absolute inset-0 rounded"
-                              style={{ border: '2px solid var(--color-signal-teal)' }}
+                              style={{ border: '2px solid var(--color-accent)' }}
                             >
                               <div className="absolute top-2 left-2 flex items-center gap-1">
-                                <Eye size={8} className="text-[var(--color-signal-teal)]" />
-                                <span className="text-[7px] text-[var(--color-signal-teal)] tracking-wider font-semibold">
+                                <Eye size={8} className="text-[var(--color-accent)]" />
+                                <span className="text-[7px] text-[var(--color-accent)] tracking-wider font-semibold">
                                   ACTIVE
                                 </span>
                               </div>
@@ -526,7 +526,7 @@ export default function LeftSidebar({
                 <div className="px-3 py-2.5 border-b border-[var(--color-border-subtle)]">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <MessageSquare size={10} className="text-[var(--color-signal-teal)]" />
+                      <MessageSquare size={10} className="text-[var(--color-accent)]" />
                       <span
                         className="text-[10px] tracking-[0.15em] font-semibold"
                         style={{ fontFamily: 'var(--font-sans)' }}
@@ -540,7 +540,7 @@ export default function LeftSidebar({
                       </span>
                       <button
                         onClick={() => { setSlackLoading(true); fetchSlackUploads().finally(() => setSlackLoading(false)); }}
-                        className="w-5 h-5 rounded flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-signal-teal)] hover:bg-[rgba(15,245,196,0.1)] cursor-pointer transition-all"
+                        className="w-5 h-5 rounded flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-accent)] hover:bg-[rgba(0,212,255,0.1)] cursor-pointer transition-all"
                         title="Refresh"
                       >
                         <RefreshCw size={9} className={slackLoading ? 'animate-spin' : ''} />
@@ -548,7 +548,7 @@ export default function LeftSidebar({
                     </div>
                   </div>
                   <div className="mt-1.5 flex items-center gap-1.5">
-                    <div className="w-1 h-1 rounded-full bg-[var(--color-signal-teal)] data-live" />
+                    <div className="w-1 h-1 rounded-full bg-[var(--color-accent)] data-live" />
                     <span className="text-[8px] text-[var(--color-text-muted)] tracking-wider">
                       AUTO-SYNC EVERY 5s
                     </span>
@@ -598,7 +598,7 @@ export default function LeftSidebar({
                               <div
                                 key={cls}
                                 className={`absolute w-2.5 h-2.5 ${cls}`}
-                                style={{ borderColor: 'rgba(15,245,196,0.3)' }}
+                                style={{ borderColor: 'rgba(0,212,255,0.3)' }}
                               />
                             ))}
                             {/* NEW badge */}
@@ -607,9 +607,9 @@ export default function LeftSidebar({
                                 <span
                                   className="text-[7px] tracking-widest font-bold px-1.5 py-0.5 rounded"
                                   style={{
-                                    color: '#0ff5c4',
+                                    color: '#00d4ff',
                                     backgroundColor: 'rgba(0,0,0,0.55)',
-                                    border: '1px solid rgba(15,245,196,0.4)',
+                                    border: '1px solid rgba(0,212,255,0.4)',
                                   }}
                                 >
                                   NEW
@@ -677,7 +677,7 @@ export default function LeftSidebar({
                 <div className="p-3 border-t border-[var(--color-border-subtle)]">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-signal-teal)] data-live" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] data-live" />
                       <span className="text-[8px] text-[var(--color-text-muted)] tracking-wider">
                         COMPOSIO + SLACK
                       </span>
@@ -696,7 +696,7 @@ export default function LeftSidebar({
                 {/* header */}
                 <div className="px-3 py-2.5 border-b border-[var(--color-border-subtle)]">
                   <div className="flex items-center gap-1.5">
-                    <Palette size={10} className="text-[var(--color-signal-teal)]" />
+                    <Palette size={10} className="text-[var(--color-accent)]" />
                     <span
                       className="text-[10px] tracking-[0.15em] font-semibold"
                       style={{ fontFamily: 'var(--font-sans)' }}
@@ -718,16 +718,16 @@ export default function LeftSidebar({
                       onChange={(e) => setPosterTopic(e.target.value)}
                       onKeyDown={(e) => { if (e.key === 'Enter') generatePosters(); }}
                       placeholder="Enter environmental topic..."
-                      className="flex-1 text-[9px] px-2 py-1.5 rounded bg-[var(--color-abyss)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] outline-none focus:border-[var(--color-signal-teal)] transition-colors"
+                      className="flex-1 text-[9px] px-2 py-1.5 rounded bg-[var(--color-abyss)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] outline-none focus:border-[var(--color-accent)] transition-colors"
                     />
                     <button
                       onClick={generatePosters}
                       disabled={posterLoading || !posterTopic.trim()}
                       className="px-2.5 py-1.5 rounded text-[8px] tracking-wider font-semibold cursor-pointer transition-all hover:brightness-110 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
                       style={{
-                        background: 'linear-gradient(135deg, rgba(15,245,196,0.2), rgba(15,245,196,0.08))',
-                        border: '1px solid rgba(15,245,196,0.3)',
-                        color: 'var(--color-signal-teal)',
+                        background: 'linear-gradient(135deg, rgba(0,212,255,0.2), rgba(0,212,255,0.08))',
+                        border: '1px solid rgba(0,212,255,0.3)',
+                        color: 'var(--color-accent)',
                       }}
                     >
                       {posterLoading ? <Loader2 size={10} className="animate-spin" /> : 'GENERATE'}
@@ -739,7 +739,7 @@ export default function LeftSidebar({
                         className="h-full rounded-full transition-all duration-300"
                         style={{
                           width: `${posterProgress}%`,
-                          background: 'linear-gradient(90deg, var(--color-signal-teal), #3b82f6)',
+                          background: 'linear-gradient(90deg, var(--color-accent), #3b82f6)',
                         }}
                       />
                     </div>
@@ -806,13 +806,13 @@ export default function LeftSidebar({
                 <div className="p-3 border-t border-[var(--color-border-subtle)]">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-signal-teal)] data-live" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] data-live" />
                       <span className="text-[8px] text-[var(--color-text-muted)] tracking-wider">
                         NANO BANANA PRO
                       </span>
                     </div>
                     <span className="text-[8px] text-[var(--color-text-muted)]">
-                      Gemini 3 Pro Image
+                      MiniMax 2.1 on Bedrock
                     </span>
                   </div>
                 </div>
@@ -828,7 +828,7 @@ export default function LeftSidebar({
                 <div className="px-3 py-2.5 border-b border-[var(--color-border-subtle)]">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <Compass size={10} className="text-[var(--color-signal-teal)]" />
+                      <Compass size={10} className="text-[var(--color-accent)]" />
                       <span
                         className="text-[10px] tracking-[0.15em] font-semibold"
                         style={{ fontFamily: 'var(--font-sans)' }}
@@ -836,8 +836,8 @@ export default function LeftSidebar({
                         ODYSSEY
                       </span>
                     </div>
-                    <span className="text-[9px] text-[var(--color-signal-teal)] flex items-center gap-1">
-                      <span className="w-1 h-1 rounded-full bg-[var(--color-signal-teal)] data-live inline-block" />
+                    <span className="text-[9px] text-[var(--color-accent)] flex items-center gap-1">
+                      <span className="w-1 h-1 rounded-full bg-[var(--color-accent)] data-live inline-block" />
                       ONLINE
                     </span>
                   </div>
@@ -849,10 +849,10 @@ export default function LeftSidebar({
                     className="absolute inset-0 odyssey-gradient"
                     style={{
                       background: `
-                        radial-gradient(ellipse at 30% 50%, rgba(15,245,196,0.15) 0%, transparent 50%),
+                        radial-gradient(ellipse at 30% 50%, rgba(0,212,255,0.15) 0%, transparent 50%),
                         radial-gradient(ellipse at 70% 30%, rgba(59,130,246,0.12) 0%, transparent 50%),
                         radial-gradient(ellipse at 50% 80%, rgba(167,139,250,0.1) 0%, transparent 50%),
-                        linear-gradient(135deg, #0a0e14, #111520, #0a0e14)
+                        linear-gradient(135deg, #0a0e1a, #111520, #0a0e1a)
                       `,
                     }}
                   />
@@ -864,8 +864,8 @@ export default function LeftSidebar({
                       className="absolute inset-x-0 bottom-0 h-[120%]"
                       style={{
                         backgroundImage: `
-                          linear-gradient(rgba(15,245,196,0.05) 1px, transparent 1px),
-                          linear-gradient(90deg, rgba(15,245,196,0.05) 1px, transparent 1px)
+                          linear-gradient(rgba(0,212,255,0.05) 1px, transparent 1px),
+                          linear-gradient(90deg, rgba(0,212,255,0.05) 1px, transparent 1px)
                         `,
                         backgroundSize: '28px 28px',
                         transform: 'perspective(200px) rotateX(40deg)',
@@ -876,18 +876,18 @@ export default function LeftSidebar({
                   {/* viewfinder */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="relative">
-                      <div className="w-16 h-16 rounded-full border border-[rgba(15,245,196,0.25)] flex items-center justify-center">
-                        <div className="w-10 h-10 rounded-full border border-[rgba(15,245,196,0.15)] flex items-center justify-center">
-                          <Compass size={20} className="text-[var(--color-signal-teal)] spin-slow" />
+                      <div className="w-16 h-16 rounded-full border border-[rgba(0,212,255,0.25)] flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full border border-[rgba(0,212,255,0.15)] flex items-center justify-center">
+                          <Compass size={20} className="text-[var(--color-accent)] spin-slow" />
                         </div>
                       </div>
-                      <div className="absolute top-1/2 -left-4 -right-4 h-px bg-[rgba(15,245,196,0.12)]" />
-                      <div className="absolute -top-4 -bottom-4 left-1/2 w-px bg-[rgba(15,245,196,0.12)]" />
+                      <div className="absolute top-1/2 -left-4 -right-4 h-px bg-[rgba(0,212,255,0.12)]" />
+                      <div className="absolute -top-4 -bottom-4 left-1/2 w-px bg-[rgba(0,212,255,0.12)]" />
                     </div>
                   </div>
                   <div className="absolute bottom-3 left-0 right-0 text-center">
                     <span
-                      className="text-[8px] tracking-[0.25em] text-[rgba(15,245,196,0.7)]"
+                      className="text-[8px] tracking-[0.25em] text-[rgba(0,212,255,0.7)]"
                       style={{ fontFamily: 'var(--font-sans)' }}
                     >
                       WORLD MODEL VISUALIZATION
@@ -898,8 +898,8 @@ export default function LeftSidebar({
                 {/* description */}
                 <div className="px-3 py-3">
                   <p className="text-[9px] text-[var(--color-text-secondary)] leading-relaxed">
-                    Step into AI-predicted environmental futures. Odyssey uses Gemini-powered multi-agent
-                    world models to simulate and visualize change trajectories across
+                    Step into AI-predicted environmental futures. Odyssey uses MiniMax-powered multi-agent
+                    world models on Amazon Bedrock to simulate and visualize change trajectories across
                     monitored locations.
                   </p>
                 </div>
@@ -942,7 +942,7 @@ export default function LeftSidebar({
                   {pins
                     .filter((p) => p.severity === 'critical' || p.severity === 'high')
                     .map((pin) => {
-                      const catColor = CATEGORY_COLORS[pin.category] || '#8b8fa4';
+                      const catColor = CATEGORY_COLORS[pin.category] || 'rgba(255,255,255,0.55)';
                       const threatColor = THREAT_COLORS[pin.severity];
                       return (
                         <button
@@ -983,14 +983,14 @@ export default function LeftSidebar({
                                 >
                                   {pin.category}
                                 </span>
-                                <span className="text-[7px] text-[var(--color-signal-teal)] flex items-center gap-0.5">
+                                <span className="text-[7px] text-[var(--color-accent)] flex items-center gap-0.5">
                                   <Sparkles size={7} /> {pin.confidence}%
                                 </span>
                               </div>
                             </div>
                             <ArrowRight
                               size={10}
-                              className="text-[var(--color-text-muted)] group-hover:text-[var(--color-signal-teal)] transition-colors shrink-0 mt-1"
+                              className="text-[var(--color-text-muted)] group-hover:text-[var(--color-accent)] transition-colors shrink-0 mt-1"
                             />
                           </div>
                         </button>
@@ -1011,13 +1011,13 @@ export default function LeftSidebar({
                     }}
                     className="w-full py-2.5 rounded flex items-center justify-center gap-2 cursor-pointer transition-all hover:brightness-110 active:scale-[0.98]"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(15,245,196,0.15), rgba(15,245,196,0.06))',
-                      border: '1px solid rgba(15,245,196,0.3)',
+                      background: 'linear-gradient(135deg, rgba(0,212,255,0.15), rgba(0,212,255,0.06))',
+                      border: '1px solid rgba(0,212,255,0.3)',
                     }}
                   >
-                    <Eye size={12} className="text-[var(--color-signal-teal)]" />
+                    <Eye size={12} className="text-[var(--color-accent)]" />
                     <span
-                      className="text-[10px] tracking-[0.15em] font-semibold text-[var(--color-signal-teal)]"
+                      className="text-[10px] tracking-[0.15em] font-semibold text-[var(--color-accent)]"
                       style={{ fontFamily: 'var(--font-sans)' }}
                     >
                       ENTER ODYSSEY
